@@ -1275,6 +1275,780 @@
     tipografar(corpo);
   };
 
+
+  /* =================================================================
+     9. Caminhante aleatório: a binomial e seu limite gaussiano
+     Simula muitos caminhantes e compara o histograma com a binomial
+     exata e com a gaussiana de Stirling. Mostra também que a largura
+     cresce como raiz de N, e não como N.
+     ================================================================= */
+  REGISTRO.caminhante = function (raiz) {
+    var corpo = moldura(raiz, 'O caminhante aleatório e o alargamento como raiz de N');
+
+    var est = { N: 40, p: 0.5, nc: 2000, vista: 'hist' };
+    var hist = {}, feitos = 0;
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+
+    opcoes(ctr, [
+      { rot: 'Distribuição de chegada', v: 'hist' },
+      { rot: 'Trajetórias', v: 'traj' }
+    ], 0, function (v) { est.vista = v; desenhar(); });
+
+    deslizante(ctr, 'passos \\(N\\)', 4, 400, 2, 40,
+      function (v) { est.N = v; simular(); });
+    deslizante(ctr, 'probabilidade \\(p\\) de ir à direita', 0.05, 0.95, 0.05, 0.5,
+      function (v) { est.p = v; simular(); },
+      function (v) { return v.toFixed(2).replace('.', ','); });
+    deslizante(ctr, 'caminhantes', 100, 20000, 100, 2000,
+      function (v) { est.nc = v; simular(); });
+
+    var mostrar = cartoes(corpo, [
+      { rot: '⟨m⟩ medido', k: 'mm' }, { rot: '(p−q)N previsto', k: 'mt' },
+      { rot: 'σ medido', k: 'sm' }, { rot: '2√(Npq) previsto', k: 'st' },
+      { rot: 'σ/N', k: 'rel' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    var trajs = [];
+
+    function simular() {
+      hist = {}; feitos = 0; trajs = [];
+      var N = est.N, p = est.p;
+      for (var c = 0; c < est.nc; c++) {
+        var m = 0, caminho = (c < 12) ? [0] : null;
+        for (var i = 0; i < N; i++) {
+          m += (Math.random() < p) ? 1 : -1;
+          if (caminho) caminho.push(m);
+        }
+        hist[m] = (hist[m] || 0) + 1;
+        feitos++;
+        if (caminho) trajs.push(caminho);
+      }
+      desenhar();
+    }
+
+    /* binomial exata em termos do deslocamento m = 2n1 - N */
+    function pExata(m, N, p) {
+      if ((N + m) % 2 !== 0) return 0;
+      var n1 = (N + m) / 2;
+      if (n1 < 0 || n1 > N) return 0;
+      return F.pBinomial(N, n1, p);
+    }
+
+    function desenhar() {
+      var N = est.N, p = est.p, q = 1 - p;
+      var mT = (p - q) * N, sT = 2 * Math.sqrt(N * p * q);
+
+      if (est.vista === 'traj') {
+        var lim = Math.max(6, Math.abs(mT) + 3.2 * sT);
+        var ax = G.eixos(cv, {
+          xmin: 0, xmax: N, ymin: -lim, ymax: lim, altura: 320,
+          rotX: 'número de passos', rotY: 'posição m',
+          marcasX: G.marcasLineares(0, N, 5, 0),
+          formataY: function (v) { return String(Math.round(v)); }
+        });
+        // envelope de mais e menos um desvio padrão, que cresce como raiz do passo
+        ax.ct.save();
+        ax.ct.strokeStyle = G.COR.vinho;
+        ax.ct.setLineDash([5, 4]);
+        ax.ct.lineWidth = 1.6;
+        [1, -1].forEach(function (sig) {
+          ax.ct.beginPath();
+          for (var k = 0; k <= 200; k++) {
+            var n = N * k / 200;
+            var y = (p - q) * n + sig * 2 * Math.sqrt(n * p * q);
+            if (k) ax.ct.lineTo(ax.X(n), ax.Y(y)); else ax.ct.moveTo(ax.X(n), ax.Y(y));
+          }
+          ax.ct.stroke();
+        });
+        ax.ct.restore();
+
+        ax.ct.save();
+        ax.ct.strokeStyle = G.COR.azulClaro;
+        ax.ct.lineWidth = 1.2;
+        ax.ct.globalAlpha = 0.85;
+        trajs.forEach(function (t) {
+          ax.ct.beginPath();
+          t.forEach(function (y, i) {
+            if (i) ax.ct.lineTo(ax.X(i), ax.Y(y)); else ax.ct.moveTo(ax.X(i), ax.Y(y));
+          });
+          ax.ct.stroke();
+        });
+        ax.ct.restore();
+        G.legenda(ax, [
+          { cor: G.COR.azulClaro, texto: 'doze caminhantes' },
+          { cor: G.COR.vinho, texto: '\u27e8m\u27e9 \u00b1 \u03c3, com \u03c3 \u221d \u221an' }
+        ]);
+      } else {
+        var lim2 = Math.max(4, Math.abs(mT) + 4 * sT);
+        var topo = 0;
+        Object.keys(hist).forEach(function (k) {
+          topo = Math.max(topo, hist[k] / feitos);
+        });
+        for (var mm = -N; mm <= N; mm++) topo = Math.max(topo, pExata(mm, N, p));
+
+        var ax2 = G.eixos(cv, {
+          xmin: -lim2, xmax: lim2, ymin: 0, ymax: topo * 1.15, altura: 320,
+          rotX: 'posição final m', rotY: 'probabilidade',
+          marcasX: G.marcasLineares(-lim2, lim2, 6, 0),
+          formataY: function (v) { return v.toFixed(3).replace('.', ','); }
+        });
+
+        var barras = [];
+        Object.keys(hist).forEach(function (k) {
+          barras.push({ x: Number(k), y: hist[k] / feitos });
+        });
+        G.barras(ax2, barras, G.COR.azulClaro, 1.6);
+
+        // binomial exata: só existe nos m de mesma paridade que N
+        ax2.ct.save();
+        ax2.ct.fillStyle = G.COR.azul;
+        for (var m2 = -N; m2 <= N; m2 += 2) {
+          var pe = pExata(m2, N, p);
+          if (pe > 0 && m2 >= -lim2 && m2 <= lim2) {
+            ax2.ct.beginPath();
+            ax2.ct.arc(ax2.X(m2), ax2.Y(pe), 2.4, 0, 2 * Math.PI);
+            ax2.ct.fill();
+          }
+        }
+        ax2.ct.restore();
+
+        // gaussiana de Stirling: como só metade dos m é acessível, a
+        // densidade por valor de m vale o dobro do espaçamento
+        G.curva(ax2, function (x) {
+          return 2 * F.dNormal(x, mT, sT);
+        }, G.COR.vinho, 2);
+
+        G.vertical(ax2, mT, G.COR.tinta, '\u27e8m\u27e9');
+        G.legenda(ax2, [
+          { cor: G.COR.azulClaro, texto: 'simulação' },
+          { cor: G.COR.azul, texto: 'binomial exata' },
+          { cor: G.COR.vinho, texto: 'gaussiana de Stirling' }
+        ]);
+      }
+
+      var som = 0, som2 = 0;
+      Object.keys(hist).forEach(function (k) {
+        var v = Number(k), c = hist[k];
+        som += v * c; som2 += v * v * c;
+      });
+      var md = feitos ? som / feitos : 0;
+      var sd = feitos ? Math.sqrt(Math.max(0, som2 / feitos - md * md)) : 0;
+
+      mostrar({
+        mm: F.fmt(md, 3), mt: F.fmt(mT, 3),
+        sm: F.fmt(sd, 3), st: F.fmt(sT, 3),
+        rel: F.fmt(sT / N, 4)
+      });
+
+      nota.innerHTML = 'Com \\(N=' + N + '\\) passos, o caminhante se afasta tipicamente '
+        + F.fmt(sT, 2) + ' posições da média, e não ' + N + '. O que cresce com \\(N\\) é o '
+        + 'caminho percorrido; o que cresce com \\(\\sqrt{N}\\) é o <b>deslocamento</b>. '
+        + 'A razão \\(\\sigma/N=' + F.fmt(sT / N, 4) + '\\) encolhe conforme \\(N\\) aumenta: '
+        + 'em escala relativa, o caminhante fica cada vez mais previsível. '
+        + 'Essa é a mesma raiz de \\(N\\) que governa a difusão, o ruído de contagem e a '
+        + 'nitidez das grandezas termodinâmicas.';
+      tipografar(nota);
+    }
+
+    simular();
+    registrarRedesenho(desenhar);
+    tipografar(corpo);
+  };
+
+  /* =================================================================
+     10. Os três sistemas resolvidos no ensemble microcanônico
+     Dois níveis, sólido de Einstein e paramagneto ideal, lado a lado.
+     Tudo sai de S = kB ln Omega e de 1/T = ds/du, sem nenhum postulado
+     adicional.
+     ================================================================= */
+  REGISTRO.microcanonico = function (raiz) {
+    var corpo = moldura(raiz, 'Três sistemas resolvidos por contagem de microestados');
+
+    /* Todas as grandezas em unidades da escala de energia do próprio
+       sistema: x = u/epsilon para dois níveis, y = u/hbar.omega para o
+       sólido de Einstein, w = u/(mu.B) para o paramagneto.
+       Temperatura em unidades de epsilon/kB. */
+    var MOD = {
+      dois: {
+        rot: 'Sistema de dois níveis',
+        esc: '\\(\\epsilon\\)',
+        /* s(u)/kB com x entre 0 e 1 */
+        s: function (x) {
+          if (x <= 0 || x >= 1) return 0;
+          return -(1 - x) * Math.log(1 - x) - x * Math.log(x);
+        },
+        xmin: 0, xmax: 1, rotU: 'energia por partícula u/\u03b5',
+        u: function (t) { return t <= 0 ? 0 : 1 / (1 + Math.exp(1 / t)); },
+        c: function (t) {
+          if (t <= 0) return 0;
+          var x = 1 / t, e = Math.exp(x);
+          return x * x * e / ((1 + e) * (1 + e));
+        },
+        umax: 1, tmax: 4
+      },
+      einstein: {
+        rot: 'Sólido de Einstein',
+        esc: '\\(\\hbar\\omega\\)',
+        /* s(u)/kB com y = u/hbar.omega, válido para y > 1/2 */
+        s: function (y) {
+          if (y <= 0.5) return 0;
+          return (y + 0.5) * Math.log(y + 0.5) - (y - 0.5) * Math.log(y - 0.5);
+        },
+        xmin: 0.5, xmax: 3.5, rotU: 'energia por oscilador u/\u210f\u03c9',
+        /* u = (1/2) coth(1/2t) */
+        u: function (t) {
+          if (t <= 0) return 0.5;
+          return 0.5 / Math.tanh(0.5 / t);
+        },
+        c: function (t) {
+          if (t <= 0) return 0;
+          var x = 1 / t;
+          if (x > 700) return 0;
+          var e = Math.exp(x);
+          return x * x * e / ((e - 1) * (e - 1));
+        },
+        umax: 3.5, tmax: 3
+      },
+      para: {
+        rot: 'Paramagneto ideal',
+        esc: '\\(\\mu_0 B\\)',
+        /* s(u)/kB com w = u/(mu.B) entre -1 e 0 (energia negativa) */
+        s: function (w) {
+          var a = 0.5 * (1 - w), b = 0.5 * (1 + w);
+          if (a <= 0 || b <= 0) return 0;
+          return -a * Math.log(a) - b * Math.log(b);
+        },
+        xmin: -1, xmax: 1, rotU: 'energia por spin u/\u03bc\u2080B',
+        u: function (t) { return t <= 0 ? -1 : -Math.tanh(1 / t); },
+        c: function (t) {
+          if (t <= 0) return 0;
+          var x = 1 / t, ch = Math.cosh(x);
+          return x * x / (ch * ch);
+        },
+        m: function (t) { return t <= 0 ? 1 : Math.tanh(1 / t); },
+        umax: 0, tmax: 4
+      }
+    };
+
+    var est = { mod: 'dois', q: 's', T: 1 };
+
+    var ctr1 = el('div', { class: 'controles' });
+    corpo.appendChild(ctr1);
+    opcoes(ctr1, Object.keys(MOD).map(function (k) {
+      return { rot: MOD[k].rot, v: k };
+    }), 0, function (v) {
+      est.mod = v;
+      cxM.style.display = (v === 'para') ? '' : 'none';
+      if (v !== 'para' && est.q === 'm') trocaQ(1);
+      desenhar();
+    });
+
+    var ctr2 = el('div', { class: 'controles' });
+    corpo.appendChild(ctr2);
+    var cxM;
+    var trocaQ = opcoes(ctr2, [
+      { rot: 'entropia s(u)', v: 's' },
+      { rot: 'energia u(T)', v: 'u' },
+      { rot: 'calor específico c(T)', v: 'c' },
+      { rot: 'magnetização m(T)', v: 'm' }
+    ], 0, function (v) { est.q = v; desenhar(); });
+    cxM = ctr2.querySelector('.botoes').lastChild;
+    cxM.style.display = 'none';
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    deslizante(corpo, 'temperatura \\(\\kB T\\) em unidades da escala de energia',
+      0.05, 4, 0.05, 1,
+      function (v) { est.T = v; desenhar(); },
+      function (v) { return v.toFixed(2).replace('.', ','); });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'u nesta temperatura', k: 'u' }, { rot: 's/k<sub>B</sub>', k: 's' },
+      { rot: 'c/k<sub>B</sub>', k: 'c' }, { rot: 'pico de c em', k: 'pc' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function picoC(M) {
+      var melhor = 0, tp = 0;
+      for (var i = 1; i <= 800; i++) {
+        var t = M.tmax * i / 800, v = M.c(t);
+        if (v > melhor) { melhor = v; tp = t; }
+      }
+      return { t: tp, c: melhor };
+    }
+
+    function desenhar() {
+      var M = MOD[est.mod], ax;
+
+      if (est.q === 's') {
+        var smax = 0;
+        for (var i = 0; i <= 400; i++) {
+          smax = Math.max(smax, M.s(M.xmin + (M.xmax - M.xmin) * i / 400));
+        }
+        ax = G.eixos(cv, {
+          xmin: M.xmin, xmax: M.xmax, ymin: 0, ymax: smax * 1.18, altura: 310,
+          rotX: M.rotU, rotY: 'entropia por partícula s/k\u1D2E',
+          marcasX: G.marcasLineares(M.xmin, M.xmax, 5, 1),
+          formataY: function (v) { return v.toFixed(2).replace('.', ','); }
+        });
+        G.curva(ax, function (x) { return M.s(x); }, G.COR.azul, 2.4);
+
+        // a inclinação da curva é 1/T: desenha a tangente no ponto atual
+        var u0 = M.u(est.T), s0 = M.s(u0), h = 1e-4;
+        var inc = (M.s(u0 + h) - M.s(u0 - h)) / (2 * h);
+        ax.ct.save();
+        ax.ct.strokeStyle = G.COR.vinho;
+        ax.ct.lineWidth = 1.8;
+        ax.ct.beginPath();
+        var d = (M.xmax - M.xmin) * 0.22;
+        ax.ct.moveTo(ax.X(u0 - d), ax.Y(s0 - inc * d));
+        ax.ct.lineTo(ax.X(u0 + d), ax.Y(s0 + inc * d));
+        ax.ct.stroke();
+        ax.ct.fillStyle = G.COR.vinho;
+        ax.ct.beginPath();
+        ax.ct.arc(ax.X(u0), ax.Y(s0), 4, 0, 2 * Math.PI);
+        ax.ct.fill();
+        ax.ct.restore();
+        G.legenda(ax, [
+          { cor: G.COR.azul, texto: 's(u) = ln \u03a9 por partícula' },
+          { cor: G.COR.vinho, texto: 'inclinação = 1/T' }
+        ]);
+      } else {
+        var f = est.q === 'u' ? M.u : est.q === 'c' ? M.c : M.m;
+        var ymin = 0, ymax = 0;
+        for (var k = 1; k <= 400; k++) {
+          var v = f(M.tmax * k / 400);
+          ymin = Math.min(ymin, v); ymax = Math.max(ymax, v);
+        }
+        if (est.q === 'u') { ymin = Math.min(ymin, M.u(0.01)); ymax = Math.max(ymax, 0); }
+        var folga = 0.12 * (ymax - ymin || 1);
+        ax = G.eixos(cv, {
+          xmin: 0, xmax: M.tmax, ymin: ymin - folga, ymax: ymax + folga, altura: 310,
+          rotX: 'temperatura k\u1D2E T em unidades da escala de energia',
+          rotY: est.q === 'u' ? 'energia por partícula'
+              : est.q === 'c' ? 'calor específico c/k\u1D2E' : 'magnetização m/\u03bc\u2080',
+          marcasX: G.marcasLineares(0, M.tmax, 4, 1),
+          formataY: function (v) { return v.toFixed(2).replace('.', ','); }
+        });
+        G.curva(ax, function (t) { return t <= 0 ? f(1e-6) : f(t); }, G.COR.azul, 2.4);
+        G.vertical(ax, est.T, G.COR.vinho, 'T');
+      }
+
+      var u = M.u(est.T), c = M.c(est.T), s = M.s(u);
+      var pc = picoC(M);
+      mostrar({
+        u: F.fmt(u, 4), s: F.fmt(s, 4), c: F.fmt(c, 4),
+        pc: 'k\u1D2ET = ' + F.fmt(pc.t, 3)
+      });
+
+      var txt;
+      if (est.mod === 'dois') {
+        txt = 'A entropia tem um <b>máximo</b> em \\(u=\\epsilon/2\\), onde metade das '
+            + 'partículas está excitada. Ali a inclinação \\(1/T\\) se anula, o que '
+            + 'significa \\(T\\to\\infty\\). Para \\(u>\\epsilon/2\\) a inclinação fica '
+            + 'negativa: são as famosas <b>temperaturas absolutas negativas</b>, mais '
+            + 'quentes que infinito, possíveis apenas porque o espectro de energia é '
+            + 'limitado por cima. É também a razão pela qual um sistema de dois níveis '
+            + 'não serve como laser: a inversão de população que ele exigiria é '
+            + 'inalcançável em equilíbrio.';
+      } else if (est.mod === 'einstein') {
+        txt = 'Em temperaturas altas, \\(c\\to\\kB\\) por oscilador, e como cada átomo do '
+            + 'sólido vale três osciladores isso dá \\(3\\kB\\) por átomo: é a '
+            + '<b>lei de Dulong e Petit</b>, de 1819. Em temperaturas baixas, \\(c\\) cai '
+            + 'exponencialmente e a energia tende a \\(\\hbar\\omega/2\\), a energia de ponto '
+            + 'zero, que não vai a lugar nenhum. Foi este modelo, em 1906, o primeiro uso da '
+            + 'quantização fora da radiação.';
+      } else {
+        txt = 'A energia por spin é \\(u=-\\mu_0 B\\tanh(\\mu_0B/\\kB T)\\) e a magnetização '
+            + 'segue a mesma tangente hiperbólica. Para campo fraco ou temperatura alta, '
+            + '\\(\\tanh x\\approx x\\) e a susceptibilidade vira '
+            + '\\(\\chi=\\mu_0^2/(\\kB T V)\\): é a <b>lei de Curie</b>, com '
+            + '\\(\\chi\\propto 1/T\\), obtida aqui sem nenhum ajuste. O calor específico '
+            + 'tem o mesmo pico de Schottky do sistema de dois níveis, e pela mesma razão: '
+            + 'são o mesmo problema com outro nome.';
+      }
+      nota.innerHTML = txt;
+      tipografar(nota);
+    }
+
+    desenhar();
+    registrarRedesenho(desenhar);
+    tipografar(corpo);
+  };
+
+  /* =================================================================
+     11. Equilíbrio térmico por contagem
+     Dois sólidos de Einstein trocam quanta. O produto Omega1.Omega2
+     tem um pico, e o pico fica mais estreito conforme N cresce. É a
+     origem microscópica da irreversibilidade.
+     ================================================================= */
+  REGISTRO.equilibrio = function (raiz) {
+    var corpo = moldura(raiz, 'Equilíbrio térmico: por que a energia se reparte assim');
+
+    var est = { NA: 60, NB: 40, q: 100 };
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+
+    deslizante(ctr, 'osciladores em A, \\(N_A\\)', 10, 600, 10, 60,
+      function (v) { est.NA = v; desenhar(); });
+    deslizante(ctr, 'osciladores em B, \\(N_B\\)', 10, 600, 10, 40,
+      function (v) { est.NB = v; desenhar(); });
+    deslizante(ctr, 'quanta de energia a repartir, \\(q\\)', 20, 1200, 10, 100,
+      function (v) { est.q = v; desenhar(); });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'q<sub>A</sub> mais provável', k: 'qa' },
+      { rot: 'previsto: q·N<sub>A</sub>/(N<sub>A</sub>+N<sub>B</sub>)', k: 'qp' },
+      { rot: 'largura relativa do pico', k: 'lg' },
+      { rot: 'fração dos estados no pico', k: 'fr' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    /* Omega de um sólido de Einstein com N osciladores e q quanta */
+    function lnOmega(q, N) { return F.lnBinom(q + N - 1, q); }
+
+    function desenhar() {
+      var NA = est.NA, NB = est.NB, Q = est.q;
+      var lnP = [], maior = -Infinity, iMax = 0, i;
+      for (i = 0; i <= Q; i++) {
+        var L = lnOmega(i, NA) + lnOmega(Q - i, NB);
+        lnP.push(L);
+        if (L > maior) { maior = L; iMax = i; }
+      }
+      // normaliza para probabilidade
+      var soma = 0, prob = [];
+      for (i = 0; i <= Q; i++) { prob.push(Math.exp(lnP[i] - maior)); soma += prob[i]; }
+      for (i = 0; i <= Q; i++) prob[i] /= soma;
+
+      var pmax = 0;
+      for (i = 0; i <= Q; i++) pmax = Math.max(pmax, prob[i]);
+
+      var ax = G.eixos(cv, {
+        xmin: 0, xmax: Q, ymin: 0, ymax: pmax * 1.15, altura: 310,
+        rotX: 'quanta no sólido A, q\u2090',
+        rotY: 'probabilidade \u221d \u03a9\u2090\u03a9\u2091',
+        marcasX: G.marcasLineares(0, Q, 5, 0),
+        formataY: function (v) { return v.toFixed(3).replace('.', ','); }
+      });
+
+      var dados = [];
+      for (i = 0; i <= Q; i++) dados.push({ x: i, y: prob[i] });
+      G.barras(ax, dados, G.COR.azulClaro, 1);
+
+      var qprev = Q * NA / (NA + NB);
+      G.vertical(ax, qprev, G.COR.vinho, 'q\u00b7N\u2090/(N\u2090+N\u2091)');
+
+      // desvio padrão da distribuição
+      var md = 0, md2 = 0;
+      for (i = 0; i <= Q; i++) { md += i * prob[i]; md2 += i * i * prob[i]; }
+      var sig = Math.sqrt(Math.max(0, md2 - md * md));
+
+      // fração dos estados dentro de um desvio padrão do pico
+      var dentro = 0;
+      for (i = 0; i <= Q; i++) if (Math.abs(i - md) <= sig) dentro += prob[i];
+
+      mostrar({
+        qa: String(iMax), qp: F.fmt(qprev, 2),
+        lg: md > 0 ? F.pct(sig / md, 2) : '·',
+        fr: F.pct(dentro, 1)
+      });
+
+      var Ntot = NA + NB;
+      nota.innerHTML =
+        'O pico fica em \\(q_A/N_A = q_B/N_B\\), isto é, onde a energia por oscilador é a '
+        + 'mesma nos dois sólidos. Nenhuma lei nova foi usada: é só onde o produto '
+        + '\\(\\Omega_A\\Omega_B\\) é máximo, ou seja, onde há mais maneiras de arranjar o '
+        + 'sistema composto. A condição \\(\\partial S_A/\\partial U_A = \\partial S_B/'
+        + '\\partial U_B\\) é exatamente \\(T_A=T_B\\).</p>'
+        + '<p>Agora puxe os deslizantes de \\(N_A\\) e \\(N_B\\) para cima. A largura '
+        + 'relativa do pico, agora em ' + (md > 0 ? F.pct(sig / md, 2) : '·')
+        + ', encolhe como \\(1/\\sqrt{N}\\). Com ' + Ntot + ' osciladores ela ainda se vê; '
+        + 'com \\(10^{23}\\) ela seria de uma parte em \\(10^{11}\\), e o sistema nunca, '
+        + 'em tempo algum de observação, seria flagrado fora do pico. <b>A '
+        + 'irreversibilidade é isto</b>: não uma proibição, mas um pico estreito demais '
+        + 'para se escapar dele.';
+      nota.innerHTML = '<p>' + nota.innerHTML;
+      tipografar(nota);
+    }
+
+    registrarRedesenho(desenhar);
+    tipografar(corpo);
+  };
+
+
+  /* =================================================================
+     12. Estado de equilíbrio e o caminho que não existe
+     Dois pistões lado a lado. Comprimindo devagar, o gás permanece
+     uniforme e o estado percorre uma curva no diagrama PV. Comprimindo
+     de repente, a pressão deixa de ser a mesma em toda parte e o
+     sistema simplesmente não tem um ponto no diagrama: só os extremos.
+     ================================================================= */
+  REGISTRO.estadopv = function (raiz) {
+    var corpo = moldura(raiz, 'Quando o sistema tem um ponto no diagrama PV, e quando não tem');
+
+    var V1 = 1.0, V2 = 0.42, P1 = 100;       // isoterma: PV = const
+    var est = { modo: 'lento', t: 0, rodando: false };
+    var rastro = [];
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+
+    opcoes(ctr, [
+      { rot: 'Compressão quase-estática', v: 'lento' },
+      { rot: 'Compressão brusca', v: 'brusco' }
+    ], 0, function (v) { est.modo = v; reiniciar(); });
+
+    var bP = el('button', { type: 'button', texto: 'comprimir' });
+    var bR = el('button', { type: 'button', class: 'sec', texto: 'reiniciar' });
+    bP.addEventListener('click', function () {
+      if (est.t >= 1) reiniciar();
+      est.rodando = true;
+    });
+    bR.addEventListener('click', reiniciar);
+    ctr.appendChild(el('div', { class: 'botoes' }, [bP, bR]));
+
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function reiniciar() { est.t = 0; est.rodando = false; rastro = []; texto(); }
+
+    function volume(t) { return V1 + (V2 - V1) * t; }
+    function pIsoterma(V) { return P1 * V1 / V; }
+
+    /* Num processo brusco a pressão junto ao pistão é maior que longe
+       dele: é essa diferença que impede falar em "a pressão do gás". */
+    function desequilibrio(t) {
+      if (est.modo === 'lento') return 0;
+      return (t > 0 && t < 1) ? 0.55 * Math.sin(Math.PI * t) : 0;
+    }
+
+    function desenhar() {
+      var p = G.preparar(cv, 330);
+      var ct = p.ct;
+      var larguraCil = Math.min(p.L * 0.40, 300);
+      var alt = 150, cx = 14, cy = 40;
+
+      var t = est.t, V = volume(t), d = desequilibrio(t);
+      var Pmedia = pIsoterma(V);
+
+      /* ---------- cilindro ---------- */
+      var fracao = V / V1;
+      var larg = larguraCil * fracao;
+
+      // gás, com gradiente quando há desequilíbrio
+      var g = ct.createLinearGradient(cx, 0, cx + larg, 0);
+      if (d > 0) {
+        g.addColorStop(0, 'rgba(44,95,141,.16)');
+        g.addColorStop(1, 'rgba(140,47,57,.52)');
+      } else {
+        g.addColorStop(0, 'rgba(44,95,141,.30)');
+        g.addColorStop(1, 'rgba(44,95,141,.30)');
+      }
+      ct.fillStyle = g;
+      ct.fillRect(cx, cy, larg, alt);
+
+      // paredes e pistão
+      ct.strokeStyle = G.COR.tinta;
+      ct.lineWidth = 1.6;
+      ct.beginPath();
+      ct.moveTo(cx, cy); ct.lineTo(cx, cy + alt);
+      ct.moveTo(cx, cy); ct.lineTo(cx + larguraCil + 26, cy);
+      ct.moveTo(cx, cy + alt); ct.lineTo(cx + larguraCil + 26, cy + alt);
+      ct.stroke();
+      ct.fillStyle = G.COR.suave;
+      ct.fillRect(cx + larg, cy, 9, alt);
+
+      // seta do empurrão, maior no caso brusco
+      ct.save();
+      ct.strokeStyle = d > 0 ? G.COR.vinho : G.COR.suave;
+      ct.lineWidth = d > 0 ? 3 : 1.8;
+      var xs = cx + larg + 12, ys = cy + alt / 2, cmp = d > 0 ? 34 : 20;
+      ct.beginPath();
+      ct.moveTo(xs + cmp, ys); ct.lineTo(xs, ys);
+      ct.lineTo(xs + 7, ys - 5); ct.moveTo(xs, ys); ct.lineTo(xs + 7, ys + 5);
+      ct.stroke();
+      ct.restore();
+
+      // rótulo do estado do gás
+      ct.save();
+      ct.font = '600 11px system-ui, sans-serif';
+      ct.textAlign = 'left';
+      ct.textBaseline = 'top';
+      if (d > 0) {
+        ct.fillStyle = G.COR.vinho;
+        ct.fillText('pressão não uniforme: P não está definida', cx, cy + alt + 10);
+        ct.font = '11px system-ui, sans-serif';
+        ct.fillStyle = G.COR.suave;
+        ct.fillText('mais densa junto ao pistão', cx, cy + alt + 26);
+      } else {
+        ct.fillStyle = G.COR.azul;
+        ct.fillText('gás uniforme: P = ' + F.fmt(Pmedia, 1) + ' kPa', cx, cy + alt + 10);
+        ct.font = '11px system-ui, sans-serif';
+        ct.fillStyle = G.COR.suave;
+        ct.fillText('um estado de equilíbrio a cada instante', cx, cy + alt + 26);
+      }
+      ct.restore();
+
+      /* ---------- diagrama PV ---------- */
+      var gx = cx + larguraCil + 80, gl = p.L - gx - 18;
+      if (gl < 140) return;
+      var gy = 22, ga = 230;
+      var vmin = 0.3, vmax = 1.15, pmin = 60, pmax = 280;
+      function X(v) { return gx + (v - vmin) / (vmax - vmin) * gl; }
+      function Y(q) { return gy + ga - (q - pmin) / (pmax - pmin) * ga; }
+
+      ct.save();
+      ct.strokeStyle = G.COR.grade;
+      ct.lineWidth = 1;
+      for (var k = 0; k <= 4; k++) {
+        var yy = gy + ga * k / 4;
+        ct.beginPath(); ct.moveTo(gx, yy); ct.lineTo(gx + gl, yy); ct.stroke();
+      }
+      ct.strokeStyle = G.COR.suave;
+      ct.lineWidth = 1.2;
+      ct.beginPath();
+      ct.moveTo(gx, gy); ct.lineTo(gx, gy + ga); ct.lineTo(gx + gl, gy + ga);
+      ct.stroke();
+      ct.fillStyle = G.COR.suave;
+      ct.font = '600 11px system-ui, sans-serif';
+      ct.textAlign = 'center';
+      ct.fillText('volume V', gx + gl / 2, gy + ga + 26);
+      ct.save();
+      ct.translate(gx - 24, gy + ga / 2);
+      ct.rotate(-Math.PI / 2);
+      ct.fillText('pressão P', 0, 0);
+      ct.restore();
+      ct.restore();
+
+      // a isoterma de referência, sempre em cinza claro
+      ct.save();
+      ct.strokeStyle = G.COR.grade;
+      ct.lineWidth = 1.4;
+      ct.beginPath();
+      for (var i = 0; i <= 120; i++) {
+        var v = vmin + (vmax - vmin) * i / 120, q = pIsoterma(v);
+        if (q < pmin || q > pmax) continue;
+        if (i) ct.lineTo(X(v), Y(q)); else ct.moveTo(X(v), Y(q));
+      }
+      ct.stroke();
+      ct.restore();
+
+      // estados inicial e final, sempre definidos
+      [[V1, P1, '1'], [V2, pIsoterma(V2), '2']].forEach(function (s) {
+        ct.save();
+        ct.fillStyle = G.COR.tinta;
+        ct.beginPath();
+        ct.arc(X(s[0]), Y(s[1]), 4.5, 0, 2 * Math.PI);
+        ct.fill();
+        ct.font = '600 12px system-ui, sans-serif';
+        ct.textAlign = 'center';
+        ct.fillText(s[2], X(s[0]), Y(s[1]) - 11);
+        ct.restore();
+      });
+
+      if (est.modo === 'lento') {
+        // o rastro é o próprio caminho: cada ponto é um estado de equilíbrio
+        ct.save();
+        ct.strokeStyle = G.COR.azul;
+        ct.lineWidth = 2.6;
+        ct.beginPath();
+        rastro.forEach(function (r, i) {
+          if (i) ct.lineTo(X(r[0]), Y(r[1])); else ct.moveTo(X(r[0]), Y(r[1]));
+        });
+        ct.stroke();
+        if (t > 0 && t < 1) {
+          ct.fillStyle = G.COR.vinho;
+          ct.beginPath();
+          ct.arc(X(V), Y(Pmedia), 4, 0, 2 * Math.PI);
+          ct.fill();
+        }
+        ct.restore();
+      } else {
+        // caminho inexistente: seta tracejada e uma interrogação
+        ct.save();
+        ct.strokeStyle = G.COR.vinho;
+        ct.setLineDash([6, 5]);
+        ct.lineWidth = 1.8;
+        ct.beginPath();
+        var xa = X(V1), ya = Y(P1), xb = X(V2), yb = Y(pIsoterma(V2));
+        ct.moveTo(xa, ya);
+        ct.quadraticCurveTo((xa + xb) / 2 - 26, (ya + yb) / 2 - 34, xb, yb);
+        ct.stroke();
+        ct.setLineDash([]);
+        if (t > 0 && t < 1) {
+          ct.fillStyle = G.COR.vinho;
+          ct.font = '700 20px system-ui, sans-serif';
+          ct.textAlign = 'center';
+          ct.textBaseline = 'middle';
+          ct.fillText('?', (xa + xb) / 2 - 16, (ya + yb) / 2 - 20);
+        }
+        ct.restore();
+      }
+    }
+
+    function texto() {
+      nota.innerHTML = est.modo === 'lento'
+        ? '<p>Comprimindo devagar, o gás tem tempo de se reacomodar a cada instante. A '
+          + 'pressão é a mesma em toda parte, e por isso o par \\((P,V)\\) existe e é único: '
+          + 'o sistema <b>tem um ponto</b> no diagrama. Uma sucessão de equilíbrios desenha '
+          + 'uma curva, e o trabalho \\(\\int P\\,dV\\) é a área sob ela.</p>'
+        : '<p>Comprimindo de repente, o gás junto ao pistão fica mais denso antes que o resto '
+          + 'perceba. Há pressões diferentes em pontos diferentes, e portanto <b>não existe '
+          + '"a pressão do gás"</b>. Sem \\(P\\) definida, não há ponto no diagrama: o '
+          + 'sistema some do gráfico durante o processo e só reaparece no fim, quando o '
+          + 'equilíbrio se restabelece.</p>'
+          + '<p>Por isso a seta aparece tracejada, com uma interrogação. Ela não é um '
+          + 'caminho: é só um lembrete de que o sistema foi de 1 a 2. E por isso também '
+          + '\\(\\int P\\,dV\\) não pode ser calculada aqui, embora o trabalho realizado '
+          + 'exista e seja perfeitamente mensurável pela força no pistão. O estado inicial e '
+          + 'o final continuam bem definidos, e com eles \\(\\Delta U\\) e \\(\\Delta S\\), '
+          + 'que são funções de estado.</p>'
+          + '<p>Os pontos 1 e 2 são os mesmos nos dois modos porque o cilindro está num '
+          + 'banho térmico: depois da compressão brusca, espera-se o gás voltar à '
+          + 'temperatura do banho. Mesmo estado inicial, mesmo estado final, caminhos '
+          + 'incomparáveis. Compare agora os dois trabalhos: no caminho quase-estático '
+          + 'ele é a área sob a curva; no brusco é maior, porque é preciso empurrar contra '
+          + 'uma pressão que o próprio empurrão aumentou. A diferença foi dissipada, e é '
+          + 'ela que faz \\(\\Delta S_{\\text{universo}}>0\\).</p>';
+      tipografar(nota);
+    }
+
+    var ultimo = 0;
+    function quadro(ts) {
+      var dt = Math.min(0.05, (ts - ultimo) / 1000) || 0.016;
+      ultimo = ts;
+      if (est.rodando && est.t < 1) {
+        est.t = Math.min(1, est.t + dt / (est.modo === 'lento' ? 4.5 : 0.9));
+        if (est.modo === 'lento') {
+          var V = volume(est.t);
+          rastro.push([V, pIsoterma(V)]);
+        }
+        if (est.t >= 1) est.rodando = false;
+      }
+      desenhar();
+      requestAnimationFrame(quadro);
+    }
+
+    texto();
+    requestAnimationFrame(quadro);
+    window.addEventListener('resize', desenhar);
+    tipografar(corpo);
+  };
+
   /* ---------- inicialização ---------- */
   document.addEventListener('DOMContentLoaded', function () {
     Array.prototype.forEach.call(document.querySelectorAll('[data-widget]'), function (n) {

@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Módulo 3: Caminhante aleatório e estados microscópicos | Física Estatística</title>
+<link rel="icon" type="image/png" href="assets/img/favicon.png">
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611071700">
+<script src="assets/js/comum.js?v=202611071700"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+
+<header class="topo">
+  <div class="topo-interno">
+    <a class="marca" href="index.html">Física Estatística <span>· LFCA/URCA</span></a>
+    <nav class="menu">
+      <a href="index.html">Início</a>
+      <span class="grupo">Fundamentos</span>
+      <a href="aula01.html" class="num" title="Módulo 1: Revisão de termodinâmica">1</a>
+      <a href="aula02.html" class="num" title="Módulo 2: Métodos estatísticos">2</a>
+      <span class="grupo">Microestados</span>
+      <a href="aula03.html" class="num ativo" title="Módulo 3: Caminhante aleatório e estados microscópicos">3</a>
+    </nav>
+  </div>
+</header>
+
+<div class="envoltorio">
+
+<aside class="lateral">
+  <h4>Neste módulo</h4>
+  <ol>
+    <li><a href="#s1">1. Cadê o bêbado?</a></li>
+    <li><a href="#s2">2. A binomial do deslocamento</a></li>
+    <li><a href="#s3">3. Médias sem somar nada</a></li>
+    <li><a href="#s4">4. A dispersão e a raiz de N</a></li>
+    <li><a href="#s5">5. Caminhadas em duas e três dimensões</a></li>
+    <li><a href="#s6">6. A aproximação de Stirling</a></li>
+    <li><a href="#s7">7. Da binomial à gaussiana</a></li>
+    <li><a href="#s8">8. Contar estados: a partícula na caixa</a></li>
+    <li><a href="#s9">9. Contar estados: o oscilador</a></li>
+    <li><a href="#s10">10. O ensemble microcanônico</a></li>
+    <li><a href="#s11">11. Sistema de dois níveis</a></li>
+    <li><a href="#s12">12. Temperaturas negativas e o laser</a></li>
+    <li><a href="#s13">13. O sólido de Einstein</a></li>
+    <li><a href="#s14">14. O paramagneto e a lei de Curie</a></li>
+    <li><a href="#s15">15. Equilíbrio térmico</a></li>
+    <li><a href="#s16">16. Equilíbrio mecânico e químico</a></li>
+    <li><a href="#s17">17. Exercícios resolvidos</a></li>
+    <li><a href="#s18">18. Exercícios propostos</a></li>
+  </ol>
+</aside>
+
+<main class="conteudo">
+
+  <p class="chapeu">Módulo 3 · Estados microscópicos e entropia</p>
+  <h1>Caminhante aleatório e estados microscópicos</h1>
+  <p class="subtitulo">Este é o módulo em que a física estatística começa de fato. Partimos de
+  um problema que parece recreativo, um bêbado cambaleando numa rua, e chegamos à fórmula
+  gravada no túmulo de Boltzmann. No caminho, três sistemas inteiros são resolvidos sem
+  nenhuma equação de movimento: apenas contando.</p>
+
+  <div class="bloco def">
+    <span class="rotulo">Objetivos</span>
+    <ul>
+      <li>Obter a distribuição binomial do deslocamento e extrair \(\overline{m}\) e \(\overline{(\Delta m)^2}\);</li>
+      <li>Entender por que o deslocamento cresce como \(\sqrt N\) e o caminho como \(N\);</li>
+      <li>Deduzir a aproximação de Stirling e usá-la para chegar à gaussiana;</li>
+      <li>Contar estados acessíveis para a partícula na caixa e para o oscilador;</li>
+      <li>Aplicar \(S=\kB\ln\Omega\) e \(1/T=\partial S/\partial U\) ao sistema de dois níveis,
+      ao sólido de Einstein e ao paramagneto ideal;</li>
+      <li>Deduzir as condições de equilíbrio térmico, mecânico e químico maximizando \(\Omega\).</li>
+    </ul>
+  </div>
+
+  <hr class="linha">
+
+  <!-- ================================================== -->
+  <h2 id="s1">1. Cadê o bêbado?</h2>
+
+  <p>Uma partícula parte da origem e se move ao longo de um eixo em passos discretos de
+  comprimento \(L\). A cada passo ela vai para a direita com probabilidade \(p\) ou para a
+  esquerda com probabilidade \(q=1-p\), sem nunca ficar parada, de modo que</p>
+
+  <p>\[p+q=1.\]</p>
+
+  <p>A pergunta é: depois de \(N\) passos, qual é a probabilidade de encontrá-la na posição
+  \(x=mL\)?</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Por que este problema e não outro</span>
+    <p>Porque ele é o esqueleto de meio curso. A mesma conta descreve a difusão de um
+    perfume na sala, o movimento browniano de um grão de pólen, a trajetória de um nêutron
+    num reator, a conformação de uma cadeia polimérica e, sobretudo, a <strong>contagem de
+    microestados</strong> de qualquer sistema cujos constituintes tenham duas opções. Resolver
+    o bêbado é resolver o paramagneto.</p>
+  </div>
+
+  <p>Seja \(n_1\) o número de passos dados para a direita e \(n_2\) para a esquerda. Então</p>
+
+  <p>\[N=n_1+n_2,\qquad m=n_1-n_2,\]</p>
+
+  <p>e \(m\) é inteiro com \(-N\le m\le N\). Resolvendo o par, \(n_1=\frac{1}{2}(N+m)\) e
+  \(n_2=\frac{1}{2}(N-m)\). Note uma consequência imediata: se \(N\) é par, \(m\) é par; se
+  \(N\) é ímpar, \(m\) é ímpar. Metade das posições é inacessível, e isso vai aparecer nos
+  gráficos.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s2">2. A binomial do deslocamento</h2>
+
+  <p>Como os passos são independentes, uma <em>sequência específica</em> com \(n_1\) passos à
+  direita e \(n_2\) à esquerda tem probabilidade</p>
+
+  <p>\[\wp = \underbrace{p\cdot p\cdots p}_{n_1}\;\underbrace{q\cdot q\cdots q}_{n_2}
+  = p^{n_1}q^{n_2}.\]</p>
+
+  <p>Mas várias sequências diferentes dão o mesmo deslocamento. Com \(N=3\) passos, há uma só
+  maneira de obter \(m=3\) (direita, direita, direita), e <em>três</em> maneiras de obter
+  \(m=1\). Essa multiplicidade é a <strong>degenerescência</strong>, e vale</p>
+
+  <p>\[\frac{N!}{n_1!\,n_2!}.\]</p>
+
+  <p>Multiplicando as duas coisas chega-se à <strong>distribuição binomial</strong>:</p>
+
+  <div class="destaque">
+    <span class="anuncio">A probabilidade de \(n_1\) passos à direita em \(N\)</span>
+    \[\wp_N(n_1)=\frac{N!}{n_1!\,(N-n_1)!}\,p^{n_1}q^{N-n_1}\]
+  </div>
+
+  <p>Em termos do deslocamento, substituindo \(n_1=\frac{1}{2}(N+m)\):</p>
+
+  <p>\[\wp_N(m)=\frac{N!}{\left[\frac{1}{2}(N+m)\right]!\left[\frac{1}{2}(N-m)\right]!}\,
+  p^{\frac{1}{2}(N+m)}q^{\frac{1}{2}(N-m)},\]</p>
+
+  <p>que para o caso simétrico \(p=q=\frac{1}{2}\) se reduz a</p>
+
+  <p>\[\wp_N(m)=\frac{N!\left(\frac{1}{2}\right)^{N}}
+  {\left[\frac{1}{2}(N+m)\right]!\left[\frac{1}{2}(N-m)\right]!}.\]</p>
+
+  <p>A normalização sai de graça do binômio de Newton:</p>
+
+  <p>\[\sum_{n_1=0}^{N}\frac{N!}{n_1!(N-n_1)!}p^{n_1}q^{N-n_1}=(p+q)^N=1^N=1.\]</p>
+
+  <div data-widget="caminhante"></div>
+
+  <!-- ================================================== -->
+  <h2 id="s3">3. Médias sem somar nada</h2>
+
+  <p>Queremos \(\overline{n_1}\). Pela definição,</p>
+
+  <p>\[\overline{n_1}=\sum_{n_1=0}^{N}n_1\frac{N!}{n_1!(N-n_1)!}p^{n_1}q^{N-n_1}.\]</p>
+
+  <p>Somar isso diretamente é desagradável. Há um truque que vale aprender, porque ele
+  reaparecerá no ensemble canônico com o nome de "derivar a função de partição":</p>
+
+  <div class="bloco def">
+    <span class="rotulo">O truque da derivada</span>
+    <p>Observe que</p>
+    <p>\[n_1\,p^{n_1}=p\,\frac{\partial}{\partial p}\left(p^{n_1}\right).\]</p>
+    <p>Trocar o fator \(n_1\) por um operador \(p\,\partial/\partial p\) permite tirá-lo de
+    dentro da soma, porque ele não depende do índice.</p>
+  </div>
+
+  <p>Tratando momentaneamente \(p\) e \(q\) como independentes:</p>
+
+  <p>\[\overline{n_1}=p\frac{\partial}{\partial p}\sum_{n_1=0}^{N}
+  \frac{N!}{n_1!(N-n_1)!}p^{n_1}q^{N-n_1}
+  = p\frac{\partial}{\partial p}(p+q)^N = pN(p+q)^{N-1}.\]</p>
+
+  <p>Só ao final impomos \(p+q=1\):</p>
+
+  <p>\[\boxed{\;\overline{n_1}=Np\;}\]</p>
+
+  <p>que é o que a intuição já dizia. Por simetria, \(\overline{n_2}=Nq\), e o deslocamento
+  médio é</p>
+
+  <p>\[\overline{m}=\overline{n_1}-\overline{n_2}=(p-q)N.\]</p>
+
+  <p>Para o caminhante simétrico, \(\overline{m}=0\): em média ele não sai do lugar. O que
+  não quer dizer que ele fique perto da origem, e é justamente essa distinção que a seção
+  seguinte resolve.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s4">4. A dispersão e a raiz de N</h2>
+
+  <p>Aplicando o truque duas vezes, \(n_1^2p^{n_1}
+  =p\frac{\partial}{\partial p}\left[p\frac{\partial}{\partial p}p^{n_1}\right]\), obtém-se</p>
+
+  <p>\[\overline{n_1^2}=p\frac{\partial}{\partial p}\left[pN(p+q)^{N-1}\right]
+  =p\left[N(p+q)^{N-1}+pN(N-1)(p+q)^{N-2}\right].\]</p>
+
+  <p>Com \(p+q=1\), isso é \(\overline{n_1^2}=Np\left[1+p(N-1)\right]=Np(Np+q)\). Logo</p>
+
+  <p>\[\overline{(\Delta n_1)^2}=\overline{n_1^2}-\overline{n_1}^{\,2}
+  =Np(Np+q)-N^2p^2=\boxed{\;Npq\;}\]</p>
+
+  <p>Para o deslocamento, use \(m=2n_1-N\). Como \(N\) é constante, ela não contribui para a
+  dispersão e o fator 2 entra ao quadrado:</p>
+
+  <p>\[\overline{(\Delta m)^2}=4\,\overline{(\Delta n_1)^2}=4Npq,
+  \qquad \sigma_m=2\sqrt{Npq}.\]</p>
+
+  <p>No caso simétrico, \(pq=1/4\) e</p>
+
+  <div class="destaque">
+    <span class="anuncio">O resultado que organiza tudo</span>
+    \[\sigma_m=\sqrt{N}\]
+  </div>
+
+  <p>O caminhante percorre uma distância \(NL\), mas se afasta da origem apenas
+  \(\sqrt{N}\,L\). Com mil passos de um metro ele caminhou um quilômetro e está, tipicamente,
+  a trinta metros de onde começou.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Por que a difusão é lenta</span>
+    <p>Se cada passo leva um tempo \(\tau\), então \(N=t/\tau\) e</p>
+    <p>\[\overline{x^2}=NL^2=\frac{L^2}{\tau}\,t\equiv 2Dt.\]</p>
+    <p>A distância típica cresce com \(\sqrt{t}\), não com \(t\). Dobrar a distância custa
+    <em>quatro</em> vezes mais tempo. É por isso que o perfume leva minutos para atravessar
+    uma sala apesar de as moléculas voarem a centenas de metros por segundo: elas vão, mas
+    vão cambaleando. O coeficiente \(D=L^2/2\tau\) é a constante de difusão, e voltaremos a
+    ela no Módulo 4.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s5">5. Caminhadas em duas e três dimensões</h2>
+
+  <p>Em \(d\) dimensões o passo pode ir em \(2d\) direções, e o vetor deslocamento é
+  \(\vec R=\sum_{k=1}^{N}\vec \ell_k\). O deslocamento quadrático médio é</p>
+
+  <p>\[\overline{R^2}=\overline{\left(\sum_k \vec\ell_k\right)\cdot\left(\sum_j \vec\ell_j\right)}
+  =\sum_k \overline{\ell_k^2}+\sum_{k\ne j}\overline{\vec\ell_k\cdot\vec\ell_j}.\]</p>
+
+  <p>O primeiro termo vale \(NL^2\). O segundo se anula, porque passos distintos são
+  independentes e não há direção privilegiada: \(\overline{\vec\ell_k\cdot\vec\ell_j}
+  =\overline{\vec\ell_k}\cdot\overline{\vec\ell_j}=0\). Portanto</p>
+
+  <p>\[\boxed{\;\overline{R^2}=NL^2\;}\]</p>
+
+  <p>em qualquer dimensão. A raiz de \(N\) não é um acidente unidimensional: é consequência
+  apenas da independência dos passos. O que muda com a dimensão é outra coisa, e bastante
+  dramática: em uma e duas dimensões o caminhante volta à origem com probabilidade 1, e em
+  três dimensões a probabilidade de retorno cai para cerca de 34%. Como disse Kakutani, um
+  bêbado sempre acha o caminho de casa, mas um passarinho bêbado pode se perder para sempre.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s6">6. A aproximação de Stirling</h2>
+
+  <p>Os fatoriais que apareceram são impraticáveis para \(N\) grande: \(100!\) tem 158
+  algarismos e \(10^{23}!\) não cabe em lugar nenhum. Precisamos de uma aproximação para
+  \(\ln n!\), e ela vem de uma identidade útil:</p>
+
+  <p>\[\int_0^{\infty}e^{-x}x^{n}\,dx = n!,\]</p>
+
+  <p>que se demonstra integrando por partes repetidamente. O integrando
+  \(e^{-x}x^n\) tem um pico pronunciado. Para localizá-lo, derive o logaritmo:</p>
+
+  <p>\[\frac{d}{dx}\left[\ln\left(e^{-x}x^n\right)\right]
+  =\frac{d}{dx}\left(-x+n\ln x\right)=-1+\frac{n}{x}=0
+  \;\Longrightarrow\; x_0=n.\]</p>
+
+  <p>Expandindo em série de Taylor em torno de \(x_0=n\), com a primeira derivada nula:</p>
+
+  <p>\[\ln\left(e^{-x}x^n\right)\approx -n+n\ln n-\frac{(x-n)^2}{2n}.\]</p>
+
+  <p>A integral vira então uma gaussiana, cujo valor é \(\sqrt{2\pi n}\):</p>
+
+  <p>\[n!=\int_0^{\infty}e^{\ln(e^{-x}x^n)}dx
+  \approx e^{-n+n\ln n}\int_0^{\infty}e^{-\frac{(x-n)^2}{2n}}dx
+  = n^n e^{-n}\sqrt{2\pi n}.\]</p>
+
+  <p>Tomando o logaritmo:</p>
+
+  <div class="destaque">
+    <span class="anuncio">Aproximação de Stirling</span>
+    \[\ln n!\;\approx\; n\ln n-n+\tfrac{1}{2}\ln(2\pi n)\]
+  </div>
+
+  <p>Em física estatística \(n\) é astronômico e o último termo é desprezível diante dos
+  outros, de modo que usaremos quase sempre a forma crua</p>
+
+  <p>\[\ln n!\approx n\ln n - n.\]</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>\(n\)</th><th>\(\ln n!\) exato</th><th>\(n\ln n-n\)</th><th>erro</th>
+    <th>com \(\frac{1}{2}\ln 2\pi n\)</th><th>erro</th></tr></thead>
+    <tbody>
+      <tr><td>10</td><td>15,104</td><td>13,026</td><td>13,8%</td><td>15,096</td><td>0,05%</td></tr>
+      <tr><td>100</td><td>363,74</td><td>360,52</td><td>0,89%</td><td>363,74</td><td>0,0008%</td></tr>
+      <tr><td>\(10^{6}\)</td><td>12 815 518</td><td>12 815 511</td><td>0,00006%</td>
+          <td>12 815 518</td><td>desprezível</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Para \(n=10^{23}\) a forma crua erra em uma parte em \(10^{21}\). É a aproximação mais
+  segura de toda a física.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s7">7. Da binomial à gaussiana</h2>
+
+  <p>Aplicando Stirling aos três fatoriais da binomial e expandindo o logaritmo em torno do
+  máximo em \(n_1=Np\), chega-se, depois de alguma álgebra, a</p>
+
+  <p>\[\wp_N(n_1)\approx \frac{1}{\sqrt{2\pi Npq}}\,
+  \exp\left[-\frac{(n_1-Np)^2}{2Npq}\right].\]</p>
+
+  <p>É uma gaussiana de média \(Np\) e variância \(Npq\), exatamente os valores que já
+  tínhamos calculado exatamente. O widget da seção 2 sobrepõe as três coisas: a simulação, a
+  binomial exata e esta gaussiana. Para \(N\) acima de algumas dezenas elas são
+  indistinguíveis perto do pico.</p>
+
+  <div class="bloco alerta">
+    <span class="rotulo">Onde a gaussiana falha</span>
+    <p>Nas <strong>caudas</strong>. A aproximação é excelente a poucos desvios padrão do
+    centro e péssima para eventos muito raros, onde pode errar por ordens de grandeza. Como
+    em física estatística quase sempre perguntamos pelo comportamento típico, e não pelo
+    excepcional, isso raramente incomoda. Mas vale saber: a gaussiana é o limite central, não
+    um substituto universal da binomial.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s8">8. Contar estados: a partícula na caixa</h2>
+
+  <p>Mudamos de assunto, mas não de método. Para aplicar \(S=\kB\ln\Omega\) é preciso saber
+  contar \(\Omega\), o número de estados acessíveis. Vejamos os dois exemplos mínimos.</p>
+
+  <p><strong>Clássica.</strong> Uma partícula livre numa caixa unidimensional de lado \(L\)
+  tem \(E=p^2/2m\), logo \(p=\pm\sqrt{2mE}\). Admitindo que a energia esteja conhecida apenas
+  dentro de uma faixa \([E,E+\delta E]\), a faixa de momento correspondente é</p>
+
+  <p>\[\delta p=\frac{1}{2}\sqrt{\frac{2m}{E}}\,\delta E,\]</p>
+
+  <p>e a área do espaço de fase acessível, contando os dois sinais do momento, é</p>
+
+  <p>\[\Omega(E,L,\delta E)\;\propto\;L\,\delta p=\sqrt{\frac{2m}{E}}\,L\,\delta E.\]</p>
+
+  <p><strong>Quântica.</strong> Com paredes infinitas, a equação de Schrödinger</p>
+
+  <p>\[-\frac{\hbar^2}{2m}\frac{d^2\Psi}{dx^2}=E\Psi\]</p>
+
+  <p>e as condições \(\Psi(0)=\Psi(L)=0\) dão \(\Psi(x)=A\sen k_nx\) com \(k_n=n\pi/L\),
+  \(n=1,2,3,\dots\), e portanto</p>
+
+  <p>\[E_n=\frac{\hbar^2k_n^2}{2m}=\frac{\hbar^2\pi^2}{2mL^2}n^2.\]</p>
+
+  <p>Aqui os estados são <em>contáveis</em>, e \(\Omega\) é literalmente quantos \(n\) caem na
+  faixa de energia. Compare os dois resultados e verá que coincidem se a área clássica for
+  medida em unidades de \(h\). É o que o exercício 2.3 do módulo anterior antecipava.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s9">9. Contar estados: o oscilador</h2>
+
+  <p><strong>Clássico.</strong> Com \(H=\frac{p^2}{2m}+\frac{1}{2}k'q^2=E\), a trajetória é a
+  elipse de semieixos \(q_m=\sqrt{2E/k'}\) e \(p_m=\sqrt{2mE}\). A região entre as elipses de
+  energia \(E\) e \(E+\delta E\) tem área</p>
+
+  <p>\[\Omega(E,\delta E)\approx \pi q_m\,\delta p+\pi p_m\,\delta q
+  = 2\pi\sqrt{\frac{m}{k'}}\,\delta E=\frac{2\pi\,\delta E}{\omega}.\]</p>
+
+  <p>Repare que não depende de \(E\): a densidade de estados do oscilador é constante.</p>
+
+  <p><strong>Quântico.</strong> Os autoestados são</p>
+
+  <p>\[E_n=\left(n+\tfrac{1}{2}\right)\hbar\omega,\qquad n=0,1,2,\dots\]</p>
+
+  <p>igualmente espaçados de \(\hbar\omega\), o que é a mesma afirmação de densidade constante.
+  O número de estados numa faixa \(\delta E\) é \(\delta E/\hbar\omega\). Comparando com o
+  resultado clássico, \(2\pi\delta E/\omega = h\cdot\delta E/\hbar\omega\): mais uma vez,
+  <strong>um estado por célula de área \(h\)</strong>.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s10">10. O ensemble microcanônico</h2>
+
+  <p>Agora podemos começar. O <strong>ensemble microcanônico</strong> descreve um sistema
+  isolado: energia \(U\), volume \(V\) e número de partículas \(N\) fixos, sem troca de nada
+  com o exterior. Pela hipótese de igual probabilidade a priori do Módulo 2, todos os
+  \(\Omega(U,V,N)\) microestados compatíveis com esses vínculos são igualmente prováveis.</p>
+
+  <p>A ponte com a termodinâmica é um único postulado:</p>
+
+  <div class="destaque">
+    <span class="anuncio">Entropia de Boltzmann</span>
+    \[S = \kB \ln \Omega(U,V,N)\]
+  </div>
+
+  <p>E a partir dela, usando a relação fundamental do Módulo 1, tudo o mais é derivada:</p>
+
+  <p>\[\frac{1}{T}=\left(\frac{\partial S}{\partial U}\right)_{V,N},\qquad
+  \frac{P}{T}=\left(\frac{\partial S}{\partial V}\right)_{U,N},\qquad
+  \frac{\mu}{T}=-\left(\frac{\partial S}{\partial N}\right)_{U,V}.\]</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Por que o logaritmo</span>
+    <p>Porque a entropia precisa ser <strong>extensiva</strong> e as multiplicidades se
+    <strong>multiplicam</strong>. Dois sistemas independentes têm
+    \(\Omega=\Omega_1\Omega_2\), e o logaritmo transforma esse produto na soma
+    \(S=S_1+S_2\), que é o comportamento exigido pela termodinâmica. Nenhuma outra função
+    faria isso. A constante \(\kB\) é apenas o fator de conversão para a unidade de
+    temperatura que herdamos do século XIX.</p>
+  </div>
+
+  <p>O roteiro, daqui em diante, é sempre o mesmo, e vale decorá-lo porque os três próximos
+  sistemas são apenas aplicações dele:</p>
+
+  <div class="bloco def">
+    <span class="rotulo">O roteiro microcanônico</span>
+    <ol>
+      <li>Conte \(\Omega(U,N)\), o número de microestados com energia \(U\);</li>
+      <li>Tome \(S=\kB\ln\Omega\) e aplique Stirling;</li>
+      <li>Passe a grandezas por partícula, \(s=S/N\) e \(u=U/N\);</li>
+      <li>Calcule \(1/T=\partial s/\partial u\) e inverta para obter \(u(T)\);</li>
+      <li>Derive de novo para o calor específico, \(c=\partial u/\partial T\).</li>
+    </ol>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s11">11. Sistema de dois níveis</h2>
+
+  <p>Considere \(N\) partículas que só podem ter duas energias, \(0\) ou \(\epsilon\). Sejam
+  \(n_1\) o número com energia zero e \(n_2=N-n_1\) o número com energia \(\epsilon\). A
+  energia total é</p>
+
+  <p>\[U=n_2\epsilon=(N-n_1)\epsilon \quad\Longrightarrow\quad n_1=N-\frac{U}{\epsilon}.\]</p>
+
+  <p><strong>Passo 1.</strong> Contar. É exatamente a degenerescência do caminhante:</p>
+
+  <p>\[\Omega(U,N)=\frac{N!}{n_1!\,n_2!}
+  =\frac{N!}{\left(N-\frac{U}{\epsilon}\right)!\left(\frac{U}{\epsilon}\right)!}.\]</p>
+
+  <p><strong>Passo 2.</strong> Entropia e Stirling. Com \(\ln n!\approx n\ln n-n\), os termos
+  lineares se cancelam e sobra</p>
+
+  <p>\[S\approx \kB\left[N\ln N-\left(N-\tfrac{U}{\epsilon}\right)
+  \ln\left(N-\tfrac{U}{\epsilon}\right)-\tfrac{U}{\epsilon}\ln\tfrac{U}{\epsilon}\right].\]</p>
+
+  <p><strong>Passo 3.</strong> Por partícula, com \(x\equiv u/\epsilon\), os termos em
+  \(\ln N\) se cancelam entre si e o resultado é notavelmente limpo:</p>
+
+  <p>\[\boxed{\;\frac{s}{\kB}=-(1-x)\ln(1-x)-x\ln x\;}\]</p>
+
+  <p><strong>Passo 4.</strong> Derivando,</p>
+
+  <p>\[\frac{1}{T}=\frac{\partial s}{\partial u}
+  =\frac{\kB}{\epsilon}\ln\left(\frac{\epsilon-u}{u}\right),\]</p>
+
+  <p>e invertendo,</p>
+
+  <p>\[\boxed{\;u(T)=\frac{\epsilon}{1+e^{\epsilon/\kB T}}\;}\]</p>
+
+  <p><strong>Passo 5.</strong> Derivando outra vez, o calor específico:</p>
+
+  <p>\[c=\frac{\partial u}{\partial T}
+  =\kB\left(\frac{\epsilon}{\kB T}\right)^{2}
+  \frac{e^{\epsilon/\kB T}}{\left(1+e^{\epsilon/\kB T}\right)^{2}}.\]</p>
+
+  <p>Esse \(c\) tem a forma de um sino com pico em \(\kB T\approx 0{,}417\,\epsilon\): é a
+  <strong>anomalia de Schottky</strong>. Ela aparece sempre que um sistema tem um conjunto
+  discreto de níveis e é, na prática, a assinatura experimental de um sistema de dois níveis.</p>
+
+  <div data-widget="microcanonico"></div>
+
+  <!-- ================================================== -->
+  <h2 id="s12">12. Temperaturas negativas e o laser</h2>
+
+  <p>Olhe de novo para \(s(u)\) do sistema de dois níveis no widget. Ela sobe, atinge um
+  máximo em \(u=\epsilon/2\) e <em>desce</em>. Como a inclinação é \(1/T\), isso significa:</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>Energia</th><th>Ocupação</th><th>Inclinação \(\partial s/\partial u\)</th>
+    <th>Temperatura</th></tr></thead>
+    <tbody>
+      <tr><td>\(u<\epsilon/2\)</td><td>maioria no nível baixo</td><td>positiva</td>
+          <td>\(T>0\), o caso usual</td></tr>
+      <tr><td>\(u=\epsilon/2\)</td><td>metade e metade</td><td>zero</td>
+          <td>\(T\to\infty\)</td></tr>
+      <tr><td>\(u>\epsilon/2\)</td><td>inversão de população</td><td>negativa</td>
+          <td>\(T<0\)</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Temperaturas absolutas negativas existem, foram realizadas em laboratório com spins
+  nucleares desde 1951, e são <strong>mais quentes</strong> que qualquer temperatura positiva:
+  posto em contato com qualquer sistema normal, um sistema a \(T<0\) cede energia. A escala
+  que ordena corretamente não é \(T\), e sim \(-1/T\).</p>
+
+  <div class="bloco alerta">
+    <span class="rotulo">A condição que torna isso possível</span>
+    <p>O espectro de energia precisa ser <strong>limitado por cima</strong>. Um gás comum não
+    admite temperatura negativa porque sempre se pode dar mais energia cinética às moléculas;
+    não há teto. Um conjunto de spins tem teto: todos apontando contra o campo. Por isso o
+    fenômeno vive em sistemas de spin, e não em gases.</p>
+  </div>
+
+  <p><strong>E o laser?</strong> Um laser precisa de inversão de população, isto é, mais
+  átomos no estado excitado do que no fundamental, para que a emissão estimulada supere a
+  absorção. Mas acabamos de ver que inversão de população é \(u>\epsilon/2\), ou seja,
+  temperatura negativa, que é impossível <em>em equilíbrio térmico</em>.</p>
+
+  <p>A conclusão é um resultado forte: <strong>um sistema de dois níveis não pode funcionar
+  como laser</strong>. Com bombeamento óptico, no melhor dos casos as populações se igualam e
+  o meio fica transparente, nunca amplificador. Por isso todo laser real tem três ou quatro
+  níveis: o truque é bombear para um nível alto de vida curta, que decai rapidamente para um
+  estado metaestável, e fazer a transição laser a partir dele para um nível <em>que se
+  esvazia depressa</em>. A inversão é mantida fora do equilíbrio, por um fluxo contínuo de
+  energia, e não apesar da termodinâmica, mas por nunca deixá-la se estabelecer.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s13">13. O sólido de Einstein</h2>
+
+  <p>Em 1906 Einstein propôs o modelo mais simples possível para um sólido: \(N\) osciladores
+  harmônicos quânticos, independentes, todos de mesma frequência \(\omega\). A energia total é</p>
+
+  <p>\[U=\left(n_1+n_2+\dots+n_N+\frac{N}{2}\right)\hbar\omega
+  =\left(M+\frac{N}{2}\right)\hbar\omega,\]</p>
+
+  <p>onde \(M=\sum_i n_i\) é o número total de <strong>quanta</strong> distribuídos entre os
+  osciladores.</p>
+
+  <p><strong>Passo 1.</strong> Contar de quantas maneiras \(M\) quanta indistinguíveis podem
+  ser repartidos entre \(N\) osciladores distinguíveis. É o problema clássico das barras e
+  estrelas: alinhe \(M\) quanta e \(N-1\) divisórias, e escolha quais posições são divisórias:</p>
+
+  <p>\[\Omega(M,N)=\frac{(M+N-1)!}{M!\,(N-1)!}.\]</p>
+
+  <p><strong>Passos 2 e 3.</strong> Aplicando \(S=\kB\ln\Omega\), Stirling e passando a
+  \(y\equiv u/\hbar\omega\), com \(N\gg 1\):</p>
+
+  <p>\[\frac{s}{\kB}\approx\left(y+\tfrac{1}{2}\right)\ln\left(y+\tfrac{1}{2}\right)
+  -\left(y-\tfrac{1}{2}\right)\ln\left(y-\tfrac{1}{2}\right).\]</p>
+
+  <p><strong>Passo 4.</strong> Derivando,</p>
+
+  <p>\[\frac{1}{T}=\frac{\kB}{\hbar\omega}
+  \ln\!\left(\frac{y+\frac{1}{2}}{y-\frac{1}{2}}\right)
+  \;\Longrightarrow\;
+  e^{\hbar\omega/\kB T}=\frac{y+\frac{1}{2}}{y-\frac{1}{2}},\]</p>
+
+  <p>e isolando \(y\):</p>
+
+  <p>\[\boxed{\;u(T)=\frac{\hbar\omega}{2}\coth\!\left(\frac{\hbar\omega}{2\kB T}\right)
+  =\frac{\hbar\omega}{2}+\frac{\hbar\omega}{e^{\hbar\omega/\kB T}-1}\;}\]</p>
+
+  <p>A segunda forma é mais eloquente: a energia é a de ponto zero mais \(\hbar\omega\) vezes
+  o número médio de quanta, que é exatamente a distribuição de Bose e Einstein que
+  encontraremos no Módulo 8.</p>
+
+  <p><strong>Passo 5.</strong> O calor específico por oscilador:</p>
+
+  <p>\[c=\kB\left(\frac{\hbar\omega}{\kB T}\right)^{2}
+  \frac{e^{\hbar\omega/\kB T}}{\left(e^{\hbar\omega/\kB T}-1\right)^{2}}.\]</p>
+
+  <div class="cartoes">
+    <div class="cartao">
+      <h3>Temperatura alta</h3>
+      <p>Com \(\hbar\omega\ll\kB T\), expandindo a exponencial, \(c\to\kB\) por oscilador. Cada
+      átomo do sólido vale três osciladores, um por direção, logo \(c\to 3\kB\) por átomo: é a
+      <strong>lei de Dulong e Petit</strong>, medida em 1819 e explicada aqui.</p>
+    </div>
+    <div class="cartao">
+      <h3>Temperatura baixa</h3>
+      <p>Com \(\hbar\omega\gg\kB T\), o calor específico cai como \(e^{-\hbar\omega/\kB T}\),
+      indo a zero como a terceira lei exige. A energia tende a \(\hbar\omega/2\), a energia de
+      ponto zero, que nenhum resfriamento retira.</p>
+    </div>
+  </div>
+
+  <div class="bloco fisica">
+    <span class="rotulo">O que Einstein acertou e o que não</span>
+    <p>Antes de 1906, o calor específico dos sólidos caindo a zero era um escândalo sem
+    explicação. Einstein mostrou que bastava quantizar os osciladores, e esse foi o
+    <strong>primeiro uso da hipótese quântica fora da radiação</strong>. O modelo acerta os
+    dois limites e todo o comportamento qualitativo.</p>
+    <p>O que ele erra é o <em>detalhe</em> de baixa temperatura: o experimento mostra
+    \(c\propto T^3\), e não um decaimento exponencial. A causa é a hipótese de frequência
+    única. Debye, em 1912, trocou-a por um espectro de modos de vibração do cristal e obteve
+    o \(T^3\) correto. Trataremos disso no Módulo 8.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s14">14. O paramagneto e a lei de Curie</h2>
+
+  <p>Considere \(N\) spins que não interagem entre si, cada um com momento magnético de
+  módulo \(\mu_0\), num campo externo \(\vec B\). A energia de um spin é
+  \(H=-\vec\mu\cdot\vec B=-\mu_z B\), com \(\mu_z=\pm\mu_0\): dois valores, conforme o spin
+  esteja alinhado ou antialinhado com o campo.</p>
+
+  <p>É de novo o mesmo problema de contagem. Com \(N_1\) spins alinhados e \(N_2=N-N_1\)
+  antialinhados,</p>
+
+  <p>\[U=-\mu_0B\,N_1+\mu_0B\,N_2,\qquad
+  \Omega=\frac{N!}{N_1!\,N_2!}.\]</p>
+
+  <p>Seguindo o roteiro, com \(w\equiv u/(\mu_0 B)\) entre \(-1\) e \(1\):</p>
+
+  <p>\[\frac{s}{\kB}=-\frac{1-w}{2}\ln\frac{1-w}{2}-\frac{1+w}{2}\ln\frac{1+w}{2},\]</p>
+
+  <p>e derivando e invertendo chega-se, com a identidade
+  \(\tanh x=(e^{2x}-1)/(e^{2x}+1)\), a</p>
+
+  <div class="destaque">
+    <span class="anuncio">Energia e magnetização do paramagneto ideal</span>
+    \[u(T)=-\mu_0 B\tanh\!\left(\frac{\mu_0B}{\kB T}\right),\qquad
+      \mathcal{M}(T)=\frac{N\mu_0}{V}\tanh\!\left(\frac{\mu_0B}{\kB T}\right)\]
+  </div>
+
+  <p>A magnetização sai da energia sem conta nova, porque \(U=-\mathcal{M}VB\). Os limites
+  fazem sentido imediato: a temperatura alta a agitação térmica vence e a tangente
+  hiperbólica tende a zero; a temperatura baixa todos os spins se alinham e
+  \(\mathcal{M}\to N\mu_0/V\), a saturação.</p>
+
+  <p>A susceptibilidade é a derivada em relação ao campo:</p>
+
+  <p>\[\chi=\frac{\partial \mathcal{M}}{\partial B}
+  =\frac{N\mu_0^{2}}{\kB T V}\operatorname{sech}^{2}\!\left(\frac{\mu_0B}{\kB T}\right),\]</p>
+
+  <p>e para campo fraco, com \(\operatorname{sech}0=1\),</p>
+
+  <div class="destaque">
+    <span class="anuncio">Lei de Curie</span>
+    \[\chi=\frac{N\mu_0^{2}}{\kB T V}\;\propto\;\frac{1}{T}\]
+  </div>
+
+  <p>Pierre Curie encontrou esse \(1/T\) experimentalmente em 1895, na sua tese de doutorado,
+  trinta anos antes de existir mecânica quântica do spin. Acabamos de obtê-lo contando
+  arranjos de setas para cima e para baixo.</p>
+
+  <div class="bloco alerta">
+    <span class="rotulo">O que falta neste modelo</span>
+    <p>Os spins aqui <strong>não interagem</strong>. Por isso a magnetização se anula sempre
+    que \(B=0\), em qualquer temperatura: sem campo, não há nada que escolha uma direção.
+    Um ímã de verdade é magnetizado <em>sem</em> campo externo, e isso exige interação entre
+    vizinhos. Acrescentá-la é o assunto do Módulo 9, com os modelos de Weiss, Heisenberg e
+    Ising, e o resultado é uma transição de fase: abaixo da temperatura de Curie,
+    magnetização espontânea.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s15">15. Equilíbrio térmico</h2>
+
+  <p>Falta a pergunta mais importante do módulo: <em>por que</em> dois corpos em contato
+  acabam na mesma temperatura? A resposta não usa nenhuma lei nova.</p>
+
+  <p>Considere dois sistemas isolados do mundo mas em contato entre si por uma parede rígida,
+  fixa e impermeável, que só deixa passar calor. A energia total \(U=U_1+U_2\) é fixa, mas a
+  repartição não. Como os sistemas são independentes, o número total de microestados do
+  conjunto, quando o primeiro tem energia \(U_1\), é o produto</p>
+
+  <p>\[\Omega(U,U_1)=\Omega_1(U_1)\,\Omega_2(U-U_1).\]</p>
+
+  <p>Pela equiprobabilidade a priori, a probabilidade de observar o sistema 1 com energia
+  \(U_1\) é proporcional a esse número:</p>
+
+  <p>\[\wp(U_1)=C\,\Omega_1(U_1)\,\Omega_2(U-U_1).\]</p>
+
+  <p>Agora o ponto crucial. \(\Omega_1\) <em>cresce</em> com \(U_1\) e \(\Omega_2\)
+  <em>decresce</em>. O produto de uma função crescente por uma decrescente tem um máximo, e o
+  equilíbrio é esse máximo:</p>
+
+  <p>\[\frac{\partial}{\partial U_1}\ln\wp = 0
+  \;\Longrightarrow\;
+  \frac{\partial \ln\Omega_1}{\partial U_1}-\frac{\partial\ln\Omega_2}{\partial U_2}=0.\]</p>
+
+  <p>Mas \(\kB\ln\Omega=S\) e \(\partial S/\partial U=1/T\). Logo</p>
+
+  <div class="destaque">
+    <span class="anuncio">Condição de equilíbrio térmico</span>
+    \[\frac{1}{T_1}=\frac{1}{T_2}\quad\Longleftrightarrow\quad T_1=T_2\]
+  </div>
+
+  <p>A igualdade de temperaturas não foi postulada: ela <strong>é</strong> a condição de
+  máxima multiplicidade. Dois corpos chegam à mesma temperatura pela mesma razão que uma
+  moeda honesta lançada mil vezes dá perto de quinhentas caras.</p>
+
+  <div data-widget="equilibrio"></div>
+
+  <!-- ================================================== -->
+  <h2 id="s16">16. Equilíbrio mecânico e químico</h2>
+
+  <p>O argumento se repete palavra por palavra, mudando apenas o que a parede deixa passar.</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>A parede permite</th><th>O que se reparte</th><th>Maximizar \(S_1+S_2\) dá</th>
+    <th>Condição</th></tr></thead>
+    <tbody>
+      <tr><td>calor</td><td>\(U=U_1+U_2\)</td>
+          <td>\(\dfrac{\partial S_1}{\partial U_1}=\dfrac{\partial S_2}{\partial U_2}\)</td>
+          <td>\(T_1=T_2\)</td></tr>
+      <tr><td>calor e movimento (pistão livre)</td><td>\(U\) e \(V=V_1+V_2\)</td>
+          <td>\(\dfrac{\partial S_1}{\partial V_1}=\dfrac{\partial S_2}{\partial V_2}\)</td>
+          <td>\(\dfrac{P_1}{T_1}=\dfrac{P_2}{T_2}\), e com \(T_1=T_2\), \(P_1=P_2\)</td></tr>
+      <tr><td>calor e partículas (parede porosa)</td><td>\(U\) e \(N=N_1+N_2\)</td>
+          <td>\(\dfrac{\partial S_1}{\partial N_1}=\dfrac{\partial S_2}{\partial N_2}\)</td>
+          <td>\(\dfrac{\mu_1}{T_1}=\dfrac{\mu_2}{T_2}\), e com \(T_1=T_2\), \(\mu_1=\mu_2\)</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Aqui está, enfim, o significado do potencial químico que o Módulo 1 introduziu sem
+  explicar. Assim como a temperatura é o que se iguala quando energia pode fluir, o potencial
+  químico é <strong>o que se iguala quando partículas podem fluir</strong>. Ele mede a
+  relutância do sistema em receber mais uma partícula, e as partículas migram do potencial
+  químico alto para o baixo, exatamente como o calor flui da temperatura alta para a baixa.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">A segunda lei, vista de perto</span>
+    <p>Note o que foi demonstrado. A entropia total aumenta até o máximo não porque exista uma
+    lei proibindo o contrário, mas porque o estado de máxima multiplicidade é esmagadoramente
+    mais provável. O sistema <em>pode</em> flutuar para longe do pico, e de fato flutua, em
+    proporção \(1/\sqrt N\).</p>
+    <p>Com \(N\sim 10^{23}\), essa proporção é \(10^{-11}\): para observar uma violação
+    perceptível da segunda lei seria preciso esperar um tempo muito maior que a idade do
+    universo. A segunda lei não é uma lei fundamental como a conservação da energia. É uma
+    afirmação estatística, verdadeira com uma margem tão absurda que nunca a veremos falhar.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s17">17. Exercícios resolvidos</h2>
+
+  <div class="bloco ex">
+    <span class="rotulo">Exercício resolvido 3.1: o caminhante assimétrico</span>
+    <p><b>Um caminhante dá 400 passos de 1 cm com \(p=0{,}6\). Calcule o deslocamento médio,
+    o desvio padrão e a probabilidade de ele terminar à esquerda da origem.</b></p>
+    <details class="solucao"><summary>Ver solução</summary>
+    <div class="corpo-solucao">
+    <p>Com \(N=400\), \(p=0{,}6\) e \(q=0{,}4\):</p>
+    <p>\[\overline{m}=(p-q)N=0{,}2\times 400=80\ \text{passos}=80\ \mathrm{cm},\]</p>
+    <p>\[\sigma_m=2\sqrt{Npq}=2\sqrt{400\times 0{,}24}=2\times 9{,}80=19{,}6\
+    \text{passos}=19{,}6\ \mathrm{cm}.\]</p>
+    <p>Terminar à esquerda significa \(m<0\), ou seja, estar a mais de
+    \(80/19{,}6=4{,}08\) desvios padrão abaixo da média. Pela gaussiana,</p>
+    <p>\[\wp(m<0)\approx \Phi(-4{,}08)\approx 2{,}2\times 10^{-5},\]</p>
+    <p>cerca de uma chance em 45 mil. Uma assimetria modesta de 60 contra 40, repetida 400
+    vezes, torna o resultado praticamente certo. É o mesmo mecanismo pelo qual um gás com um
+    desequilíbrio ínfimo de pressão escoa sempre no mesmo sentido.</p>
+    <p>Confira no widget da seção 2: ponha \(N=400\) e \(p=0{,}60\).</p>
+    </div></details>
+  </div>
+
+  <div class="bloco ex">
+    <span class="rotulo">Exercício resolvido 3.2: o pico de Schottky</span>
+    <p><b>Determine a temperatura em que o calor específico do sistema de dois níveis é
+    máximo, e o valor do máximo.</b></p>
+    <details class="solucao"><summary>Ver solução</summary>
+    <div class="corpo-solucao">
+    <p>Escreva \(x=\epsilon/\kB T\), de modo que</p>
+    <p>\[\frac{c}{\kB}=\frac{x^{2}e^{x}}{(1+e^{x})^{2}}.\]</p>
+    <p>Derivando em relação a \(x\) e igualando a zero, depois de simplificar o fator comum
+    \(x e^x/(1+e^x)^3\), a condição é</p>
+    <p>\[2(1+e^{x})=x(e^{x}-1)
+    \quad\Longleftrightarrow\quad
+    \frac{x}{2}=\coth\frac{x}{2}.\]</p>
+    <p>Não há solução em forma fechada. Numericamente, \(x^{*}=2{,}3994\), logo</p>
+    <p>\[\frac{\kB T^{*}}{\epsilon}=\frac{1}{x^{*}}=0{,}4168,
+    \qquad \frac{c_{\max}}{\kB}=0{,}4393.\]</p>
+    <p><b>Para que serve.</b> A posição do pico mede diretamente o espaçamento \(\epsilon\)
+    entre os níveis. Medindo o calor específico de uma amostra a baixa temperatura e vendo
+    onde está o pico de Schottky, obtém-se \(\epsilon\) sem nenhuma espectroscopia. É uma
+    técnica padrão em física de baixas temperaturas.</p>
+    <p>Confira os dois números no cartão "pico de c em" do widget da seção 11.</p>
+    </div></details>
+  </div>
+
+  <div class="bloco ex">
+    <span class="rotulo">Exercício resolvido 3.3: dois sólidos de Einstein</span>
+    <p><b>Dois sólidos de Einstein, A com \(N_A=3\) osciladores e B com \(N_B=3\),
+    compartilham \(q=6\) quanta. Monte a tabela de multiplicidades e identifique o
+    macroestado mais provável. Depois discuta o que muda com \(N_A=N_B=10^{23}\).</b></p>
+    <details class="solucao"><summary>Ver solução</summary>
+    <div class="corpo-solucao">
+    <p>Com \(\Omega(q,N)=\binom{q+N-1}{q}\) e \(N=3\), temos
+    \(\Omega(q,3)=\binom{q+2}{2}=(q+1)(q+2)/2\):</p>
+    <div class="tabela-rolavel">
+    <table>
+      <thead><tr><th>\(q_A\)</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr></thead>
+      <tbody>
+        <tr><th>\(\Omega_A\)</th><td>1</td><td>3</td><td>6</td><td>10</td><td>15</td><td>21</td><td>28</td></tr>
+        <tr><th>\(\Omega_B\)</th><td>28</td><td>21</td><td>15</td><td>10</td><td>6</td><td>3</td><td>1</td></tr>
+        <tr><th>\(\Omega_A\Omega_B\)</th><td>28</td><td>63</td><td>90</td><td><b>100</b></td>
+            <td>90</td><td>63</td><td>28</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p>O total é \(28+63+90+100+90+63+28=462\), que confere com
+    \(\binom{6+6-1}{6}=\binom{11}{6}=462\), como tinha de ser: o sistema composto é ele mesmo
+    um sólido de Einstein com 6 osciladores.</p>
+    <p>O macroestado mais provável é \(q_A=3\), a repartição igual, com 100 microestados em
+    462, ou 21,6%. Mas repare: o estado <em>menos</em> provável, \(q_A=0\), ainda tem 28 em
+    462, isto é 6%. Com seis osciladores, a "segunda lei" é uma tendência fraca, e flutuações
+    enormes são rotineiras.</p>
+    <p><b>Com \(10^{23}\).</b> O pico continua em \(q_A=q/2\), mas sua largura relativa cai
+    como \(1/\sqrt{N}\), chegando a \(10^{-11}\). A probabilidade de observar \(q_A=0\),
+    equivalente a toda a energia espontaneamente numa metade, passa a ser da ordem de
+    \(2^{-10^{23}}\): um número cujo <em>expoente</em> já é maior que o número de átomos do
+    universo observável. A tendência fraca de seis osciladores vira certeza absoluta.</p>
+    <p>Reproduza os dois regimes no widget da seção 15, movendo \(N_A\) e \(N_B\) do mínimo
+    ao máximo e observando a largura relativa do pico.</p>
+    </div></details>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s18">18. Exercícios propostos</h2>
+
+  <div class="bloco def">
+    <span class="rotulo">Para resolver</span>
+    <ol>
+      <li><b>3.1</b> Mostre que \(\overline{n_2}=Nq\) usando o truque da derivada aplicado a
+      \(q\,\partial/\partial q\), e verifique que \(\overline{n_1}+\overline{n_2}=N\).</li>
+
+      <li><b>3.2</b> Use a aproximação de Stirling \(N!\approx N^Ne^{-N}\sqrt{2\pi N}\) para
+      demonstrar que a binomial tende a
+      \(\wp_N(n_1)\approx (2\pi Npq)^{-1/2}\exp\left[-(n_1-Np)^2/2Npq\right]\).
+      Sugestão: expanda \(\ln\wp_N(n_1)\) em torno de \(n_1=Np\) até segunda ordem.</li>
+
+      <li><b>3.3</b> Uma molécula de ar à temperatura ambiente tem livre caminho médio
+      \(L\approx 70\) nm e velocidade típica \(500\) m/s. Estime o tempo entre colisões, o
+      coeficiente de difusão \(D=L^2/2\tau\) e o tempo para a molécula se afastar 1 m por
+      difusão. Compare com o tempo que levaria em linha reta.</li>
+
+      <li><b>3.4</b> Para o sólido de Einstein, mostre que no limite \(\kB T\gg\hbar\omega\)
+      a energia tende a \(u\to\kB T\) e o calor específico a \(c\to\kB\). Em seguida mostre
+      que a lei de Dulong e Petit corresponde a \(3\kB\) por átomo e explique o fator 3.</li>
+
+      <li><b>3.5</b> Um paramagneto ideal tem \(\mu_0=9{,}27\times 10^{-24}\) J/T num campo
+      de 1 T. Calcule a temperatura abaixo da qual mais de 90% dos spins estão alinhados, e
+      comente se isso é alcançável em laboratório.</li>
+
+      <li><b>3.6</b> <b>Desmagnetização adiabática.</b> Mostre que, para o paramagneto, a
+      entropia por spin depende de \(B\) e \(T\) apenas pela combinação \(B/T\). Conclua que
+      reduzir \(B\) lentamente a entropia constante faz \(T\) cair na mesma proporção, e
+      explique por que essa é a técnica padrão para chegar abaixo de 1 mK.</li>
+
+      <li><b>3.7</b> <b>Modelo de Langmuir.</b> Um sólido tem \(N\) sítios de adsorção, cada
+      um vazio (energia 0) ou ocupado (energia \(-\epsilon\)). Conte \(\Omega(U,N)\), obtenha
+      \(s(u)\), e mostre que a fração ocupada em equilíbrio é
+      \(\theta=1/(1+e^{-\epsilon/\kB T})\). Compare com o sistema de dois níveis e explique
+      por que são o mesmo problema.</li>
+
+      <li><b>3.8</b> Para o sistema de dois níveis, calcule a entropia em \(u=0\),
+      \(u=\epsilon/2\) e \(u=\epsilon\), e interprete fisicamente cada valor. Por que a
+      entropia é a mesma nos dois extremos?</li>
+    </ol>
+  </div>
+
+  <nav class="nav-aulas">
+    <a href="aula02.html"><small>Módulo anterior</small>← 2. Métodos estatísticos</a>
+    <span class="em-breve"><small>Em preparação</small>4. Movimento browniano</span>
+  </nav>
+
+</main>
+</div>
+
+<footer class="rodape">
+  <img class="logo-rodape" src="assets/img/logo-lfca.png" alt="LFCA | URCA">
+  <p><strong>Prof. Apiano Morais</strong> · <a href="mailto:apiano.morais@urca.br">apiano.morais@urca.br</a><br>
+  Laboratório de Física Computacional Aplicada (LFCA) · Universidade Regional do Cariri</p>
+</footer>
+
+<script src="assets/js/widgets.js?v=202611071700"></script>
+</body>
+</html>
