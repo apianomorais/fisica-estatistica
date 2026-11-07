@@ -1115,6 +1115,166 @@
     tipografar(corpo);
   };
 
+
+  /* =================================================================
+     8. O zero absoluto por extrapolação
+     Gases diferentes, em quantidades diferentes, dão retas P contra t
+     de inclinações diferentes. Prolongadas, todas cruzam o eixo no
+     mesmo ponto. É a evidência experimental de que a temperatura mede
+     algo universal, e não uma propriedade de cada substância.
+     ================================================================= */
+  REGISTRO.kelvin = function (raiz) {
+    var corpo = moldura(raiz, 'Por que o zero absoluto é o mesmo para todos os gases');
+
+    var ZERO = -273.15;
+
+    /* P0 é a pressão a 0 °C, que depende só da quantidade de gás posta no
+       bulbo. tmin é a temperatura abaixo da qual aquele gás deixa de ser gás:
+       ali a medida acaba e começa a extrapolação. */
+    var GASES = [
+      { nome: 'hélio', P0: 118, tmin: -268.9, cor: '#2c5f8d' },
+      { nome: 'hidrogênio', P0: 96, tmin: -252.9, cor: '#1f6f54' },
+      { nome: 'nitrogênio', P0: 74, tmin: -195.8, cor: '#b5831f' },
+      { nome: 'oxigênio', P0: 52, tmin: -183.0, cor: '#8c2f39' },
+      { nome: 'gás carbônico', P0: 31, tmin: -78.5, cor: '#7a5ea8' }
+    ];
+
+    var est = { P0: 140, zoom: false };
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+
+    deslizante(ctr, 'quantidade do seu gás (pressão a 0 °C)', 20, 180, 1, 140,
+      function (v) { est.P0 = v; desenhar(); },
+      function (v) { return v + ' kPa'; });
+
+    var cx = el('label', { class: 'caixa' });
+    var chk = el('input', { type: 'checkbox' });
+    cx.appendChild(chk);
+    cx.appendChild(el('span', { texto: 'aproximar o cruzamento' }));
+    chk.addEventListener('change', function () { est.zoom = chk.checked; desenhar(); });
+    ctr.appendChild(cx);
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'cruzamento do seu gás', k: 'z' },
+      { rot: 'coeficiente \\(\\alpha=\\frac{1}{P_0}\\frac{dP}{dt}\\)', k: 'a' },
+      { rot: '1/α', k: 'ia' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function desenhar() {
+      var tmin = est.zoom ? -290 : -300;
+      var tmax = est.zoom ? -255 : 160;
+      var pmax = est.zoom ? 14 : 260;
+
+      var ax = G.eixos(cv, {
+        xmin: tmin, xmax: tmax, ymin: 0, ymax: pmax, altura: 340,
+        rotX: 'temperatura t (°C)', rotY: 'pressão P (kPa)',
+        marcasX: est.zoom
+          ? [-290, -283, -273.15, -266, -259].map(function (v) {
+              return { v: v, r: v === -273.15 ? '-273,15' : String(v) };
+            })
+          : [-300, -200, -100, 0, 100].map(function (v) {
+              return { v: v, r: String(v) };
+            }),
+        formataY: function (v) { return String(Math.round(v)); }
+      });
+
+      var ct = ax.ct;
+      var todos = GASES.concat([{ nome: 'o seu gás', P0: est.P0,
+                                  tmin: -270, cor: '#1b1f24', seu: true }]);
+
+      todos.forEach(function (g) {
+        var P = function (t) { return g.P0 * (1 + t / 273.15); };
+
+        // trecho medido: do ponto em que o gás liquefaz para cima
+        ct.save();
+        ct.strokeStyle = g.cor;
+        ct.lineWidth = g.seu ? 2.6 : 2;
+        ct.beginPath();
+        ct.moveTo(ax.X(Math.max(g.tmin, tmin)), ax.Y(P(Math.max(g.tmin, tmin))));
+        ct.lineTo(ax.X(tmax), ax.Y(P(tmax)));
+        ct.stroke();
+
+        // extrapolação: tracejada, até o eixo
+        ct.setLineDash([5, 4]);
+        ct.lineWidth = 1.3;
+        ct.beginPath();
+        ct.moveTo(ax.X(ZERO), ax.Y(0));
+        ct.lineTo(ax.X(Math.max(g.tmin, tmin)), ax.Y(P(Math.max(g.tmin, tmin))));
+        ct.stroke();
+        ct.restore();
+
+        // onde a medida acaba
+        if (g.tmin > tmin && g.tmin < tmax && !g.seu) {
+          ct.save();
+          ct.fillStyle = g.cor;
+          ct.beginPath();
+          ct.arc(ax.X(g.tmin), ax.Y(P(g.tmin)), 3.4, 0, 2 * Math.PI);
+          ct.fill();
+          ct.restore();
+        }
+
+        // rótulo na ponta direita da reta
+        if (!est.zoom) {
+          ct.save();
+          ct.fillStyle = g.cor;
+          ct.font = (g.seu ? '600 ' : '') + '11px system-ui, sans-serif';
+          ct.textAlign = 'right';
+          ct.textBaseline = 'bottom';
+          ct.fillText(g.nome, ax.X(tmax) - 4, ax.Y(P(tmax)) - 3);
+          ct.restore();
+        }
+      });
+
+      // o ponto de encontro
+      ct.save();
+      ct.strokeStyle = G.COR.vinho;
+      ct.setLineDash([3, 3]);
+      ct.lineWidth = 1.2;
+      ct.beginPath();
+      ct.moveTo(ax.X(ZERO), ax.y0);
+      ct.lineTo(ax.X(ZERO), ax.y1);
+      ct.stroke();
+      ct.setLineDash([]);
+      ct.fillStyle = G.COR.vinho;
+      ct.beginPath();
+      ct.arc(ax.X(ZERO), ax.Y(0), 4.5, 0, 2 * Math.PI);
+      ct.fill();
+      ct.font = '600 11px system-ui, sans-serif';
+      ct.textAlign = 'left';
+      ct.textBaseline = 'top';
+      ct.fillText('-273,15 °C = 0 K', ax.X(ZERO) + 7, ax.y0 + 2);
+      ct.restore();
+
+      var alfa = 1 / 273.15;
+      mostrar({
+        z: '-273,15 °C',
+        a: F.fmt(alfa, 6) + ' /°C',
+        ia: F.fmt(1 / alfa, 2) + ' °C'
+      });
+
+      nota.innerHTML = est.zoom
+        ? 'Ampliado em torno do cruzamento: as cinco retas e a sua chegam ao eixo no mesmo '
+          + 'ponto. Nenhuma delas foi ajustada para isso. Nas medidas reais de Charles e de '
+          + 'Gay-Lussac, feitas com instrumentos do início do século XIX, o encontro já '
+          + 'aparecia dentro do erro experimental.'
+        : 'Mude a quantidade do seu gás: a reta gira, mas <b>em torno do mesmo ponto</b>. '
+          + 'Os círculos marcam onde cada gás liquefaz e a medida acaba: do hélio em -268,9 °C '
+          + 'ao gás carbônico em -78,5 °C. Dali para a esquerda tudo é extrapolação '
+          + 'tracejada, e é justamente por isso que o resultado impressiona: cinco '
+          + 'substâncias quimicamente distintas, que nem sequer chegam juntas até lá, '
+          + 'apontam todas para o mesmo lugar.';
+      tipografar(nota);
+    }
+
+    registrarRedesenho(desenhar);
+    tipografar(corpo);
+  };
+
   /* ---------- inicialização ---------- */
   document.addEventListener('DOMContentLoaded', function () {
     Array.prototype.forEach.call(document.querySelectorAll('[data-widget]'), function (n) {

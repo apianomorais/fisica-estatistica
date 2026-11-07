@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Módulo 1: Revisão de termodinâmica | Física Estatística</title>
 <link rel="icon" type="image/png" href="assets/img/favicon.png">
-<link rel="stylesheet" href="assets/css/estilo.css?v=202611071645">
-<script src="assets/js/comum.js?v=202611071645"></script>
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611071649">
+<script src="assets/js/comum.js?v=202611071649"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
 <body>
@@ -167,10 +167,42 @@
   <div class="bloco fisica">
     <span class="rotulo">A escala Kelvin</span>
     <p>A escala é ancorada no ponto triplo da água, 273,16 K, e o zero é a extrapolação do
-    ponto onde a pressão de um gás ideal se anularia. Essa extrapolação é notável: gases
-    diferentes, em condições diferentes, extrapolam todos para o <em>mesmo</em> ponto. É um
-    indício experimental forte de que a temperatura mede algo universal, e não uma propriedade
-    de cada substância.</p>
+    ponto onde a pressão de um gás ideal se anularia.</p>
+    <p>Vale demorar nesse ponto, porque ele é um dos resultados experimentais mais bonitos da
+    física. Encerre um gás num bulbo de volume fixo e meça a pressão a várias temperaturas.
+    O gráfico de \(P\) contra \(t\) em graus Celsius é uma reta. Mude a quantidade de gás e a
+    reta muda de inclinação. Troque de gás, de hélio para nitrogênio para gás carbônico, e a
+    inclinação muda outra vez.</p>
+    <p>Mas prolongue todas elas para a esquerda. Todas cruzam o eixo das temperaturas
+    <strong>no mesmo ponto</strong>, perto de 273,15 graus abaixo de zero. A experiência faz
+    essa pergunta a substâncias quimicamente distintas e recebe sempre a mesma resposta.</p>
+  </div>
+
+  <div data-widget="kelvin"></div>
+
+  <p>Dito em fórmula: todos os gases diluídos obedecem a
+  \(P = P_0\left(1+\alpha t\right)\) com o <em>mesmo</em> coeficiente
+  \(\alpha = 1/273{,}15\) por grau, qualquer que seja o gás e qualquer que seja \(P_0\). Uma
+  constante que não depende da substância medida está dizendo alguma coisa sobre a
+  temperatura, e não sobre o gás. Definindo \(T = t + 273{,}15\), a reta passa a ser
+  simplesmente \(P\propto T\), e a extrapolação vira a origem de uma escala
+  <strong>absoluta</strong>.</p>
+
+  <div class="bloco alerta">
+    <span class="rotulo">Nenhum gás chega lá</span>
+    <p>Repare nos círculos do gráfico: cada curva medida termina onde aquele gás liquefaz, do
+    gás carbônico em 78,5 graus negativos ao hélio em 268,9 negativos. Nenhuma substância
+    permanece gasosa até o cruzamento, e portanto <em>nenhuma reta é medida até lá</em>. O
+    zero absoluto não é um ponto observado: é um ponto para onde cinco extrapolações
+    independentes apontam.</p>
+    <p>Esse é também o primeiro aviso de que \(PV=N\kB T\) é um modelo com prazo de validade.
+    Gases reais desviam da reta, e tanto mais quanto maiores a pressão e menor a temperatura.
+    Existe, para cada gás, uma temperatura especial em que os desvios se cancelam em primeira
+    ordem e a lei de Boyle volta a valer numa faixa larga de pressões: é a
+    <strong>temperatura de Boyle</strong>, definida pelo anulamento do segundo coeficiente do
+    virial, \(B(T_B)=0\). Para o nitrogênio ela fica em torno de 327 K, para o hidrogênio em
+    110 K, e para o hélio em apenas 23 K. Trataremos dela no Módulo 7, junto com a expansão em
+    aglomerados e a equação de van der Waals.</p>
   </div>
 
   <!-- ================================================== -->
@@ -740,6 +772,6 @@
   Laboratório de Física Computacional Aplicada (LFCA) · Universidade Regional do Cariri</p>
 </footer>
 
-<script src="assets/js/widgets.js?v=202611071645"></script>
+<script src="assets/js/widgets.js?v=202611071649"></script>
 </body>
 </html>
