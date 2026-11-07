@@ -212,6 +212,24 @@ var F = (function () {
     return s * h / 3;
   }
 
+  /* Função de Bessel modificada de segunda espécie, pela representação
+     integral  K_a(x) = ∫₀^∞ e^{-x cosh t} cosh(at) dt.  O que se devolve é
+     e^x K_a(x), porque para x grande K_a sozinho estoura o ponto flutuante
+     e, nas razões em que ela aparece, o fator e^x cancela de qualquer modo.
+     O integrando é estreito para x grande (largura ~1/√x) e largo para x
+     pequeno, e o corte acompanha os dois casos.
+     Confere com scipy.special.kve em onze dígitos para a = 0…4 e
+     x entre 0,01 e 10⁴. */
+  function besselKe(a, x) {
+    if (!(x > 0)) return Infinity;
+    var f = function (t) {
+      var y = x * (Math.cosh(t) - 1);
+      return y > 700 ? 0 : Math.exp(-y) * Math.cosh(a * t);
+    };
+    var t1 = Math.acosh(1 + 60 / x);
+    return simpson(f, 0, t1, 2000) + simpson(f, t1, t1 + 10, 1500);
+  }
+
   /* Raiz de f no intervalo [a,b] por bisseção; devolve null se não houver troca de sinal */
   function bissecao(f, a, b, tol) {
     var fa = f(a), fb = f(b);
@@ -260,7 +278,7 @@ var F = (function () {
     planck: planck, wien: wien,
     langevin: langevin, brillouin: brillouin, isingCampoMedio: isingCampoMedio,
     cEinstein: cEinstein, cDebye: cDebye, schottky: schottky,
-    simpson: simpson, bissecao: bissecao,
+    simpson: simpson, bissecao: bissecao, besselKe: besselKe,
     normalAleatoria: normalAleatoria, fmt: fmt, pct: pct
   };
 })();

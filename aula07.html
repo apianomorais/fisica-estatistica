@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Módulo 7: Gases clássicos | Física Estatística</title>
 <link rel="icon" type="image/png" href="assets/img/favicon.png">
-<link rel="stylesheet" href="assets/css/estilo.css?v=202611071806">
-<script src="assets/js/comum.js?v=202611071806"></script>
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611071820">
+<script src="assets/js/comum.js?v=202611071820"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
 <body>
@@ -48,8 +48,10 @@
     <li><a href="#s10">10. A temperatura de Boyle</a></li>
     <li><a href="#s11">11. Expansão livre e resfriamento</a></li>
     <li><a href="#s12">12. O gás ultrarrelativístico</a></li>
-    <li><a href="#s13">13. Exercícios resolvidos</a></li>
-    <li><a href="#s14">14. Exercícios propostos</a></li>
+    <li><a href="#s13">13. Do losango ao hiper-octaedro</a></li>
+    <li><a href="#s14">14. O gás relativístico exato</a></li>
+    <li><a href="#s15">15. Exercícios resolvidos</a></li>
+    <li><a href="#s16">16. Exercícios propostos</a></li>
   </ol>
 </aside>
 
@@ -509,7 +511,181 @@
   </div>
 
   <!-- ================================================== -->
-  <h2 id="s13">13. Exercícios resolvidos</h2>
+  <h2 id="s13">13. Do losango ao hiper-octaedro</h2>
+
+  <p>O resultado da seção anterior saiu do ensemble canônico, de uma integral gaussiana e de
+  uma derivada de \(\ln Z\). Vale refazê-lo no <strong>microcanônico</strong>, porque lá ele
+  não depende de nenhuma integral: depende de um fato geométrico, e o fato se enxerga.</p>
+
+  <p>Considere \(N\) partículas numa caixa, com hamiltoniana</p>
+
+  <p>\[H=\sum_{i=1}^{N}c\,|p_i| + u(\vec r_i),\qquad
+  u(\vec r_i)=\begin{cases}0,&amp;0\le r_i\le L,\\ \infty,&amp;\text{fora.}\end{cases}\]</p>
+
+  <p>No microcanônico, contar estados é medir o volume da região do espaço de fase com
+  energia até \(E\). A parte espacial dá \(L^N\) e não tem mistério. A parte dos momentos é
+  onde está a física, e a pergunta é: <em>que sólido é esse?</em></p>
+
+  <div data-widget="politopo"></div>
+
+  <p>Para duas partículas, \(E=c(|p_1|+|p_2|)\) é a equação de um <strong>losango</strong>
+  de semidiagonal \(E/c\), de área</p>
+
+  <p>\[\Omega_p(N=2)=4\times\tfrac12\times\left(\frac{E}{c}\right)^2
+  =2\left(\frac{E}{c}\right)^2,\]</p>
+
+  <p>quatro triângulos retângulos de catetos \(E/c\). Para três, o sólido é um
+  <strong>octaedro</strong>, oito pirâmides de base triangular:</p>
+
+  <p>\[\Omega_p(N=3)=8\times\tfrac13\times\tfrac12\left(\frac{E}{c}\right)^3
+  =\frac43\left(\frac{E}{c}\right)^3.\]</p>
+
+  <p>O padrão é claro e vale em qualquer dimensão. São \(2^N\) ortantes, um para cada escolha
+  dos sinais dos \(p_i\), e dentro de cada um a região \(\sum_i p_i\le E/c\) é um simplex, de
+  volume \((E/c)^N/N!\). Logo</p>
+
+  <p>\[\boxed{\;\Omega_p(N,E)=\frac{2^N}{N!}\left(\frac{E}{c}\right)^{N}\;}\]</p>
+
+  <p>o volume do <strong>hiper-octaedro</strong>. Juntando com a parte espacial, dividindo
+  por \(h^N\) para contar células e por \(N!\) pela indistinguibilidade,</p>
+
+  <p>\[\Omega=\frac{1}{h^N}\frac{L^N}{N!}\cdot\frac{2^N}{N!}\left(\frac{E}{c}\right)^{N}
+  =\frac{1}{(N!)^2}\left(\frac{2LE}{hc}\right)^{N}.\]</p>
+
+  <p>Com \(S=\kB\ln\Omega\) e Stirling,</p>
+
+  <p>\[S=N\kB\ln\left(\frac{2LE}{hc}\right)-2\kB\ln N!
+  \approx N\kB\ln\left(\frac{2e^2}{N^2}\frac{LE}{hc}\right),\]</p>
+
+  <p>e as duas derivadas dão tudo de uma vez:</p>
+
+  <p>\[\frac{P}{T}=\dpar{S}{L}{E}=\frac{N\kB}{L}\;\Longrightarrow\; PL=N\kB T,
+  \qquad
+  \frac1T=\dpar{S}{E}{L}=\frac{N\kB}{E}\;\Longrightarrow\; E=N\kB T.\]</p>
+
+  <p>Portanto \(u=\kB T\) e \(c=\kB\) por partícula, contra \(u=\frac12\kB T\) e
+  \(c=\frac12\kB\) do caso não relativístico em uma dimensão.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Esfera contra octaedro, e o expoente de E</span>
+    <p>O contraste entre os dois gases cabe numa linha. Se \(E=\sum p_i^2/2m\), a superfície
+    de energia constante é uma <strong>hiperesfera</strong> de raio \(\sqrt{2mE}\); se
+    \(E=c\sum|p_i|\), é um <strong>hiper-octaedro</strong> de vértice \(E/c\). Os volumes
+    são</p>
+    <div class="tabela-rolavel">
+    <table>
+      <thead><tr><th></th><th>Não relativístico</th><th>Ultrarrelativístico</th></tr></thead>
+      <tbody>
+        <tr><td>Superfície de energia</td><td>hiperesfera \(\sum p_i^2=2mE\)</td>
+            <td>hiper-octaedro \(\sum|p_i|=E/c\)</td></tr>
+        <tr><td>Volume em \(\nu\) dimensões</td>
+            <td>\(\dfrac{\pi^{\nu/2}}{\Gamma(\frac\nu2+1)}(2mE)^{\nu/2}\)</td>
+            <td>\(\dfrac{2^\nu}{\nu!}\left(\dfrac{E}{c}\right)^{\nu}\)</td></tr>
+        <tr><td>\(\Omega\) depende de \(E\) como</td><td>\(E^{\nu/2}\)</td><td>\(E^{\nu}\)</td></tr>
+        <tr><td>\(S=\kB\ln\Omega\)</td><td>\(\frac\nu2\kB\ln E+\text{const}\)</td>
+            <td>\(\nu\kB\ln E+\text{const}\)</td></tr>
+        <tr><td>\(1/T=\partial S/\partial E\)</td><td>\(\frac{\nu\kB}{2E}\)</td>
+            <td>\(\frac{\nu\kB}{E}\)</td></tr>
+        <tr><td>Energia</td><td>\(E=\frac\nu2\kB T\)</td><td>\(E=\nu\kB T\)</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p>Aqui \(\nu\) é o número de coordenadas de momento: \(\nu=N\) na dedução acima, com um
+    momento por partícula, e \(\nu=3N\) para partículas que se movem no espaço. Com
+    \(\nu=3N\) a tabela devolve \(U=\frac32N\kB T\) e \(U=3N\kB T\), exatamente os dois
+    resultados da seção 12.</p>
+    <p>O prefator muda de \(\pi^{\nu/2}/\Gamma\) para \(2^\nu/\nu!\), mas prefatores não
+    dependem de \(E\) e somem na derivada. Todo o conteúdo termodinâmico está no
+    <strong>expoente</strong>, e o expoente é \(\nu/2\) ou \(\nu\) conforme a superfície seja
+    redonda ou pontiaguda. É só isso.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s14">14. O gás relativístico exato</h2>
+
+  <p>Entre os dois limites há uma solução fechada, e ela é instrutiva. Tome a energia
+  cinética relativística completa, já subtraída a energia de repouso:</p>
+
+  <p>\[\epsilon(p)=\sqrt{p^2c^2+m^2c^4}-mc^2,\]</p>
+
+  <p>e escreva a função de partição de uma partícula:</p>
+
+  <p>\[Z_1=\frac{4\pi V}{h^3}\int_0^{\infty}
+  e^{-\beta c\left(\sqrt{p^2+m^2c^2}-mc\right)}p^2\,dp.\]</p>
+
+  <p>A substituição que resolve é <strong>hiperbólica</strong>, e não por acaso: a relação
+  \(E^2-p^2c^2=m^2c^4\) é uma hipérbole, e parametrizá-la com \(p=mc\operatorname{senh}\theta\)
+  é a mesma coisa que usar a rapidez em vez da velocidade. Com
+  \(dp=mc\cosh\theta\,d\theta\) e \(\cosh^2\theta-\operatorname{senh}^2\theta=1\),</p>
+
+  <p>\[\sqrt{p^2+m^2c^2}=mc\cosh\theta
+  \quad\Longrightarrow\quad
+  \beta c\left(\sqrt{p^2+m^2c^2}-mc\right)=x\left(\cosh\theta-1\right),\]</p>
+
+  <p>com \(x\equiv\beta mc^2=mc^2/\kB T\). A função de partição vira</p>
+
+  <p>\[Z_1=\frac{4\pi V}{h^3}m^3c^3e^{x}\int_0^{\infty}
+  e^{-x\cosh\theta}\left(\cosh^3\theta-\cosh\theta\right)d\theta.\]</p>
+
+  <p>E aqui a integral já é conhecida. A <strong>função de Bessel modificada de segunda
+  espécie</strong> tem exatamente esta representação integral:</p>
+
+  <div class="bloco def">
+    <span class="rotulo">Função de Bessel modificada de segunda espécie</span>
+    <p>\[K_a(x)=\int_0^{\infty}e^{-x\cosh\theta}\cosh\left(a\theta\right)d\theta,\]</p>
+    <p>solução da equação \(x^2y''+xy'-(x^2+a^2)y=0\) que decai no infinito.</p>
+  </div>
+
+  <p>Derivando sob o sinal de integral, \(K_1''(x)=\int e^{-x\cosh\theta}\cosh^3\theta\,
+  d\theta\), de modo que a integral acima é \(K_1''(x)-K_1(x)\). Usando
+  \(K_1'=-K_0-K_1/x\) e a relação de recorrência, isso se reduz a \(K_2(x)/x\), e</p>
+
+  <p>\[\boxed{\;Z_1=\frac{4\pi m^2 c}{h^3\beta}\,V\,e^{\beta mc^2}
+  K_2\!\left(\beta mc^2\right)\;}\]</p>
+
+  <p>Com \(Z_N=Z_1^N/N!\) e Stirling, a energia livre e a energia saem por derivação. A
+  pressão continua sendo \(P=N\kB T/V\): <strong>em qualquer regime, o gás é ideal</strong>,
+  porque \(Z_1\) depende de \(V\) só pelo fator linear. Já a energia interpola:</p>
+
+  <p>\[\frac{U}{N}=mc^2\left[\frac1x-1+\frac{K_1(x)+K_3(x)}{2K_2(x)}\right].\]</p>
+
+  <p>Essa é a curva traçada na quarta vista do widget da seção 12, junto com a quadratura
+  direta das integrais originais, que serve de verificação: as duas coincidem em cinco casas
+  decimais em toda a faixa.</p>
+
+  <p>Os dois limites saem das assintóticas de \(K_2\). Para \(x\gg1\), isto é
+  \(\kB T\ll mc^2\),</p>
+
+  <p>\[K_2(x)\approx\sqrt{\frac{\pi}{2x}}\,e^{-x}
+  \left[1+\frac{15}{8x}+\frac{105}{128x^2}+\dots\right],\]</p>
+
+  <p>e o \(e^{-x}\) cancela o \(e^{+x}\) de \(Z_1\), deixando</p>
+
+  <p>\[Z_1\approx V\left(\frac{2\pi m\kB T}{h^2}\right)^{3/2}=\frac{V}{\lambda_T^3},\]</p>
+
+  <p>que é o gás ideal não relativístico do Módulo 6, comprimento de onda térmico e tudo.
+  Para \(x\ll1\), \(K_2(x)\approx 2/x^2\), e</p>
+
+  <p>\[Z_1\approx 8\pi V\left(\frac{\kB T}{hc}\right)^{3},\]</p>
+
+  <p>que é o \(V/\Lambda^3\) da seção 12, com \(\Lambda=\pi^{2/3}\hbar c/\kB T\).</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Por que vale a pena ter a solução exata</span>
+    <p>Porque ela mostra que não há transição alguma. O calor específico sobe
+    continuamente de \(\frac32\kB\) para \(3\kB\) ao longo de umas três décadas de
+    temperatura, e o expoente adiabático desce de \(5/3\) para \(4/3\) na mesma passagem.
+    Não existe uma temperatura em que o gás "fica relativístico": existe uma faixa larga em
+    que ele vai ficando.</p>
+    <p>Isso importa para a conta de Chandrasekhar. Uma anã branca não está de um lado ou de
+    outro da fronteira: ela está em cima dela, com \(\gamma\) um pouco acima de \(4/3\) e
+    caindo à medida que a massa cresce. O limite de 1,4 massas solares é o ponto em que esse
+    \(\gamma\) deixa de ser suficiente, e é por isso que ele é um limite nítido saindo de uma
+    transição suave.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s15">15. Exercícios resolvidos</h2>
 
   <div class="bloco ex">
     <span class="rotulo">Exercício resolvido 7.1: as constantes do argônio</span>
@@ -573,7 +749,7 @@
   </div>
 
   <!-- ================================================== -->
-  <h2 id="s14">14. Exercícios propostos</h2>
+  <h2 id="s16">16. Exercícios propostos</h2>
 
   <div class="bloco def">
     <span class="rotulo">Para resolver</span>
@@ -626,6 +802,6 @@
   Laboratório de Física Computacional Aplicada (LFCA) · Universidade Regional do Cariri</p>
 </footer>
 
-<script src="assets/js/widgets.js?v=202611071806"></script>
+<script src="assets/js/widgets.js?v=202611071820"></script>
 </body>
 </html>

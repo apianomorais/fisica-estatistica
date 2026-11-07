@@ -4211,7 +4211,8 @@
     opcoes(ctr0, [
       { rot: 'Energia contra momento', v: 'disp' },
       { rot: 'Camada no espaço dos momentos', v: 'mom' },
-      { rot: 'Distribuição de energia', v: 'ene' }
+      { rot: 'Distribuição de energia', v: 'ene' },
+      { rot: 'A curva exata', v: 'exata' }
     ], 0, function (v) { est.vista = v; desenhar(); });
 
     var cv = el('canvas');
@@ -4258,11 +4259,24 @@
       return den > 0 ? num / den / th : 1.5;
     }
 
+    /* A solução exata, em função de Bessel modificada de segunda espécie:
+       com a substituição p = mc·senh θ a integral vira a representação
+       integral de K₂, e a energia cinética média fica
+         ⟨ε⟩ = mc²[1/x − 1 + (K₁(x)+K₃(x))/2K₂(x)],   x = βmc² = mc²/kT.
+       Aqui em unidades de kB T. Confere com a quadratura direta acima em
+       cinco casas em toda a faixa do deslizante. */
+    function besselMedia(th) {
+      var x = 1 / th;
+      return x * (1 / x - 1
+        + (F.besselKe(1, x) + F.besselKe(3, x)) / (2 * F.besselKe(2, x)));
+    }
+
     function desenhar() {
       var th = Math.pow(10, est.logth);
-      var med = momentos(th);
+      var med = besselMedia(th);
       var h = th * 1e-3;
-      var cv1 = ((th + h) * momentos(th + h) - (th - h) * momentos(th - h)) / (2 * h);
+      var cv1 = ((th + h) * besselMedia(th + h)
+                 - (th - h) * besselMedia(th - h)) / (2 * h);
       /* γ = (c + kB)/c para um gás ideal com esse calor específico */
       var gama = (cv1 + 1) / cv1;
       /* momento típico: onde x²e^{-e/θ} é máximo */
@@ -4335,6 +4349,36 @@
           { cor: G.COR.azul, texto: 'peso não relativístico' },
           { cor: G.COR.ambar, texto: 'peso ultrarrelativístico' }
         ]);
+      } else if (est.vista === 'exata') {
+        /* a figura do resultado de Bessel: ⟨ε⟩/kT contra log₁₀(kT/mc²) */
+        var ax4 = G.eixos(cv, {
+          xmin: -3, xmax: 2, ymin: 1.3, ymax: 3.2, altura: 300,
+          rotX: 'log₁₀(k₈T/mc²)', rotY: '⟨ε⟩ / k₈T',
+          marcasX: G.marcasLineares(-3, 2, 5, 0),
+          formataY: function (v) { return F.fmt(v, 1); }
+        });
+        G.curva(ax4, function () { return 1.5; }, G.COR.azul, 1.6, [6, 4]);
+        G.curva(ax4, function () { return 3; }, G.COR.ambar, 1.6, [6, 4]);
+        G.curva(ax4, function (lg) { return besselMedia(Math.pow(10, lg)); },
+                G.COR.vinho, 3);
+        /* os pontos verdes são a quadratura direta das mesmas integrais, sem
+           passar por Bessel: se a dedução estiver certa, caem sobre a curva */
+        ax4.ct.save();
+        ax4.ct.fillStyle = G.COR.verde;
+        for (var j = -3; j <= 2.0001; j += 0.25) {
+          ax4.ct.beginPath();
+          ax4.ct.arc(ax4.X(j), ax4.Y(Math.min(3.2, momentos(Math.pow(10, j)))),
+                     3.2, 0, 2 * Math.PI);
+          ax4.ct.fill();
+        }
+        ax4.ct.restore();
+        G.vertical(ax4, est.logth, G.COR.tinta, 'aqui', true);
+        G.legenda(ax4, [
+          { cor: G.COR.vinho, texto: 'exata, via K₂(βmc²)' },
+          { cor: G.COR.verde, texto: 'quadratura direta' },
+          { cor: G.COR.azul, texto: '3/2' },
+          { cor: G.COR.ambar, texto: '3' }
+        ]);
       } else {
         var ax3 = G.eixos(cv, {
           xmin: 0, xmax: 10, ymin: 0, ymax: 0.62, altura: 300,
@@ -4393,6 +4437,22 @@
           + '\\(e^{-pc/\\kB T}\\), que tem cauda muito mais longa. Mais partículas sobrevivem '
           + 'com momento alto, e cada uma delas custa mais energia: é a composição dos dois '
           + 'efeitos que dobra \\(U\\).</p>'
+        : est.vista === 'exata'
+        ? '<p>Esta é a curva da seção 14, traçada pela solução exata '
+          + '\\(\\med{\\epsilon}=mc^2\\left[\\frac1x-1+\\frac{K_1(x)+K_3(x)}{2K_2(x)}\\right]\\), '
+          + 'com \\(x=mc^2/\\kB T\\), e com \\(K_a\\) calculada pela própria representação '
+          + 'integral \\(K_a(x)=\\int_0^\\infty e^{-x\\cosh t}\\cosh(at)\\,dt\\) de onde ela '
+          + 'veio.</p>'
+          + '<p>Os pontos verdes são a quadratura direta de '
+          + '\\(\\int p^2\\epsilon\\,e^{-\\beta\\epsilon}dp\\big/\\int p^2e^{-\\beta\\epsilon}dp\\), '
+          + 'sem passar por Bessel em momento algum. Eles caem sobre a curva em cinco casas '
+          + 'decimais, o que verifica a substituição '
+          + '\\(p=mc\\,\\operatorname{senh}\\theta\\) e as identidades de \\(K_a\\) usadas na '
+          + 'dedução.</p>'
+          + '<p>Repare onde fica a transição: ela ocupa umas três décadas de temperatura e '
+          + 'não tem nada de abrupto. Metade do caminho entre \\(3/2\\) e \\(3\\) é cruzada '
+          + 'perto de \\(\\kB T\\approx mc^2/3\\), bem antes de a partícula típica ser '
+          + 'relativística. Quem comanda é a cauda da distribuição.</p>'
         : '<p>Traduzida de momento para energia, a mesma camada vira a <b>densidade de '
           + 'estados</b>. Com \\(\\epsilon=p^2/2m\\), \\(p\\propto\\sqrt\\epsilon\\) e '
           + '\\(g(\\epsilon)\\propto\\sqrt\\epsilon\\); com \\(\\epsilon=pc\\), '
@@ -5381,6 +5441,235 @@
         + 'que um transistor esquenta e muda de comportamento, e é também por isso que o '
         + 'diamante, que tem a mesma estrutura cristalina do silício, é um isolante '
         + 'excelente.</p>';
+      tipografar(nota);
+    }
+
+    registrarRedesenho(desenhar);
+    tipografar(corpo);
+  };
+
+  /* =================================================================
+     22c. A superfície de energia constante: esfera contra octaedro
+     No gás não relativístico, E = Σp²/2m é uma hiperesfera. No
+     ultrarrelativístico, E = cΣ|p| é um hiper-octaedro. É essa troca de
+     forma que muda o expoente de E em Ω, e daí sai tudo.
+     ================================================================= */
+  REGISTRO.politopo = function (raiz) {
+    var corpo = moldura(raiz, 'A superfície de energia constante: esfera ou octaedro');
+
+    var est = { vista: 'duas' };
+
+    var ctr0 = el('div', { class: 'controles' });
+    corpo.appendChild(ctr0);
+    opcoes(ctr0, [
+      { rot: 'Duas partículas', v: 'duas' },
+      { rot: 'Três partículas', v: 'tres' },
+      { rot: 'O expoente de E', v: 'escala' }
+    ], 0, function (v) { est.vista = v; desenhar(); });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'não relativístico', k: 'nr' },
+      { rot: 'ultrarrelativístico', k: 'ur' },
+      { rot: 'Ω ∝', k: 'om' },
+      { rot: 'energia', k: 'en' },
+      { rot: 'calor específico', k: 'cc' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    /* ---- N = 2: círculo contra losango ---- */
+    function duas(p) {
+      var ct = p.ct, L = p.L, A = p.A;
+      var R = Math.min(L * 0.46, A * 0.29);
+      var cx = L / 2, cy = A / 2 + 6;
+
+      /* eixos p1 e p2 */
+      ct.strokeStyle = G.COR.grade; ct.lineWidth = 1;
+      ct.beginPath();
+      ct.moveTo(cx - R * 1.45, cy); ct.lineTo(cx + R * 1.45, cy);
+      ct.moveTo(cx, cy - R * 1.45); ct.lineTo(cx, cy + R * 1.45);
+      ct.stroke();
+
+      /* o disco: todos os estados com energia até E */
+      ct.fillStyle = 'rgba(44,95,141,.16)';
+      ct.beginPath(); ct.arc(cx, cy, R, 0, 2 * Math.PI); ct.fill();
+      ct.strokeStyle = G.COR.azul; ct.lineWidth = 2.6;
+      ct.beginPath(); ct.arc(cx, cy, R, 0, 2 * Math.PI); ct.stroke();
+
+      /* o losango */
+      ct.fillStyle = 'rgba(181,131,31,.20)';
+      ct.beginPath();
+      ct.moveTo(cx + R, cy); ct.lineTo(cx, cy - R);
+      ct.lineTo(cx - R, cy); ct.lineTo(cx, cy + R); ct.closePath();
+      ct.fill();
+      ct.strokeStyle = G.COR.ambar; ct.lineWidth = 2.6; ct.stroke();
+
+      ct.font = '600 12px system-ui, sans-serif';
+      ct.fillStyle = G.COR.suave;
+      ct.textAlign = 'left'; ct.textBaseline = 'middle';
+      ct.fillText('p₁', cx + R * 1.5, cy);
+      ct.textAlign = 'center'; ct.textBaseline = 'bottom';
+      ct.fillText('p₂', cx, cy - R * 1.5);
+
+      ct.font = '600 12px system-ui, sans-serif';
+      ct.textAlign = 'right';
+      ct.fillStyle = G.COR.azul;
+      ct.fillText('p₁² + p₂² = 2mE', cx - R * 0.82, cy - R * 0.82);
+      ct.fillStyle = G.COR.ambar;
+      ct.textAlign = 'left'; ct.textBaseline = 'top';
+      ct.fillText('|p₁| + |p₂| = E/c', cx + R * 0.52, cy + R * 0.52);
+
+      ct.fillStyle = G.COR.tinta;
+      ct.font = '12px system-ui, sans-serif';
+      ct.textAlign = 'center'; ct.textBaseline = 'top';
+      ct.fillText('área do disco: πp²   ·   área do losango: 2p²', cx, A - 22);
+    }
+
+    /* ---- N = 3: esfera contra octaedro, em projeção isométrica ---- */
+    function tres(p) {
+      var ct = p.ct, L = p.L, A = p.A;
+      var R = Math.min(L, A) * 0.30;
+      var cxa = L * 0.29, cxb = L * 0.71, cy = A / 2 - 6;
+      var co = Math.cos(Math.PI / 6), si = Math.sin(Math.PI / 6);
+
+      function proj(cx, v) {
+        return { x: cx + R * (v[0] - v[1]) * co,
+                 y: cy + R * ((v[0] + v[1]) * si - v[2]) * 0.86 };
+      }
+      function eixos3(cx) {
+        ct.strokeStyle = G.COR.grade; ct.lineWidth = 1;
+        [[1.5, 0, 0], [0, 1.5, 0], [0, 0, 1.5]].forEach(function (v, k) {
+          var a = proj(cx, [0, 0, 0]), b = proj(cx, v);
+          ct.beginPath(); ct.moveTo(a.x, a.y); ct.lineTo(b.x, b.y); ct.stroke();
+          ct.fillStyle = G.COR.suave;
+          ct.font = '600 11px system-ui, sans-serif';
+          ct.textAlign = 'center'; ct.textBaseline = 'middle';
+          ct.fillText('p' + '₁₂₃'[k], b.x + (k === 2 ? 0 : k ? -9 : 9), b.y + (k === 2 ? -8 : 4));
+        });
+      }
+
+      /* esfera */
+      eixos3(cxa);
+      ct.fillStyle = 'rgba(44,95,141,.16)';
+      ct.beginPath(); ct.arc(cxa, cy, R, 0, 2 * Math.PI); ct.fill();
+      ct.strokeStyle = G.COR.azul; ct.lineWidth = 2.4;
+      ct.beginPath(); ct.arc(cxa, cy, R, 0, 2 * Math.PI); ct.stroke();
+      ct.lineWidth = 1.1;
+      ct.strokeStyle = 'rgba(44,95,141,.5)';
+      ct.beginPath(); ct.ellipse(cxa, cy, R, R * 0.36, 0, 0, 2 * Math.PI); ct.stroke();
+      ct.beginPath(); ct.ellipse(cxa, cy, R * 0.36, R, 0, 0, 2 * Math.PI); ct.stroke();
+
+      /* octaedro: as faces com soma de sinais positiva estão de frente */
+      eixos3(cxb);
+      var V = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]];
+      var faces = [];
+      [1, -1].forEach(function (a) {
+        [1, -1].forEach(function (b) {
+          [1, -1].forEach(function (c) {
+            faces.push({ s: [a, b, c], frente: a + b + c > 0 });
+          });
+        });
+      });
+      /* primeiro as de trás, tracejadas */
+      faces.forEach(function (f) {
+        if (f.frente) return;
+        var pts = [proj(cxb, [f.s[0], 0, 0]), proj(cxb, [0, f.s[1], 0]),
+                   proj(cxb, [0, 0, f.s[2]])];
+        ct.save();
+        ct.setLineDash([4, 4]);
+        ct.strokeStyle = 'rgba(181,131,31,.55)'; ct.lineWidth = 1.2;
+        ct.beginPath();
+        ct.moveTo(pts[0].x, pts[0].y);
+        ct.lineTo(pts[1].x, pts[1].y); ct.lineTo(pts[2].x, pts[2].y);
+        ct.closePath(); ct.stroke();
+        ct.restore();
+      });
+      faces.forEach(function (f) {
+        if (!f.frente) return;
+        var pts = [proj(cxb, [f.s[0], 0, 0]), proj(cxb, [0, f.s[1], 0]),
+                   proj(cxb, [0, 0, f.s[2]])];
+        ct.fillStyle = 'rgba(181,131,31,' + (f.s[0] + f.s[1] + f.s[2] === 3 ? '.30' : '.17') + ')';
+        ct.strokeStyle = G.COR.ambar; ct.lineWidth = 2;
+        ct.beginPath();
+        ct.moveTo(pts[0].x, pts[0].y);
+        ct.lineTo(pts[1].x, pts[1].y); ct.lineTo(pts[2].x, pts[2].y);
+        ct.closePath(); ct.fill(); ct.stroke();
+      });
+
+      ct.font = '600 12px system-ui, sans-serif';
+      ct.textAlign = 'center'; ct.textBaseline = 'top';
+      ct.fillStyle = G.COR.azul;
+      ct.fillText('esfera: Σp² = 2mE', cxa, A - 40);
+      ct.fillStyle = G.COR.ambar;
+      ct.fillText('octaedro: Σ|p| = E/c', cxb, A - 40);
+      ct.fillStyle = G.COR.tinta;
+      ct.font = '12px system-ui, sans-serif';
+      ct.fillText('volume 4πp³/3   ·   volume 4p³/3', (cxa + cxb) / 2, A - 20);
+    }
+
+    function desenhar() {
+      if (est.vista === 'escala') {
+        var ax = G.eixos(cv, {
+          xmin: 0, xmax: 3, ymin: 0, ymax: 3.2, altura: 300,
+          rotX: 'ln(E/E\u2080)', rotY: '[ln Ω(E) − ln Ω(E\u2080)] / N',
+          marcasX: G.marcasLineares(0, 3, 6, 1),
+          formataY: function (v) { return F.fmt(v, 1); }
+        });
+        G.curva(ax, function (x) { return 0.5 * x; }, G.COR.azul, 2.8);
+        G.curva(ax, function (x) { return x; }, G.COR.ambar, 2.8);
+        G.legenda(ax, [
+          { cor: G.COR.ambar, texto: 'ultrarrelativístico: inclinação 1' },
+          { cor: G.COR.azul, texto: 'não relativístico: inclinação 1/2' }
+        ]);
+      } else {
+        var p = G.preparar(cv, 320);
+        if (est.vista === 'duas') duas(p); else tres(p);
+      }
+
+      mostrar({
+        nr: 'hiperesfera',
+        ur: 'hiper-octaedro',
+        om: 'E^{N/2} ou E^{N}',
+        en: '½Nk\u2088T ou Nk\u2088T',
+        cc: '½k\u2088 ou k\u2088'
+      });
+
+      nota.innerHTML = est.vista === 'duas'
+        ? '<p>Duas partículas, um momento cada. Todos os estados com energia até \\(E\\) '
+          + 'ficam <em>dentro</em> da curva, e contá-los é medir a área.</p>'
+          + '<p>No caso de sempre, \\(E=(p_1^2+p_2^2)/2m\\) é a equação de um '
+          + '<b>círculo</b> de raio \\(\\sqrt{2mE}\\), e a área é \\(\\pi\\cdot 2mE\\), '
+          + 'proporcional a \\(E\\). No caso ultrarrelativístico, \\(E=c(|p_1|+|p_2|)\\) é a '
+          + 'equação de um <b>losango</b> de semidiagonal \\(E/c\\), e a área é '
+          + '\\(2(E/c)^2\\), proporcional a \\(E^2\\).</p>'
+          + '<p>Já aqui está tudo. A potência de \\(E\\) dobrou, e é só isso que a '
+          + 'termodinâmica vai enxergar.</p>'
+        : est.vista === 'tres'
+        ? '<p>Com três partículas a esfera continua esfera e o losango vira <b>octaedro</b>: '
+          + 'o mesmo corpo com os vértices sobre os eixos e as faces planas cortando o '
+          + 'caminho entre eles. O volume da esfera vale \\(\\frac43\\pi p^3\\) e o do '
+          + 'octaedro \\(\\frac43 p^3\\), com \\(p\\) sendo o valor máximo de um momento '
+          + 'isolado.</p>'
+          + '<p>Em \\(N\\) dimensões o octaedro vira o <b>hiper-octaedro</b>, de volume '
+          + '\\(2^N(E/c)^N/N!\\): são \\(2^N\\) ortantes, um para cada escolha de sinais, '
+          + 'e em cada um deles o corpo é o simplex \\(\\sum p_i\\le E/c\\), de volume '
+          + '\\((E/c)^N/N!\\). A hiperesfera, por sua vez, tem volume '
+          + '\\(\\pi^{N/2}(2mE)^{N/2}/\\Gamma(\\frac N2+1)\\).</p>'
+          + '<p>Os prefatores são feios e não importam: eles não dependem de \\(E\\). O que '
+          + 'importa é o expoente, \\(E^{N/2}\\) contra \\(E^{N}\\).</p>'
+        : '<p>Aqui está por que o expoente é tudo. A entropia é \\(S=\\kB\\ln\\Omega\\), e '
+          + 'com \\(\\Omega\\propto E^{\\alpha N}\\) ela é \\(S=\\alpha N\\kB\\ln E + '
+          + '\\text{const}\\): uma reta neste gráfico, de inclinação \\(\\alpha\\).</p>'
+          + '<p>Mas \\(1/T=\\partial S/\\partial E=\\alpha N\\kB/E\\), de modo que '
+          + '\\(E=\\alpha N\\kB T\\) e \\(c=\\alpha\\kB\\) por partícula. A inclinação da '
+          + 'reta <em>é</em> o calor específico. Com \\(\\alpha=1/2\\) temos a equipartição '
+          + 'de sempre; com \\(\\alpha=1\\), o dobro.</p>'
+          + '<p>Nada disso usou a função de partição, o ensemble canônico ou a distribuição '
+          + 'de Boltzmann. Saiu de contar pontos dentro de um sólido geométrico, que é o que '
+          + 'o ensemble microcanônico sempre foi.</p>';
       tipografar(nota);
     }
 
