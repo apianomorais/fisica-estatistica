@@ -303,12 +303,12 @@
            der: ['S = -\\dpar{G}{T}{P}', 'V = \\dpar{G}{P}{T}'],
            max: '\\dpar{V}{T}{P} = -\\dpar{S}{P}{T}',
            uso: 'o potencial do laboratório comum, onde o que se fixa é a temperatura ambiente e a pressão atmosférica.' },
-      H: { nome: 'Entalpia', def: 'H = U + PV',
+      E: { nome: 'Entalpia', def: 'E = U + PV',
            vars: ['S', 'P'],
-           dif: 'dH = T\\,dS + V\\,dP',
-           der: ['T = \\dpar{H}{S}{P}', 'V = \\dpar{H}{P}{S}'],
+           dif: 'dE = T\\,dS + V\\,dP',
+           der: ['T = \\dpar{E}{S}{P}', 'V = \\dpar{E}{P}{S}'],
            max: '\\dpar{T}{P}{S} = \\dpar{V}{S}{P}',
-           uso: 'a energia que se troca em processos a pressão constante: por isso o calor de reação é \\(\\Delta H\\).' },
+           uso: 'a energia que se troca em processos a pressão constante: por isso o calor de reação é \\(\\Delta E\\).' },
       U: { nome: 'Energia interna', def: 'U = U(S,V)',
            vars: ['S', 'V'],
            dif: 'dU = T\\,dS - P\\,dV',
@@ -322,7 +322,7 @@
     var GRADE = [
       ['V', 'F', 'T'],
       ['U', '', 'G'],
-      ['S', 'H', 'P']
+      ['S', 'E', 'P']
     ];
 
     var tab = el('div', { class: 'quadrado' });

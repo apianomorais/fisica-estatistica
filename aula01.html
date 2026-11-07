@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Módulo 1: Revisão de termodinâmica | Física Estatística</title>
 <link rel="icon" type="image/png" href="assets/img/favicon.png">
-<link rel="stylesheet" href="assets/css/estilo.css?v=202611071532">
-<script src="assets/js/comum.js?v=202611071532"></script>
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611071634">
+<script src="assets/js/comum.js?v=202611071634"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
 <body>
@@ -61,7 +61,7 @@
       <li>Separar variáveis extensivas de intensivas e reconhecer o papel de uma equação de estado;</li>
       <li>Distinguir processo quase-estático de processo reversível, que não são a mesma coisa;</li>
       <li>Entender por que \(\dbar Q\) e \(\dbar W\) são diferenciais inexatas e \(dU\) e \(dS\) não são;</li>
-      <li>Escrever as diferenciais de \(U\), \(H\), \(F\) e \(G\) e tirar delas as quatro relações de Maxwell;</li>
+      <li>Escrever as diferenciais de \(U\), \(E\), \(F\) e \(G\) e tirar delas as quatro relações de Maxwell;</li>
       <li>Definir \(C_V\), \(C_P\), \(\kappa_T\), \(\kappa_S\) e \(\alpha\), e demonstrar \(\kappa_T(C_P-C_V)=TV\alpha^2\);</li>
       <li>Deduzir \(PV=N\kB T\) dos choques das moléculas e aplicar o teorema da equipartição.</li>
     </ul>
@@ -316,8 +316,8 @@
     <tbody>
       <tr><td><b>Energia interna</b> \(U\)</td><td>—</td>
           <td>\(dU=T\,dS-P\,dV\)</td><td>\(S,V\)</td><td>sistema isolado</td></tr>
-      <tr><td><b>Entalpia</b> \(H\)</td><td>\(U+PV\)</td>
-          <td>\(dH=T\,dS+V\,dP\)</td><td>\(S,P\)</td><td>pressão constante</td></tr>
+      <tr><td><b>Entalpia</b> \(E\)</td><td>\(U+PV\)</td>
+          <td>\(dE=T\,dS+V\,dP\)</td><td>\(S,P\)</td><td>pressão constante</td></tr>
       <tr><td><b>Helmholtz</b> \(F\)</td><td>\(U-TS\)</td>
           <td>\(dF=-S\,dT-P\,dV\)</td><td>\(T,V\)</td><td>banho térmico, volume fixo</td></tr>
       <tr><td><b>Gibbs</b> \(G\)</td><td>\(U-TS+PV\)</td>
@@ -328,9 +328,9 @@
 
   <div class="bloco alerta">
     <span class="rotulo">Uma nota de notação</span>
-    <p>Nas notas de aula a entalpia aparece como \(E\). Aqui usamos \(H\), que é a letra dos
-    quatro livros da bibliografia, para evitar confusão com a energia. São o mesmo objeto:
-    \(H = E = U + PV\).</p>
+    <p>A entalpia aqui é \(E\), como nas notas de aula. Boa parte dos livros, inclusive os
+    quatro da bibliografia, escreve \(H\): são o mesmo objeto, \(E = H = U + PV\). A letra
+    \(H\) fica reservada, neste curso, para o campo magnético \(\mathcal{H}\).</p>
   </div>
 
   <p>A dedução de \(F\) ilustra o mecanismo. Partindo de \(dU=T\,dS-P\,dV\) e notando que
@@ -406,12 +406,12 @@
     <tbody>
       <tr><td>Capacidade a volume constante</td><td>\(C_V=\dpar{U}{T}{V}=T\dpar{S}{T}{V}\)</td>
           <td>\(-T\left(\partial^2 F/\partial T^2\right)_V\)</td><td>calor por grau, sem deixar expandir</td></tr>
-      <tr><td>Capacidade a pressão constante</td><td>\(C_P=\dpar{H}{T}{P}=T\dpar{S}{T}{P}\)</td>
+      <tr><td>Capacidade a pressão constante</td><td>\(C_P=\dpar{E}{T}{P}=T\dpar{S}{T}{P}\)</td>
           <td>\(-T\left(\partial^2 G/\partial T^2\right)_P\)</td><td>calor por grau, deixando expandir</td></tr>
       <tr><td>Compressibilidade isotérmica</td><td>\(\kappa_T=-\dfrac{1}{V}\dpar{V}{P}{T}\)</td>
           <td>\(-\frac{1}{V}\left(\partial^2 G/\partial P^2\right)_T\)</td><td>quanto encolhe ao ser apertado</td></tr>
       <tr><td>Compressibilidade adiabática</td><td>\(\kappa_S=-\dfrac{1}{V}\dpar{V}{P}{S}\)</td>
-          <td>\(-\frac{1}{V}\left(\partial^2 H/\partial P^2\right)_S\)</td><td>idem, sem trocar calor</td></tr>
+          <td>\(-\frac{1}{V}\left(\partial^2 E/\partial P^2\right)_S\)</td><td>idem, sem trocar calor</td></tr>
       <tr><td>Expansão térmica</td><td>\(\alpha=\dfrac{1}{V}\dpar{V}{T}{P}\)</td>
           <td>—</td><td>quanto dilata ao ser aquecido</td></tr>
     </tbody>
@@ -738,6 +738,6 @@
   Laboratório de Física Computacional Aplicada (LFCA) · Universidade Regional do Cariri</p>
 </footer>
 
-<script src="assets/js/widgets.js?v=202611071532"></script>
+<script src="assets/js/widgets.js?v=202611071634"></script>
 </body>
 </html>
