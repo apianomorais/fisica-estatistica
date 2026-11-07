@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Módulo 1: Revisão de termodinâmica | Física Estatística</title>
+<link rel="icon" type="image/png" href="assets/img/favicon.png">
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611071532">
+<script src="assets/js/comum.js?v=202611071532"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+
+<header class="topo">
+  <div class="topo-interno">
+    <a class="marca" href="index.html">Física Estatística <span>· LFCA/URCA</span></a>
+    <nav class="menu">
+      <a href="index.html">Início</a>
+      <span class="grupo">Fundamentos</span>
+      <a href="aula01.html" class="num ativo" title="Módulo 1: Revisão de termodinâmica">1</a>
+    </nav>
+  </div>
+</header>
+
+<div class="envoltorio">
+
+<aside class="lateral">
+  <h4>Neste módulo</h4>
+  <ol>
+    <li><a href="#s1">1. O que a termodinâmica sabe sem ver os átomos</a></li>
+    <li><a href="#s2">2. Variáveis extensivas e intensivas</a></li>
+    <li><a href="#s3">3. Equação de estado</a></li>
+    <li><a href="#s4">4. Processos: quase-estático e reversível</a></li>
+    <li><a href="#s5">5. Trabalho e a diferencial inexata</a></li>
+    <li><a href="#s6">6. Primeira lei</a></li>
+    <li><a href="#s7">7. Segunda lei e entropia</a></li>
+    <li><a href="#s8">8. Os quatro potenciais termodinâmicos</a></li>
+    <li><a href="#s9">9. Relações de Maxwell</a></li>
+    <li><a href="#s10">10. Funções resposta</a></li>
+    <li><a href="#s11">11. Terceira lei</a></li>
+    <li><a href="#s12">12. A pressão vem dos choques</a></li>
+    <li><a href="#s13">13. Equipartição</a></li>
+    <li><a href="#s14">14. A entropia do gás ideal</a></li>
+    <li><a href="#s15">15. Exercícios resolvidos</a></li>
+    <li><a href="#s16">16. Exercícios propostos</a></li>
+  </ol>
+</aside>
+
+<main class="conteudo">
+
+  <p class="chapeu">Módulo 1 · Fundamentos</p>
+  <h1>Revisão de termodinâmica</h1>
+  <p class="subtitulo">A termodinâmica descreve um copo de água com meia dúzia de números,
+  sem jamais perguntar o que fazem as moléculas lá dentro. Antes de construir a ponte entre
+  os dois mundos, vale reconstruir com cuidado o lado macroscópico dessa ponte: é dele que
+  virão as perguntas que a física estatística terá de responder.</p>
+
+  <div class="bloco def">
+    <span class="rotulo">Objetivos</span>
+    <ul>
+      <li>Separar variáveis extensivas de intensivas e reconhecer o papel de uma equação de estado;</li>
+      <li>Distinguir processo quase-estático de processo reversível, que não são a mesma coisa;</li>
+      <li>Entender por que \(\dbar Q\) e \(\dbar W\) são diferenciais inexatas e \(dU\) e \(dS\) não são;</li>
+      <li>Escrever as diferenciais de \(U\), \(H\), \(F\) e \(G\) e tirar delas as quatro relações de Maxwell;</li>
+      <li>Definir \(C_V\), \(C_P\), \(\kappa_T\), \(\kappa_S\) e \(\alpha\), e demonstrar \(\kappa_T(C_P-C_V)=TV\alpha^2\);</li>
+      <li>Deduzir \(PV=N\kB T\) dos choques das moléculas e aplicar o teorema da equipartição.</li>
+    </ul>
+  </div>
+
+  <hr class="linha">
+
+  <!-- ================================================== -->
+  <h2 id="s1">1. O que a termodinâmica sabe sem ver os átomos</h2>
+
+  <p>Um litro de ar nesta sala tem da ordem de \(10^{22}\) moléculas. Descrever o estado
+  mecânico desse gás exigiria três coordenadas e três componentes de momento para cada
+  molécula: algo como \(10^{23}\) números. Nenhum computador guardaria essa lista, e se
+  guardasse ela seria inútil, porque mudaria por inteiro a cada bilionésimo de segundo.</p>
+
+  <div class="destaque">
+    <span class="anuncio">E, no entanto, três números bastam</span>
+    Pressão, volume e temperatura descrevem completamente esse gás para qualquer finalidade
+    prática. A termodinâmica é a ciência que descobriu isso, e funcionou por um século inteiro
+    sem precisar acreditar em átomos.
+  </div>
+
+  <p>A pergunta que organiza toda a disciplina é: <strong>por que funciona?</strong> Por que
+  \(10^{23}\) graus de liberdade colapsam em três? A resposta é a física estatística, e ela
+  tem duas partes. A primeira é que, em um sistema enorme, as flutuações relativas de qualquer
+  grandeza macroscópica caem como \(1/\sqrt{N}\): com \(N\sim 10^{23}\), isso é uma parte em
+  \(10^{11}\), e a média vira a única coisa observável. A segunda é que o equilíbrio é,
+  esmagadoramente, a configuração mais provável, e não uma configuração especial.</p>
+
+  <p>Neste módulo o programa é outro, mais modesto e indispensável: reconstruir o lado
+  macroscópico com precisão suficiente para que, nos módulos seguintes, cada resultado
+  estatístico possa ser confrontado com uma lei termodinâmica já conhecida. Quando mais
+  adiante aparecer \(F=-\kB T\ln Z\), o senhor precisará saber exatamente o que \(F\) é e o
+  que se extrai dela. Essa é a razão desta revisão.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Equilíbrio termodinâmico</span>
+    <p>Um sistema está em equilíbrio termodinâmico quando seus parâmetros macroscópicos
+    <strong>não variam no tempo</strong> e não há fluxos líquidos de matéria ou energia
+    atravessando-o. Só nesse estado as variáveis de estado estão definidas.</p>
+    <p>É uma restrição severa e fácil de esquecer: durante uma explosão, uma chama ou uma
+    expansão brusca, <em>não existe</em> uma pressão do sistema, porque pressões diferentes
+    coexistem em pontos diferentes. Toda vez que escrevermos \(P\) estaremos supondo
+    equilíbrio, ou uma sucessão de equilíbrios.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s2">2. Variáveis extensivas e intensivas</h2>
+
+  <p>Imagine duplicar o sistema: juntar dois recipientes idênticos de gás num só, do dobro do
+  tamanho. As grandezas se dividem em dois grupos segundo o que acontece com elas nessa
+  operação.</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th></th><th>Extensivas</th><th>Intensivas</th></tr></thead>
+    <tbody>
+      <tr><td><b>Ao dobrar o sistema</b></td><td>dobram</td><td>não mudam</td></tr>
+      <tr><td><b>Proporcionais a</b></td><td>\(N\), o tamanho do sistema</td><td>nada: são locais</td></tr>
+      <tr><td><b>Exemplos</b></td><td>\(N\), \(V\), \(U\), \(S\), \(M\) (momento magnético)</td>
+          <td>\(T\), \(P\), \(\mu\), \(\mathcal{H}\) (campo)</td></tr>
+      <tr><td><b>Entre dois sistemas em contato</b></td><td>somam-se</td><td>igualam-se no equilíbrio</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>A última linha é a mais importante e costuma passar despercebida. Quando dois corpos
+  trocam calor livremente, o que fica igual no equilíbrio é a <em>temperatura</em>, uma
+  intensiva; a energia total é que se reparte. Quando um pistão livre separa dois gases, o
+  que se iguala é a <em>pressão</em>. Quando moléculas podem passar de um lado para o outro,
+  o que se iguala é o <em>potencial químico</em>. Essas três igualdades são, respectivamente,
+  as condições de equilíbrio térmico, mecânico e químico, e voltaremos a elas no Módulo 3,
+  agora deduzidas de uma contagem de microestados.</p>
+
+  <div class="bloco alerta">
+    <span class="rotulo">Um cuidado com a palavra "intensiva"</span>
+    <p>Intensiva não quer dizer "pequena" nem "secundária". Quer dizer apenas que o valor não
+    depende de quanto material existe. Uma grandeza extensiva dividida por outra extensiva
+    resulta sempre intensiva: \(u = U/N\), \(v = V/N\), \(s = S/N\), \(\rho = m/V\). É assim
+    que se constroem as versões "por partícula" que usaremos o tempo todo.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s3">3. Equação de estado</h2>
+
+  <p>Se \(T\), \(V\) e \(P\) descrevem o sistema, elas não são independentes: existe um
+  vínculo entre as três, determinado experimentalmente, que chamamos de equação de estado:</p>
+
+  <p>\[f(T,V,P)=0.\]</p>
+
+  <p>O efeito é reduzir de três para <strong>duas</strong> o número de variáveis
+  independentes. Fixados o volume e a temperatura de um gás, a pressão não é mais escolha
+  nossa. Para o gás ideal o vínculo tem a forma familiar</p>
+
+  <p>\[\boxed{\;PV = N\kB T\;}\qquad \kB = 1{,}380\,649\times 10^{-23}\ \mathrm{J/K},\]</p>
+
+  <p>com \(N\) o número de moléculas. Em termos de mols, \(PV = nRT\) com
+  \(R = N_A \kB = 8{,}314\) J/(mol·K). A constante de Boltzmann é o fator de conversão entre
+  temperatura e energia, e sua pequenez é apenas um acidente histórico: o kelvin foi definido
+  antes de sabermos que temperatura <em>é</em> energia por grau de liberdade.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">A escala Kelvin</span>
+    <p>A escala é ancorada no ponto triplo da água, 273,16 K, e o zero é a extrapolação do
+    ponto onde a pressão de um gás ideal se anularia. Essa extrapolação é notável: gases
+    diferentes, em condições diferentes, extrapolam todos para o <em>mesmo</em> ponto. É um
+    indício experimental forte de que a temperatura mede algo universal, e não uma propriedade
+    de cada substância.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s4">4. Processos: quase-estático e reversível</h2>
+
+  <p>Um processo termodinâmico é uma mudança de estado, provocada pela variação de condições
+  externas. Dois adjetivos aparecem o tempo todo e são frequentemente confundidos.</p>
+
+  <div class="cartoes">
+    <div class="cartao">
+      <h3>Quase-estático</h3>
+      <p>As condições externas variam tão devagar que o sistema passa por uma <strong>sucessão
+      de estados de equilíbrio</strong>. Só assim o caminho pode ser desenhado como uma curva
+      num diagrama PV: cada ponto da curva é um estado com \(P\) e \(T\) bem definidos.</p>
+    </div>
+    <div class="cartao">
+      <h3>Reversível</h3>
+      <p>Além de quase-estático, o processo pode ser <strong>desfeito</strong>: invertendo as
+      condições externas, sistema e vizinhança voltam ambos ao estado inicial, sem deixar
+      rastro no universo. Exige ausência de atrito, de dissipação e de gradientes finitos.</p>
+    </div>
+  </div>
+
+  <p>Todo processo reversível é quase-estático, mas a recíproca é falsa. Comprimir um gás
+  lentamente com um pistão que tem atrito é quase-estático e irreversível: o calor gerado
+  pelo atrito não volta sozinho para a mão que empurrou. Essa distinção é o que dá conteúdo à
+  segunda lei.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s5">5. Trabalho e a diferencial inexata</h2>
+
+  <p>O trabalho de uma força \(F\) ao longo de um deslocamento \(dx\) é \(\dbar W = F\,dx\).
+  Para um gás num cilindro com pistão, a força é \(PA\) e o deslocamento muda o volume em
+  \(dV\), de modo que o trabalho realizado <strong>sobre</strong> o gás é</p>
+
+  <p>\[\dbar W = -P\,dV.\]</p>
+
+  <p>O sinal negativo é a convenção que usaremos em todo o curso: comprimir o gás
+  (\(dV<0\)) realiza trabalho positivo sobre ele. A mesma estrutura reaparece em outros
+  tipos de trabalho, sempre como o produto de uma variável <em>intensiva</em> pela variação
+  de uma <em>extensiva</em>:</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>Tipo de trabalho</th><th>Intensiva</th><th>Extensiva</th><th>\(\dbar W\)</th></tr></thead>
+    <tbody>
+      <tr><td>Mecânico (fluido)</td><td>\(P\)</td><td>\(V\)</td><td>\(-P\,dV\)</td></tr>
+      <tr><td>Químico</td><td>\(\mu\)</td><td>\(N\)</td><td>\(\mu\,dN\)</td></tr>
+      <tr><td>Magnético</td><td>\(\mu_0\mathcal{H}\)</td><td>\(M\)</td><td>\(\mu_0\mathcal{H}\,dM\)</td></tr>
+      <tr><td>Elétrico</td><td>\(\mathcal{E}\)</td><td>\(\wp\)</td><td>\(\mathcal{E}\,d\wp\)</td></tr>
+      <tr><td>Superficial</td><td>\(\sigma\)</td><td>\(A\)</td><td>\(\sigma\,dA\)</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Com várias espécies químicas, \(N=\sum_{i=1}^{k}N_i\) e o trabalho químico é
+  \(\dbar W=\sum_{i=1}^{k}\mu_i\,dN_i\), cada espécie com seu potencial.</p>
+
+  <div class="bloco alerta">
+    <span class="rotulo">Por que o símbolo \(\dbar\) e não \(d\)</span>
+    <p>Escrevemos \(\dbar W\) com a barra cortada (muitos livros usam \(\delta W\), como nas
+    notas de aula) porque <strong>o trabalho não é função de estado</strong>. Não existe uma
+    função \(W(P,V)\) cuja diferença entre dois pontos dê o trabalho: ele depende do caminho.</p>
+    <p>Verifique no widget abaixo: leve o gás do mesmo estado inicial ao mesmo volume final
+    pelo caminho isotérmico e pelo adiabático. Os estados de partida coincidem, os volumes
+    finais coincidem, e os trabalhos são diferentes. Já \(dU\) e \(dS\) <em>são</em> exatas: a
+    variação depende só dos extremos. É dessa exatidão que sairão, na seção 9, as relações de
+    Maxwell.</p>
+  </div>
+
+  <div data-widget="processos"></div>
+
+  <!-- ================================================== -->
+  <h2 id="s6">6. Primeira lei</h2>
+
+  <p>A energia de um sistema pode variar sem que nenhuma coordenada generalizada mude, isto é,
+  sem que se realize trabalho. A energia transferida dessa maneira é o <strong>calor</strong>.
+  A primeira lei é a afirmação de que, somados os dois canais, a energia interna é uma função
+  de estado:</p>
+
+  <p>\[\boxed{\;dU = \dbar Q + \dbar W\;}\]</p>
+
+  <p>Para um sistema isolado \(U\) é constante. O conteúdo físico não é a conservação da
+  energia, que já se conhecia da mecânica, mas a afirmação de que <em>calor é uma forma de
+  transferência de energia</em> e de que a soma das duas parcelas, ambas dependentes do
+  caminho, resulta em algo que não depende.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s7">7. Segunda lei e entropia</h2>
+
+  <p>A segunda lei introduz uma nova função de estado, a entropia \(S\), com duas propriedades:</p>
+
+  <div class="bloco def">
+    <span class="rotulo">As duas afirmações</span>
+    <ol>
+      <li>Em qualquer processo de um sistema <strong>isolado</strong>,
+      \[\Delta S \ge 0.\]</li>
+      <li>Numa transformação infinitesimal em que há troca de calor,
+      \[\dbar Q \le T\,dS,\]
+      com igualdade se e somente se o processo for reversível.</li>
+    </ol>
+  </div>
+
+  <p>Note que \(dS\) é uma diferencial exata, porque \(S\) é função do estado. Em um processo
+  reversível, portanto, \(\dbar Q = T\,dS\), e a primeira lei toma a forma que usaremos daqui
+  em diante:</p>
+
+  <p>\[\boxed{\;dU = T\,dS - P\,dV + \mu\,dN\;}\]</p>
+
+  <p>Esta é a <strong>relação fundamental</strong>. Vale a pena notar o que ela significa:
+  embora deduzida para um processo reversível, ela relaciona apenas <em>funções de estado</em>,
+  e portanto vale sempre. O que se perde num processo irreversível não é a equação, é a
+  identificação de \(T\,dS\) com o calor trocado e de \(-P\,dV\) com o trabalho realizado.</p>
+
+  <div class="bloco ex">
+    <span class="rotulo">Exemplo: a expansão livre</span>
+    <p>Um gás ocupa metade de um recipiente isolado; a outra metade está vazia. Retira-se a
+    divisória. O gás se espalha.</p>
+    <p>Não há troca de calor (\(\dbar Q'=0\), recipiente isolado) nem trabalho contra nada
+    (\(\dbar W'=0\), o vácuo não oferece resistência). Pela primeira lei, \(dU=0\): a
+    temperatura de um gás ideal não muda numa expansão livre.</p>
+    <p>Mas \(dS > 0\), e muito. O estado final é o mesmo que se obteria por uma expansão
+    isotérmica reversível até o mesmo volume, na qual \(\Delta S = N\kB\ln 2 > 0\). A entropia
+    é função de estado: não importa como se chegou lá. Aqui está, em uma linha, a
+    irreversibilidade: nada impede o gás de voltar espontaneamente para a metade original,
+    exceto que a probabilidade disso é \(2^{-N}\).</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s8">8. Os quatro potenciais termodinâmicos</h2>
+
+  <p>A relação fundamental \(dU=T\,dS-P\,dV\) diz que \(U\) é naturalmente função de \(S\) e
+  \(V\). Isso é inconveniente: ninguém controla a entropia de um sistema no laboratório. O que
+  se controla é a temperatura (pondo o sistema num banho térmico) e a pressão (deixando-o
+  aberto para a atmosfera).</p>
+
+  <p>A saída é uma transformação de Legendre: trocar uma variável pelo seu conjugado,
+  subtraindo o produto dos dois. O resultado são três novos potenciais, cada um sob medida
+  para um tipo de vínculo experimental.</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>Potencial</th><th>Definição</th><th>Diferencial</th><th>Variáveis naturais</th><th>Vínculo correspondente</th></tr></thead>
+    <tbody>
+      <tr><td><b>Energia interna</b> \(U\)</td><td>—</td>
+          <td>\(dU=T\,dS-P\,dV\)</td><td>\(S,V\)</td><td>sistema isolado</td></tr>
+      <tr><td><b>Entalpia</b> \(H\)</td><td>\(U+PV\)</td>
+          <td>\(dH=T\,dS+V\,dP\)</td><td>\(S,P\)</td><td>pressão constante</td></tr>
+      <tr><td><b>Helmholtz</b> \(F\)</td><td>\(U-TS\)</td>
+          <td>\(dF=-S\,dT-P\,dV\)</td><td>\(T,V\)</td><td>banho térmico, volume fixo</td></tr>
+      <tr><td><b>Gibbs</b> \(G\)</td><td>\(U-TS+PV\)</td>
+          <td>\(dG=-S\,dT+V\,dP\)</td><td>\(T,P\)</td><td>bancada de laboratório</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="bloco alerta">
+    <span class="rotulo">Uma nota de notação</span>
+    <p>Nas notas de aula a entalpia aparece como \(E\). Aqui usamos \(H\), que é a letra dos
+    quatro livros da bibliografia, para evitar confusão com a energia. São o mesmo objeto:
+    \(H = E = U + PV\).</p>
+  </div>
+
+  <p>A dedução de \(F\) ilustra o mecanismo. Partindo de \(dU=T\,dS-P\,dV\) e notando que
+  \(T\,dS = d(TS)-S\,dT\):</p>
+
+  <p>\[dU = d(TS) - S\,dT - P\,dV \;\Longrightarrow\; d(U-TS) = -S\,dT - P\,dV,\]</p>
+
+  <p>e como \(F \equiv U-TS\), chega-se a \(dF=-S\,dT-P\,dV\). A variável \(S\) saiu e entrou
+  \(T\). É exatamente o que queríamos.</p>
+
+  <p>De cada diferencial lemos imediatamente as primeiras derivadas, bastando comparar com
+  \(dF = \dpar{F}{T}{V}dT + \dpar{F}{V}{T}dV\):</p>
+
+  <p>\[S=-\dpar{F}{T}{V},\qquad P=-\dpar{F}{V}{T}.\]</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Por que \(F\) será o potencial da física estatística</span>
+    <p>O ensemble canônico descreve um sistema em contato com um reservatório à temperatura
+    \(T\), com volume e número de partículas fixos. As variáveis naturais são exatamente
+    \(T\) e \(V\): as de \(F\). Não é coincidência que o resultado central do Módulo 5 seja
+    \(F=-\kB T\ln Z\). A função de partição \(Z\) entrega a energia livre de Helmholtz, e dela
+    saem \(S\), \(P\) e todo o resto por diferenciação.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s9">9. Relações de Maxwell</h2>
+
+  <p>Aqui está o truque que rende quatro identidades de graça. Se \(\Phi\) é função de \(x\) e
+  \(y\) e sua diferencial é exata, as derivadas segundas cruzadas são iguais:</p>
+
+  <p>\[\frac{\partial^2\Phi}{\partial x\,\partial y}=\frac{\partial^2\Phi}{\partial y\,\partial x}.\]</p>
+
+  <p>Aplicando a \(F(T,V)\), cujas primeiras derivadas acabamos de obter:</p>
+
+  <p>\[\frac{\partial}{\partial V}\left(-S\right)=\frac{\partial}{\partial T}\left(-P\right)
+  \;\Longrightarrow\; \dpar{S}{V}{T}=\dpar{P}{T}{V}.\]</p>
+
+  <p>Repetindo com os outros três potenciais saem as quatro <strong>relações de Maxwell</strong>:</p>
+
+  <p>\[\dpar{T}{V}{S}=-\dpar{P}{S}{V},\qquad \dpar{T}{P}{S}=\dpar{V}{S}{P},\]</p>
+  <p>\[\dpar{S}{V}{T}=\dpar{P}{T}{V},\qquad \dpar{V}{T}{P}=-\dpar{S}{P}{T}.\]</p>
+
+  <p>O valor prático é enorme: do lado esquerdo das duas últimas aparece a entropia, que
+  ninguém mede; do lado direito, só \(P\), \(V\) e \(T\), que qualquer bancada mede. As
+  relações de Maxwell são a ponte entre o que se calcula e o que se mede.</p>
+
+  <p>Decorar as quatro é desnecessário. O quadrado abaixo as reconstrói em segundos.</p>
+
+  <div data-widget="quadrado"></div>
+
+  <div class="bloco def">
+    <span class="rotulo">Como usar o quadrado</span>
+    <ol>
+      <li>Cada potencial fica entre as suas duas variáveis naturais: \(F\) entre \(T\) e
+      \(V\), \(G\) entre \(T\) e \(P\), e assim por diante;</li>
+      <li>Os pares conjugados ficam nas diagonais: \(T\) com \(S\), \(P\) com \(V\);</li>
+      <li>A diferencial do potencial usa suas duas variáveis naturais, cada uma multiplicada
+      pelo seu conjugado;</li>
+      <li>Cruzando as duas primeiras derivadas sai a relação de Maxwell daquele potencial.</li>
+    </ol>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s10">10. Funções resposta</h2>
+
+  <p>As funções resposta medem o quanto o sistema reage a um empurrão: quanto a temperatura
+  sobe por unidade de calor, quanto o volume encolhe por unidade de pressão. São elas que se
+  medem no laboratório, e é com elas que a teoria terá de se confrontar.</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>Função</th><th>Definição</th><th>Em termos de um potencial</th><th>O que mede</th></tr></thead>
+    <tbody>
+      <tr><td>Capacidade a volume constante</td><td>\(C_V=\dpar{U}{T}{V}=T\dpar{S}{T}{V}\)</td>
+          <td>\(-T\left(\partial^2 F/\partial T^2\right)_V\)</td><td>calor por grau, sem deixar expandir</td></tr>
+      <tr><td>Capacidade a pressão constante</td><td>\(C_P=\dpar{H}{T}{P}=T\dpar{S}{T}{P}\)</td>
+          <td>\(-T\left(\partial^2 G/\partial T^2\right)_P\)</td><td>calor por grau, deixando expandir</td></tr>
+      <tr><td>Compressibilidade isotérmica</td><td>\(\kappa_T=-\dfrac{1}{V}\dpar{V}{P}{T}\)</td>
+          <td>\(-\frac{1}{V}\left(\partial^2 G/\partial P^2\right)_T\)</td><td>quanto encolhe ao ser apertado</td></tr>
+      <tr><td>Compressibilidade adiabática</td><td>\(\kappa_S=-\dfrac{1}{V}\dpar{V}{P}{S}\)</td>
+          <td>\(-\frac{1}{V}\left(\partial^2 H/\partial P^2\right)_S\)</td><td>idem, sem trocar calor</td></tr>
+      <tr><td>Expansão térmica</td><td>\(\alpha=\dfrac{1}{V}\dpar{V}{T}{P}\)</td>
+          <td>—</td><td>quanto dilata ao ser aquecido</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Note que todas são derivadas <em>segundas</em> de um potencial. Isso não é detalhe
+  decorativo: é a razão pela qual as transições de fase aparecem como singularidades das
+  funções resposta enquanto o potencial em si continua contínuo. Voltaremos a isso no
+  Módulo 9, com Landau.</p>
+
+  <div class="bloco ex">
+    <span class="rotulo">Exercício resolvido 1.1: a relação entre \(C_P\) e \(C_V\)</span>
+    <p><b>Demonstre que</b> \(\kappa_T\,(C_P-C_V)=TV\alpha^2\).</p>
+    <details class="solucao"><summary>Ver solução</summary>
+    <div class="corpo-solucao">
+    <p>O caminho é escrever \(T\,dS\) de duas maneiras e comparar. Tomando \(S=S(T,V)\):</p>
+    <p>\[T\,dS = T\dpar{S}{T}{V}dT + T\dpar{S}{V}{T}dV = C_V\,dT + T\dpar{P}{T}{V}dV,\]</p>
+    <p>onde a última igualdade usou a terceira relação de Maxwell. Agora com \(S=S(T,P)\):</p>
+    <p>\[T\,dS = C_P\,dT + T\dpar{S}{P}{T}dP = C_P\,dT - T\dpar{V}{T}{P}dP = C_P\,dT - TV\alpha\,dP,\]</p>
+    <p>pela quarta relação de Maxwell. Igualando as duas expressões e isolando \(dT\):</p>
+    <p>\[(C_P-C_V)\,dT = T\dpar{P}{T}{V}dV + TV\alpha\,dP.\]</p>
+    <p>Como \(T\) e \(V\) podem ser tomadas independentes, fixe \(P\) (\(dP=0\)) e divida por
+    \(dT\):</p>
+    <p>\[C_P-C_V = T\dpar{P}{T}{V}\dpar{V}{T}{P} = T\dpar{P}{T}{V}\,V\alpha.\]</p>
+    <p>Falta eliminar \((\partial P/\partial T)_V\), que não é diretamente mensurável. Use a
+    regra cíclica para três variáveis ligadas por uma equação de estado:</p>
+    <p>\[\dpar{P}{T}{V}\dpar{T}{V}{P}\dpar{V}{P}{T}=-1
+    \;\Longrightarrow\;\dpar{P}{T}{V} = -\frac{(\partial V/\partial T)_P}{(\partial V/\partial P)_T}
+    = \frac{V\alpha}{V\kappa_T}=\frac{\alpha}{\kappa_T}.\]</p>
+    <p>Substituindo:</p>
+    <p>\[C_P - C_V = T\,\frac{\alpha}{\kappa_T}\,V\alpha
+    \;\Longrightarrow\; \boxed{\;\kappa_T(C_P-C_V)=TV\alpha^2\;}\]</p>
+    <p><b>Leitura do resultado.</b> O lado direito é um quadrado, logo não negativo, e
+    \(\kappa_T>0\) por estabilidade mecânica. Portanto \(C_P\ge C_V\) <em>sempre</em>, qualquer
+    que seja a substância. A razão física é transparente: aquecendo a pressão constante, parte
+    do calor vai embora como trabalho de expansão, e é preciso fornecer mais. Note ainda o
+    caso curioso da água a 4 °C, onde \(\alpha=0\) e portanto \(C_P=C_V\) exatamente.</p>
+    <p>Para o gás ideal, \(\alpha=1/T\) e \(\kappa_T=1/P\), o que dá
+    \(C_P-C_V = TV/(T^2 P)\cdot P = V P/T = N\kB\): a relação de Mayer.</p>
+    </div></details>
+  </div>
+
+  <p>Por um caminho inteiramente análogo demonstra-se a segunda relação entre as respostas,</p>
+
+  <p>\[C_P(\kappa_T-\kappa_S)=TV\alpha^2,\]</p>
+
+  <p>de onde \(\kappa_T\ge\kappa_S\): comprimir deixando o calor escapar é mais fácil do que
+  comprimir adiabaticamente, porque na compressão adiabática o gás esquenta e resiste mais.
+  Dividindo as duas relações membro a membro obtém-se ainda
+  \(\gamma \equiv C_P/C_V = \kappa_T/\kappa_S\), que é como Laplace corrigiu a velocidade do
+  som de Newton.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s11">11. Terceira lei</h2>
+
+  <p>No enunciado de Nernst e Simon: <em>a variação de entropia associada a qualquer processo
+  isotérmico reversível de um sistema condensado tende a zero quando a temperatura em que ele
+  é realizado tende a 0 K</em>. Equivalentemente,</p>
+
+  <p>\[\lim_{T\to 0^+} S = S_0,\]</p>
+
+  <p>com \(S_0\) independente de pressão, volume, campo magnético ou qualquer outro parâmetro.
+  No zero absoluto o sistema está no estado de menor energia possível, e \(S_0\) é a entropia
+  residual, associada à degenerescência desse estado fundamental.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Uma consequência que se mede</span>
+    <p>A entropia a volume constante é
+    \[S(T_2,V)=S(T_1,V)+\int_{T_1}^{T_2}\frac{C_V}{T}\,dT.\]</p>
+    <p>Para que \(S\) permaneça finita quando \(T_1\to 0\), a integral não pode divergir, e
+    isso <strong>obriga</strong> \(C_V\to 0\) quando \(T\to 0\). É uma previsão forte e
+    verificável, e a equipartição clássica a viola de maneira espetacular: ela prevê
+    \(C_V=\frac{3}{2}N\kB\), constante até o zero absoluto. O experimento dá zero.</p>
+    <p>Essa contradição foi um dos primeiros sinais de que a mecânica clássica não bastava, e
+    é o assunto da seção seguinte.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s12">12. A pressão vem dos choques</h2>
+
+  <p>Esta é a primeira vez no curso em que olhamos para dentro do gás. O argumento é de
+  Bernoulli, tem três séculos, e é o embrião de toda a física estatística.</p>
+
+  <p>Uma molécula de massa \(m\) com velocidade \(v_x\) bate na parede perpendicular ao eixo
+  \(x\) e volta elasticamente. Seu momento muda de \(mv_x\) para \(-mv_x\), de modo que a
+  parede recebe \(2mv_x\). Se metade das \(N\) moléculas se move para a direita, a força média
+  sobre a parede durante um intervalo \(\Delta t\) é</p>
+
+  <p>\[F_x=\frac{N}{2}\,\frac{2mv_x}{\Delta t}.\]</p>
+
+  <p>A pressão numa parede de área \(A\) é \(P=F_x/A\). Como no intervalo \(\Delta t\) a região
+  que alcança a parede tem volume \(V=v_x\,\Delta t\,A\):</p>
+
+  <p>\[P = N\,\frac{m v_x^2}{V}.\]</p>
+
+  <p>Falta relacionar \(\overline{v_x^2}\) com a velocidade total. Como nenhuma direção é
+  privilegiada, \(\overline{v_x^2}=\overline{v_y^2}=\overline{v_z^2}\) e portanto
+  \(\overline{v^2}=3\,\overline{v_x^2}\). Substituindo:</p>
+
+  <p>\[\boxed{\;PV=\tfrac{1}{3}Nm\overline{v^2}\;}\]</p>
+
+  <p>Compare agora com a equação de estado experimental \(PV=N\kB T\). As duas só podem ser
+  verdadeiras ao mesmo tempo se</p>
+
+  <p>\[\kB T = \tfrac{1}{3}m\overline{v^2}
+  \quad\Longrightarrow\quad
+  \overline{E}_{\mathrm{cin}}=\tfrac{1}{2}m\overline{v^2}=\tfrac{3}{2}\kB T.\]</p>
+
+  <div class="destaque">
+    <span class="anuncio">Temperatura é energia cinética média</span>
+    A temperatura deixa de ser uma sensação ou a leitura de um termômetro e passa a ser uma
+    medida direta da agitação das moléculas. Este é o primeiro resultado genuinamente
+    estatístico do curso, e foi obtido com pouco mais do que a conservação do momento.
+  </div>
+
+  <p>O widget abaixo faz exatamente essa contagem em um gás bidimensional: ele registra cada
+  impulso na parede direita e compara a pressão medida com a prevista.</p>
+
+  <div data-widget="cinetica"></div>
+
+  <!-- ================================================== -->
+  <h2 id="s13">13. Equipartição</h2>
+
+  <p>O resultado \(\overline{E}=\frac{3}{2}\kB T\) tem uma leitura que o generaliza. As três
+  parcelas da energia cinética, \(\frac{1}{2}mv_x^2\), \(\frac{1}{2}mv_y^2\) e
+  \(\frac{1}{2}mv_z^2\), são termos quadráticos independentes no hamiltoniano, e cada uma
+  ficou com \(\frac{1}{2}\kB T\). O teorema da equipartição afirma que isso é geral:</p>
+
+  <div class="bloco def">
+    <span class="rotulo">Teorema da equipartição</span>
+    <p>No equilíbrio térmico clássico, <strong>cada termo quadrático no hamiltoniano
+    contribui com \(\frac{1}{2}\kB T\)</strong> para a energia média.</p>
+    <p>Demonstraremos isso no Módulo 5, a partir da distribuição canônica. Por ora, vale como
+    regra de contagem.</p>
+  </div>
+
+  <p>A contagem é direta. Um gás monoatômico tem três termos de translação:
+  \(U=\frac{3}{2}N\kB T\), logo \(C_V=\frac{3}{2}N\kB\) e \(\gamma=5/3\). Uma molécula
+  diatômica rígida ganha dois eixos de rotação, chegando a \(C_V=\frac{5}{2}N\kB\) e
+  \(\gamma=7/5=1{,}4\), que é o valor usado na questão do EUF mais adiante. Se a vibração
+  também contar, o modo vibracional traz <em>dois</em> termos quadráticos, cinético e
+  potencial, e \(C_V\) sobe para \(\frac{7}{2}N\kB\).</p>
+
+  <p>E aqui a teoria clássica quebra. A previsão é uma constante, independente da temperatura,
+  e o experimento mostra <strong>degraus</strong>: o hidrogênio tem \(C_V/R=3/2\) abaixo de
+  100 K, sobe para \(5/2\) à temperatura ambiente e só se aproxima de \(7/2\) perto de
+  3000 K. Os graus de liberdade <em>congelam</em> quando \(\kB T\) fica pequeno diante do
+  espaçamento entre os níveis de energia correspondentes. Isso é mecânica quântica entrando na
+  termodinâmica, e é o assunto dos Módulos 5 e 8.</p>
+
+  <div data-widget="equiparticao"></div>
+
+  <!-- ================================================== -->
+  <h2 id="s14">14. A entropia do gás ideal</h2>
+
+  <p>Para fechar a revisão, um cálculo que será refeito do zero no Módulo 3, com contagem de
+  microestados, e que serve de gabarito. Trabalhando por partícula, com
+  \(u=U/N\), \(v=V/N\) e \(s=S/N\), a equação de estado fica \(P/T=\kB/v\) e a relação
+  fundamental fica \(du = T\,ds - P\,dv\).</p>
+
+  <p>Para um gás ideal monoatômico, \(u=\frac{3}{2}\kB T\), ou seja \(1/T=\frac{3}{2}\kB/u\).
+  Integrando \(ds = du/T + (P/T)\,dv\) termo a termo:</p>
+
+  <p>\[s(u,v)=\int \frac{3}{2}\frac{\kB}{u}\,du + \int \frac{\kB}{v}\,dv
+  = \tfrac{3}{2}\kB\ln u + \kB\ln v + K.\]</p>
+
+  <p>Ou, nas variáveis extensivas,</p>
+
+  <p>\[S = N\kB\left[\tfrac{3}{2}\ln\frac{U}{N} + \ln\frac{V}{N}\right] + NK.\]</p>
+
+  <p>A entropia cresce com a energia e com o volume, como se espera. O que a termodinâmica
+  <em>não</em> consegue dizer é quanto vale \(K\): é uma constante de integração, e nenhuma
+  medida macroscópica a fixa. Ela só será determinada no Módulo 3, quando contarmos
+  microestados e chegarmos à fórmula de Sackur e Tetrode. Guarde esta lacuna: é exatamente o
+  tipo de pergunta que a física estatística existe para responder.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s15">15. Exercícios resolvidos</h2>
+
+  <div class="bloco ex">
+    <span class="rotulo">Exercício resolvido 1.2: EUF 2019-1, questão 5</span>
+    <p>Comprime-se \(n\) mols de um gás ideal diatômico (\(\gamma=1{,}4\), \(C_V=5R/2\)),
+    inicialmente a \(P_0=1{,}01\times 10^5\) Pa, \(T_0=330\) K e \(V_0=1\) L, até o volume
+    final de 100 mL. Em seguida, parte do gás é expelida para que a pressão volte a \(P_0\),
+    agora a 300 K.</p>
+    <ol>
+      <li>Para a compressão isotérmica, determine a pressão ao fim da compressão.</li>
+      <li>Para a compressão adiabática, determine a pressão ao fim da compressão.</li>
+      <li>Determine a fração do gás inicial liberada na segunda etapa.</li>
+      <li>Esboce as duas compressões num diagrama PV e diga em qual o trabalho realizado sobre
+      o gás é menor.</li>
+    </ol>
+    <p>Use \(10^{1,3}\approx 20\), \(10^{1,4}\approx 25\) e \(10^{1,7}\approx 50\).</p>
+
+    <details class="solucao"><summary>Ver solução</summary>
+    <div class="corpo-solucao">
+    <p><b>(a) Compressão isotérmica.</b> Com \(T\) fixo, \(PV\) é constante:</p>
+    <p>\[P_1 V_1 = P_0 V_0 \;\Longrightarrow\;
+    P_1 = P_0\frac{V_0}{V_1} = 1{,}01\times 10^5 \times \frac{1}{0{,}1}
+    = 1{,}01\times 10^6\ \mathrm{Pa}.\]</p>
+    <p>Dez vezes a pressão inicial, porque o volume caiu a um décimo.</p>
+
+    <p><b>(b) Compressão adiabática.</b> Agora vale \(PV^\gamma=\) constante:</p>
+    <p>\[P_1 = P_0\left(\frac{V_0}{V_1}\right)^{\gamma} = P_0\,10^{1,4}
+    \approx 1{,}01\times 10^5\times 25 = 2{,}5\times 10^6\ \mathrm{Pa},\]</p>
+    <p>duas vezes e meia a pressão do caso isotérmico. A temperatura ao fim da compressão
+    adiabática é \(T_1=T_0\,10^{\gamma-1}=330\times 10^{0,4}\approx 330\times 2{,}5
+    = 830\) K, e é esse aquecimento que explica a pressão maior.</p>
+
+    <p><b>(c) Fração liberada.</b> A pergunta não depende do caminho da etapa (1), só dos
+    estados. Compare o estado inicial com o final, ambos à pressão \(P_0\):</p>
+    <p>inicial: \(P_0 V_0 = n_0 R T_0\), com \(V_0=1\) L e \(T_0=330\) K;<br>
+       final: \(P_0 V_1 = n_f R T_f\), com \(V_1=0{,}1\) L e \(T_f=300\) K.</p>
+    <p>Dividindo uma pela outra:</p>
+    <p>\[\frac{n_f}{n_0}=\frac{V_1}{V_0}\cdot\frac{T_0}{T_f}
+    = 0{,}1\times\frac{330}{300}=0{,}11.\]</p>
+    <p>A fração liberada é \(1-n_f/n_0 = \boxed{0{,}89}\), ou seja, 89% do gás é expelido.</p>
+
+    <p><b>(d) Qual trabalho é menor.</b> O trabalho sobre o gás é a área sob a curva no
+    diagrama PV. Partindo do mesmo ponto, a adiabática é mais íngreme que a isoterma, porque
+    a cada redução de volume o gás também esquenta e empurra de volta com mais força. A curva
+    adiabática fica <em>acima</em> da isotérmica em todo o trecho comprimido, e portanto deixa
+    mais área sob si.</p>
+    <p>Logo o trabalho realizado sobre o gás é <b>menor na compressão isotérmica</b>.
+    Quantitativamente, com \(n_0=P_0V_0/RT_0 = 101/(8{,}314\times 330)=0{,}0368\) mol:</p>
+    <p>\[W_{\mathrm{iso}} = n_0 R T_0 \ln\frac{V_0}{V_1}
+    = 0{,}0368\times 8{,}314\times 330 \times \ln 10 \approx 232\ \mathrm{J},\]</p>
+    <p>\[W_{\mathrm{adi}} = \frac{P_1V_1-P_0V_0}{\gamma-1}
+    = \frac{2{,}5\times 10^6\times 10^{-4} - 1{,}01\times 10^5\times 10^{-3}}{0{,}4}
+    \approx 373\ \mathrm{J}.\]</p>
+    <p>Confira os dois números no widget da seção 5: escolha a razão de volumes 0,10 e
+    mantenha \(\gamma=1{,}4\). Ele mostrará 232,56 J e 381,75 J. A diferença de cerca de 2%
+    no caso adiabático vem da aproximação \(10^{1,4}\approx 25\) sugerida pela prova: o valor
+    exato é 25,12, e com ele o trabalho é 382 J. Em prova, use os números aproximados que o
+    enunciado oferece.</p>
+    </div></details>
+  </div>
+
+  <div class="bloco ex">
+    <span class="rotulo">Exercício resolvido 1.3: a energia interna só depende de \(T\)?</span>
+    <p><b>Mostre que</b> \(\dpar{U}{V}{T}=T\dpar{P}{T}{V}-P\) <b>e use o resultado para provar
+    que a energia interna de um gás ideal não depende do volume.</b></p>
+    <details class="solucao"><summary>Ver solução</summary>
+    <div class="corpo-solucao">
+    <p>Parta da relação fundamental escrita para \(dS\), com \(S=S(T,V)\):</p>
+    <p>\[dS = \frac{dU + P\,dV}{T}
+    = \frac{1}{T}\left[\dpar{U}{T}{V}dT + \dpar{U}{V}{T}dV\right] + \frac{P}{T}dV.\]</p>
+    <p>Agrupando os coeficientes de \(dT\) e \(dV\):</p>
+    <p>\[\dpar{S}{T}{V}=\frac{1}{T}\dpar{U}{T}{V}=\frac{C_V}{T},\qquad
+    \dpar{S}{V}{T}=\frac{1}{T}\left[\dpar{U}{V}{T}+P\right].\]</p>
+    <p>Como \(dS\) é exata, as derivadas cruzadas se igualam:</p>
+    <p>\[\frac{\partial}{\partial V}\left(\frac{C_V}{T}\right)_T
+    = \frac{\partial}{\partial T}\left\{\frac{1}{T}\left[\dpar{U}{V}{T}+P\right]\right\}_V.\]</p>
+    <p>O lado esquerdo é \(\frac{1}{T}\frac{\partial^2 U}{\partial V\,\partial T}\). Derivando
+    o lado direito pela regra do produto, o termo com a derivada segunda de \(U\) cancela
+    exatamente o lado esquerdo, restando</p>
+    <p>\[0 = -\frac{1}{T^2}\left[\dpar{U}{V}{T}+P\right]+\frac{1}{T}\dpar{P}{T}{V},\]</p>
+    <p>e multiplicando por \(T^2\):</p>
+    <p>\[\boxed{\;\dpar{U}{V}{T}=T\dpar{P}{T}{V}-P\;}\]</p>
+    <p>Esta é a <b>equação da energia</b>. Ela é notável: o lado esquerdo não é mensurável
+    diretamente, o lado direito só exige a equação de estado.</p>
+    <p><b>Aplicação ao gás ideal.</b> De \(P=N\kB T/V\) vem \((\partial P/\partial T)_V =
+    N\kB/V = P/T\), logo</p>
+    <p>\[\dpar{U}{V}{T}=T\cdot\frac{P}{T}-P=0.\]</p>
+    <p>A energia interna do gás ideal depende só da temperatura. Isso justifica, <em>a
+    posteriori</em>, o que foi usado sem demonstração na expansão livre: o gás se espalha, o
+    volume dobra, e a temperatura não muda.</p>
+    <p><b>E um gás de van der Waals?</b> Com \(P=\frac{N\kB T}{V-Nb}-\frac{aN^2}{V^2}\), o
+    termo atrativo não depende de \(T\), e sobra \((\partial U/\partial V)_T = aN^2/V^2 > 0\).
+    Separar as moléculas contra a atração mútua custa energia, e por isso um gás real
+    <em>esfria</em> numa expansão livre. É o efeito Joule, e voltaremos a ele no Módulo 7.</p>
+    </div></details>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s16">16. Exercícios propostos</h2>
+
+  <div class="bloco def">
+    <span class="rotulo">Para resolver</span>
+    <ol>
+      <li><b>1.1</b> Um mol de gás ideal monoatômico a 300 K e 1 atm é comprimido
+      isotermicamente até metade do volume. Calcule \(W\), \(Q\) e \(\Delta S\) do gás, e
+      verifique que \(\Delta S_{\text{universo}}=0\) se o processo for reversível.</li>
+
+      <li><b>1.2</b> Mostre que, para um processo adiabático quase-estático de um gás ideal,
+      \(TV^{\gamma-1}\) é constante. Parta de \(dU=-P\,dV\) com \(dU=nC_V\,dT\).</li>
+
+      <li><b>1.3</b> Use a relação de Maxwell \((\partial S/\partial V)_T=(\partial
+      P/\partial T)_V\) para calcular a variação de entropia de um gás de van der Waals numa
+      expansão isotérmica de \(V_1\) a \(V_2\). Compare com o gás ideal.</li>
+
+      <li><b>1.4</b> Demonstre \(C_P(\kappa_T-\kappa_S)=TV\alpha^2\), seguindo o roteiro do
+      exercício resolvido 1.1 mas escrevendo \(T\,dS\) em função de \((T,P)\) e de \((S,P)\).</li>
+
+      <li><b>1.5</b> A velocidade do som num gás é \(c=\sqrt{1/(\rho\kappa_S)}\). Newton supôs
+      o processo isotérmico e errou por cerca de 18%. Mostre que usando \(\kappa_S\) no lugar
+      de \(\kappa_T\) o fator que falta é \(\sqrt{\gamma}\), e calcule \(c\) no ar a 20 °C
+      (\(\gamma=1{,}4\), massa molar 29 g/mol).</li>
+
+      <li><b>1.6</b> Um sólido obedece a Dulong e Petit, \(C_V=3N\kB\), acima da temperatura
+      ambiente. Mostre que essa lei é a equipartição aplicada a \(3N\) osciladores
+      tridimensionais, e explique por que ela falha a baixas temperaturas. Confirme com o
+      widget da seção 13 qual é o parâmetro que controla o congelamento.</li>
+
+      <li><b>1.7</b> Dois corpos idênticos de capacidade calorífica \(C\) constante, às
+      temperaturas \(T_1\) e \(T_2\), são postos em contato térmico. Determine a temperatura
+      final e mostre que \(\Delta S>0\) usando a desigualdade entre as médias aritmética e
+      geométrica.</li>
+    </ol>
+  </div>
+
+  <nav class="nav-aulas">
+    <a href="index.html"><small>Voltar</small>← Início</a>
+    <span class="em-breve"><small>Em preparação</small>2. Métodos estatísticos</span>
+  </nav>
+
+</main>
+</div>
+
+<footer class="rodape">
+  <img class="logo-rodape" src="assets/img/logo-lfca.png" alt="LFCA | URCA">
+  <p><strong>Prof. Apiano Morais</strong> · <a href="mailto:apiano.morais@urca.br">apiano.morais@urca.br</a><br>
+  Laboratório de Física Computacional Aplicada (LFCA) · Universidade Regional do Cariri</p>
+</footer>
+
+<script src="assets/js/widgets.js?v=202611071532"></script>
+</body>
+</html>

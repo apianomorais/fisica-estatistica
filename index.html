@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Física Estatística | LFCA/URCA</title>
+<link rel="icon" type="image/png" href="assets/img/favicon.png">
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611071532">
+<script src="assets/js/comum.js?v=202611071532"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+
+<header class="topo">
+  <div class="topo-interno">
+    <a class="marca" href="index.html">Física Estatística <span>· LFCA/URCA</span></a>
+    <nav class="menu">
+      <a href="index.html" class="ativo">Início</a>
+      <span class="grupo">Fundamentos</span>
+      <a href="aula01.html" class="num" title="Módulo 1: Revisão de termodinâmica">1</a>
+    </nav>
+  </div>
+</header>
+
+<div class="envoltorio">
+<main class="conteudo">
+
+  <div class="heroi">
+    <span class="placa-logo">
+      <img src="assets/img/logo-lfca.png" alt="LFCA | URCA (Laboratório de Física Computacional Aplicada)">
+    </span>
+    <h1>Física Estatística</h1>
+    <p>Material interativo da disciplina</p>
+    <p class="meta">
+      Prof. Apiano Morais · Laboratório de Física Computacional Aplicada (LFCA)<br>
+      Universidade Regional do Cariri (URCA) · apiano.morais@urca.br
+    </p>
+  </div>
+
+  <h2 id="apresentacao">A ponte entre dois mundos</h2>
+
+  <p>Em 1877, numa Viena que ainda discutia se átomos existiam,
+  <strong>Ludwig Boltzmann</strong> escreveu uma equação curta demais para o que carregava:
+  a entropia de um estado macroscópico é o logaritmo do número de maneiras microscópicas de
+  realizá-lo. De um lado do sinal de igual, uma grandeza da termodinâmica, medida em
+  calorímetros. Do outro, uma contagem. Uma contagem de configurações de partículas que a
+  maior parte dos físicos e químicos da época considerava uma ficção conveniente.</p>
+
+  <p>Boltzmann foi atacado a vida inteira por isso, sobretudo por Ernst Mach e pela escola
+  energetista, para quem falar de átomos era metafísica. Morreu em 1906, sem ver a
+  controvérsia resolvida. Três anos antes, um jovem funcionário do escritório de patentes de
+  Berna havia publicado a explicação do movimento browniano a partir de choques moleculares,
+  e em 1908 Jean Perrin mediu o número de Avogadro usando aquela previsão. Os átomos eram
+  reais, e a contagem de Boltzmann estava certa.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">O que esta disciplina faz</span>
+    <p>A termodinâmica descreve um litro de gás com três números e não pergunta o que há
+    dentro. A mecânica descreve cada molécula com perfeita precisão, e por isso não serve para
+    \(10^{23}\) delas. A física estatística é a ponte: ela parte das leis microscópicas,
+    admite que não sabemos nem queremos saber o estado exato do sistema, e mostra que a
+    ignorância, tratada com honestidade estatística, produz exatamente a termodinâmica.</p>
+    <p>É também a disciplina em que a mecânica quântica entra pela porta dos fundos. O calor
+    específico que teima em cair a zero, a radiação de corpo negro que não diverge, os elétrons
+    que se recusam a ocupar o mesmo estado: tudo isso aparece aqui como correção estatística, e
+    foi assim, historicamente, que a quantização foi descoberta.</p>
+  </div>
+
+  <div class="destaque">
+    <span class="anuncio">A frase que ficou no túmulo</span>
+    \(S = \kB \ln W\). Boltzmann não a escreveu nessa forma: foi Planck quem a compactou assim,
+    e quem introduziu a constante que leva o nome do outro. Está gravada no túmulo de
+    Boltzmann, no Cemitério Central de Viena.
+  </div>
+
+  <h2>Como este material funciona</h2>
+
+  <p>O site reúne o conteúdo da disciplina em módulos. Cada módulo traz a teoria completa,
+  exercícios resolvidos passo a passo e <strong>simuladores interativos</strong>: você muda os
+  parâmetros e vê a física responder na hora. Em vez de olhar para a figura de um gás, você
+  pode contar os choques nas paredes e ver a pressão aparecer.</p>
+
+  <div class="destaque">
+    <strong>Como usar durante a aula:</strong> acompanhe a leitura, pare em cada simulador e
+    experimente. As soluções dos exercícios ficam ocultas até você clicar: tente resolver antes
+    de abrir.
+  </div>
+
+  <h2>Os módulos</h2>
+
+  <h3 class="unidade">Fundamentos</h3>
+
+  <div class="cartoes">
+
+    <a class="cartao" href="aula01.html">
+      <span class="numero">Módulo 1</span>
+      <h3>Revisão de termodinâmica</h3>
+      <p>Variáveis extensivas e intensivas, as três leis, os quatro potenciais, relações de
+      Maxwell, funções resposta e a pressão deduzida dos choques.</p>
+      <div class="etiquetas">
+        <span class="etiqueta">Diagrama PV</span>
+        <span class="etiqueta">Quadrado termodinâmico</span>
+        <span class="etiqueta">Equipartição</span>
+      </div>
+    </a>
+
+    <span class="cartao em-preparo">
+      <span class="numero">Módulo 2</span>
+      <h3>Métodos estatísticos</h3>
+      <p>Probabilidade e estatística para física, tópicos de mecânica clássica, espaço de
+      fase e o teorema de Liouville.</p>
+      <div class="etiquetas"><span class="etiqueta">Em preparação</span></div>
+    </span>
+
+  </div>
+
+  <h3 class="unidade">Estados microscópicos e entropia</h3>
+
+  <div class="cartoes">
+
+    <span class="cartao em-preparo">
+      <span class="numero">Módulo 3</span>
+      <h3>Caminhante aleatório e estados microscópicos</h3>
+      <p>Entropia de Boltzmann, sistema de dois níveis, sólido de Einstein, paramagneto ideal
+      e as condições de equilíbrio térmico, mecânico e químico.</p>
+      <div class="etiquetas"><span class="etiqueta">Em preparação</span></div>
+    </span>
+
+    <span class="cartao em-preparo">
+      <span class="numero">Módulo 4</span>
+      <h3>Movimento browniano</h3>
+      <p>A equação de Langevin, difusão, a relação de Einstein e a medida de Perrin do número
+      de Avogadro.</p>
+      <div class="etiquetas"><span class="etiqueta">Em preparação</span></div>
+    </span>
+
+  </div>
+
+  <h3 class="unidade">Ensembles</h3>
+
+  <div class="cartoes">
+
+    <span class="cartao em-preparo">
+      <span class="numero">Módulo 5</span>
+      <h3>Ensembles canônico e grã-canônico</h3>
+      <p>Função de partição, \(F=-\kB T\ln Z\), flutuações de energia, potencial químico e o
+      ensemble grã-canônico.</p>
+      <div class="etiquetas"><span class="etiqueta">Em preparação</span></div>
+    </span>
+
+  </div>
+
+  <h3 class="unidade">Gases</h3>
+
+  <div class="cartoes">
+
+    <span class="cartao em-preparo">
+      <span class="numero">Módulo 6</span>
+      <h3>Gás ideal</h3>
+      <p>Distribuição de Maxwell e Boltzmann, paradoxo de Gibbs e a fórmula de Sackur e
+      Tetrode.</p>
+      <div class="etiquetas"><span class="etiqueta">Em preparação</span></div>
+    </span>
+
+    <span class="cartao em-preparo">
+      <span class="numero">Módulo 7</span>
+      <h3>Gases clássicos</h3>
+      <p>Gás real, expansão em aglomerados, van der Waals e o gás ideal relativístico.</p>
+      <div class="etiquetas"><span class="etiqueta">Em preparação</span></div>
+    </span>
+
+    <span class="cartao em-preparo">
+      <span class="numero">Módulo 8</span>
+      <h3>Gases quânticos</h3>
+      <p>Gás de Fermi, condutores, semicondutores e isolantes, corpo negro e o condensado de
+      Bose e Einstein.</p>
+      <div class="etiquetas"><span class="etiqueta">Em preparação</span></div>
+    </span>
+
+  </div>
+
+  <h3 class="unidade">Magnetismo</h3>
+
+  <div class="cartoes">
+
+    <span class="cartao em-preparo">
+      <span class="numero">Módulo 9</span>
+      <h3>Magnetismo</h3>
+      <p>Modelos de Weiss e Heisenberg, ferromagnetismo, modelo de Ising e a teoria de
+      Landau.</p>
+      <div class="etiquetas"><span class="etiqueta">Em preparação</span></div>
+    </span>
+
+  </div>
+
+  <h2>Bibliografia</h2>
+
+  <ul>
+    <li>LEONEL, E. D. <em>Fundamentos da Física Estatística</em>. São Paulo: Blucher.</li>
+    <li>HUANG, K. <em>Statistical Mechanics</em>. 2. ed. New York: Wiley.</li>
+    <li>TOLMAN, R. C. <em>The Principles of Statistical Mechanics</em>. Oxford.</li>
+    <li>CASQUILHO, J. P.; TEIXEIRA, P. I. C. <em>Introdução à Física Estatística</em>.
+    São Paulo: Livraria da Física.</li>
+  </ul>
+
+  <div class="bloco def">
+    <span class="rotulo">Disciplina irmã</span>
+    <p>As ferramentas de probabilidade usadas aqui (distribuição binomial, Poisson, Gaussiana,
+    propagação de erros, ajuste de dados) são desenvolvidas em detalhe no material de
+    <a href="https://apianomorais.github.io/probabilidade-estatistica/">Probabilidade e
+    Estatística</a>, do mesmo laboratório.</p>
+  </div>
+
+</main>
+</div>
+
+<footer class="rodape">
+  <img class="logo-rodape" src="assets/img/logo-lfca.png" alt="LFCA | URCA">
+  <p><strong>Prof. Apiano Morais</strong> · <a href="mailto:apiano.morais@urca.br">apiano.morais@urca.br</a><br>
+  Laboratório de Física Computacional Aplicada (LFCA) · Universidade Regional do Cariri</p>
+</footer>
+
+</body>
+</html>
