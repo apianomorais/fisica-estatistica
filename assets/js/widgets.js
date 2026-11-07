@@ -3390,6 +3390,362 @@
     tipografar(corpo);
   };
 
+
+  /* =================================================================
+     19. Distribuição de Maxwell e a atmosfera
+     Gases reais, em unidades reais. A fração acima da velocidade de
+     escape explica por que a Terra perdeu o hidrogênio e guardou o
+     nitrogênio, e por que a Lua não guardou nada.
+     ================================================================= */
+  REGISTRO.maxwell = function (raiz) {
+    var corpo = moldura(raiz, 'Distribuição de Maxwell: velocidades, escape e atmosfera');
+
+    var u = 1.66053906660e-27;
+    var GAS = [
+      { nome: 'H\u2082', M: 2.016, cor: '#2c5f8d' },
+      { nome: 'He', M: 4.003, cor: '#1f6f54' },
+      { nome: 'N\u2082', M: 28.01, cor: '#b5831f' },
+      { nome: 'O\u2082', M: 32.00, cor: '#8c2f39' },
+      { nome: 'CO\u2082', M: 44.01, cor: '#7a5ea8' }
+    ];
+    var CORPOS = {
+      terra: { rot: 'Terra', vesc: 11200, T: 290, g: 9.81 },
+      lua: { rot: 'Lua', vesc: 2380, T: 250, g: 1.62 },
+      marte: { rot: 'Marte', vesc: 5030, T: 210, g: 3.72 },
+      jupiter: { rot: 'Júpiter', vesc: 59500, T: 165, g: 24.8 }
+    };
+
+    var est = { vista: 'vel', T: 290, corpo: 'terra', iGas: 2 };
+
+    var ctr0 = el('div', { class: 'controles' });
+    corpo.appendChild(ctr0);
+    opcoes(ctr0, [
+      { rot: 'Distribuição de velocidades', v: 'vel' },
+      { rot: 'Atmosfera e escape', v: 'atm' }
+    ], 0, function (v) { est.vista = v; desenhar(); });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    var desT = deslizante(ctr, 'temperatura', 50, 1500, 5, 290,
+      function (v) { est.T = v; desenhar(); },
+      function (v) { return v + ' K'; });
+    opcoes(ctr, Object.keys(CORPOS).map(function (k) {
+      return { rot: CORPOS[k].rot, v: k };
+    }), 0, function (v) {
+      est.corpo = v;
+      desT.value = CORPOS[v].T;
+      desT.dispatchEvent(new Event('input'));
+    });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'v mais provável', k: 'vp' }, { rot: '⟨v⟩', k: 'vm' },
+      { rot: 'v<sub>rms</sub>', k: 'vq' }, { rot: 'v de escape', k: 've' },
+      { rot: 'altura de escala', k: 'h' }
+    ]);
+    var tabela = el('div', { class: 'tabela-rolavel' });
+    corpo.appendChild(tabela);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function massa(i) { return GAS[i].M * u; }
+
+    /* fração de moléculas com v > vc, por integração da Maxwell 3D */
+    function fracaoAcima(m, T, vc) {
+      var a = m / (2 * F.C.kB * T);
+      var x = Math.sqrt(a) * vc;
+      if (x > 30) {                      // cauda: assintótico, evita 0/0 numérico
+        return (2 / Math.sqrt(Math.PI)) * x * Math.exp(-x * x);
+      }
+      var f = function (s) { return s * s * Math.exp(-s * s); };
+      var topo = Math.max(x + 12, 14);
+      return (4 / Math.sqrt(Math.PI)) * F.simpson(f, x, topo, 4000);
+    }
+
+    function desenhar() {
+      var C = CORPOS[est.corpo], T = est.T, i;
+
+      if (est.vista === 'vel') {
+        var vmax = 1.1 * F.vQuadratica(massa(0), T) * 2.6;
+        var ymax = 0;
+        GAS.forEach(function (g) {
+          ymax = Math.max(ymax, F.maxwell(F.vProvavel(g.M * u, T), g.M * u, T));
+        });
+        var ax = G.eixos(cv, {
+          xmin: 0, xmax: vmax, ymin: 0, ymax: ymax * 1.12, altura: 320,
+          rotX: 'velocidade (m/s)', rotY: 'densidade de probabilidade f(v)',
+          marcasX: G.marcasLineares(0, vmax, 5, 0),
+          formataY: function () { return ''; }
+        });
+        GAS.forEach(function (g, k) {
+          G.curva(ax, function (v) { return F.maxwell(v, g.M * u, T); },
+                  g.cor, k === est.iGas ? 3 : 1.6);
+        });
+        if (C.vesc < vmax) {
+          G.vertical(ax, C.vesc, G.COR.tinta,
+                     'escape da ' + C.rot + ': ' + C.vesc + ' m/s', false);
+        }
+        G.legenda(ax, GAS.map(function (g) {
+          return { cor: g.cor, texto: g.nome };
+        }));
+      } else {
+        /* perfil de densidade na atmosfera isotérmica */
+        var hmax = 120e3;
+        var ax2 = G.eixos(cv, {
+          xmin: 0, xmax: 1.02, ymin: 0, ymax: hmax, altura: 320,
+          rotX: 'densidade relativa n(y)/n\u2080', rotY: 'altitude (km)',
+          marcasX: G.marcasLineares(0, 1, 5, 1),
+          formataY: function (v) { return String(Math.round(v / 1000)); }
+        });
+        GAS.forEach(function (g, k) {
+          var H = F.C.kB * T / (g.M * u * C.g);
+          ax2.ct.save();
+          ax2.ct.strokeStyle = g.cor;
+          ax2.ct.lineWidth = k === est.iGas ? 3 : 1.6;
+          ax2.ct.beginPath();
+          for (var j = 0; j <= 200; j++) {
+            var y = hmax * j / 200;
+            var n = Math.exp(-y / H);
+            if (j) ax2.ct.lineTo(ax2.X(n), ax2.Y(y));
+            else ax2.ct.moveTo(ax2.X(n), ax2.Y(y));
+          }
+          ax2.ct.stroke();
+          ax2.ct.restore();
+        });
+        G.legenda(ax2, GAS.map(function (g) {
+          return { cor: g.cor, texto: g.nome + ': H = '
+            + F.fmt(F.C.kB * T / (g.M * u * C.g) / 1000, 1) + ' km' };
+        }));
+      }
+
+      var g0 = GAS[est.iGas], m0 = massa(est.iGas);
+      mostrar({
+        vp: F.fmt(F.vProvavel(m0, T), 0) + ' m/s',
+        vm: F.fmt(F.vMedia(m0, T), 0) + ' m/s',
+        vq: F.fmt(F.vQuadratica(m0, T), 0) + ' m/s',
+        ve: C.vesc + ' m/s',
+        h: F.fmt(F.C.kB * T / (m0 * C.g) / 1000, 1) + ' km'
+      });
+
+      /* tabela: fração acima da velocidade de escape, por gás */
+      var linhas = GAS.map(function (g) {
+        var m = g.M * u;
+        var fr = fracaoAcima(m, T, C.vesc);
+        var razao = C.vesc / F.vQuadratica(m, T);
+        var veredito = razao > 6 ? 'retida com folga'
+                     : razao > 4 ? 'retida'
+                     : razao > 2.5 ? 'escapa em tempo geológico'
+                     : 'escapa depressa';
+        return '<tr><td><b>' + g.nome + '</b></td><td>' + g.M.toFixed(2).replace('.', ',')
+             + '</td><td>' + F.fmt(F.vQuadratica(m, T), 0) + '</td><td>'
+             + F.fmt(razao, 2) + '</td><td>'
+             + (fr < 1e-300 ? '&lt; 10<sup>-300</sup>' : F.fmt(fr, 3))
+             + '</td><td>' + veredito + '</td></tr>';
+      }).join('');
+      tabela.innerHTML = '<table><thead><tr><th>Gás</th><th>M (u)</th>'
+        + '<th>v<sub>rms</sub> (m/s)</th><th>v<sub>esc</sub>/v<sub>rms</sub></th>'
+        + '<th>fração acima de v<sub>esc</sub></th><th>destino</th></tr></thead><tbody>'
+        + linhas + '</tbody></table>';
+
+      nota.innerHTML = est.vista === 'vel'
+        ? '<p>Todas as curvas são a mesma função, '
+          + '\\(f(v)\\propto v^2e^{-mv^2/2\\kB T}\\), com massas diferentes. Como a '
+          + 'energia cinética média é a mesma para todas, \\(\\tfrac32\\kB T\\), a '
+          + 'velocidade típica escala como \\(1/\\sqrt m\\): o hidrogênio é quase quatro '
+          + 'vezes mais rápido que o oxigênio na mesma temperatura.</p>'
+          + '<p>A linha vertical é a velocidade de escape. O que importa não é a média, e '
+          + 'sim a <b>cauda</b>: basta que uma fração ínfima ultrapasse \\(v_{\\rm esc}\\) '
+          + 'para que, ao longo de bilhões de anos, o gás se perca. A regra prática dos '
+          + 'planetólogos é \\(v_{\\rm esc}/v_{\\rm rms}>6\\) para reter um gás pela idade do '
+          + 'Sistema Solar, e a tabela aplica esse critério.</p>'
+        : '<p>Num campo gravitacional uniforme, a distribuição de Boltzmann no potencial '
+          + '\\(u=mgy\\) dá \\(n(y)=n_0e^{-mgy/\\kB T}\\): é a '
+          + '<b>fórmula barométrica</b>. A altura de escala \\(H=\\kB T/mg\\) é onde a '
+          + 'densidade cai por um fator \\(e\\).</p>'
+          + '<p>Repare que \\(H\\) depende da massa: o hidrogênio tem uma atmosfera muito '
+          + 'mais alta que o gás carbônico. É por isso que as camadas superiores da '
+          + 'atmosfera são relativamente mais ricas em gases leves, e é também a razão pela '
+          + 'qual Perrin mediu \\(N_A\\) de um terceiro jeito, contando grãos suspensos em '
+          + 'água a alturas diferentes: a mesma exponencial vale para eles.</p>';
+      tipografar(nota);
+    }
+
+    registrarRedesenho(desenhar);
+    tipografar(corpo);
+  };
+
+  /* =================================================================
+     20. O paradoxo de Gibbs
+     Duas câmaras, a divisória retirada. Sem o fator 1/N! a entropia
+     aumenta mesmo quando os gases são idênticos, o que é absurdo.
+     ================================================================= */
+  REGISTRO.gibbs = function (raiz) {
+    var corpo = moldura(raiz, 'O paradoxo de Gibbs e o fator 1/N!');
+
+    var est = { iguais: true, N: 60, t: 0, rodando: false };
+    var part = [];
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+
+    opcoes(ctr, [
+      { rot: 'O mesmo gás dos dois lados', v: 1 },
+      { rot: 'Gases diferentes', v: 0 }
+    ], 0, function (v) { est.iguais = !!v; reiniciar(); });
+
+    deslizante(ctr, 'partículas de cada lado \\(N\\)', 20, 200, 10, 60,
+      function (v) { est.N = v; reiniciar(); });
+
+    var bA = el('button', { type: 'button', texto: 'retirar a divisória' });
+    var bR = el('button', { type: 'button', class: 'sec', texto: 'reiniciar' });
+    bA.addEventListener('click', function () { est.rodando = true; });
+    bR.addEventListener('click', reiniciar);
+    ctr.appendChild(el('div', { class: 'botoes' }, [bA, bR]));
+
+    var mostrar = cartoes(corpo, [
+      { rot: '\u0394S sem o 1/N! (errado)', k: 'se' },
+      { rot: '\u0394S com o 1/N! (correto)', k: 'sc' },
+      { rot: 'o que o experimento mede', k: 'sx' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function reiniciar() {
+      part = [];
+      for (var lado = 0; lado < 2; lado++) {
+        for (var i = 0; i < est.N; i++) {
+          part.push({
+            x: lado * 0.5 + Math.random() * 0.48 + 0.01,
+            y: Math.random() * 0.96 + 0.02,
+            vx: (Math.random() - 0.5) * 0.5,
+            vy: (Math.random() - 0.5) * 0.5,
+            e: lado
+          });
+        }
+      }
+      est.t = 0; est.rodando = false;
+      texto();
+    }
+
+    function passo(dt) {
+      est.t = Math.min(1, est.t + dt * 0.22);
+      for (var i = 0; i < part.length; i++) {
+        var p = part[i];
+        p.x += p.vx * dt; p.y += p.vy * dt;
+        if (p.y < 0) { p.y = -p.y; p.vy = -p.vy; }
+        if (p.y > 1) { p.y = 2 - p.y; p.vy = -p.vy; }
+        if (p.x < 0) { p.x = -p.x; p.vx = -p.vx; }
+        if (p.x > 1) { p.x = 2 - p.x; p.vx = -p.vx; }
+        // enquanto a divisória existe, ela reflete
+        if (!est.rodando) {
+          if (p.e === 0 && p.x > 0.5) { p.x = 1 - p.x; p.vx = -p.vx; }
+          if (p.e === 1 && p.x < 0.5) { p.x = 1 - p.x; p.vx = -p.vx; }
+        }
+      }
+    }
+
+    function desenhar() {
+      var p = G.preparar(cv, 260);
+      var ct = p.ct;
+      var larg = Math.min(p.L - 28, 640), alt = p.A - 40;
+      var x0 = (p.L - larg) / 2, y0 = 14;
+
+      ct.save();
+      ct.strokeStyle = G.COR.tinta; ct.lineWidth = 1.6;
+      ct.strokeRect(x0, y0, larg, alt);
+      if (!est.rodando) {
+        ct.lineWidth = 3;
+        ct.beginPath();
+        ct.moveTo(x0 + larg / 2, y0); ct.lineTo(x0 + larg / 2, y0 + alt);
+        ct.stroke();
+      } else {
+        ct.strokeStyle = G.COR.borda || '#d8dee6';
+        ct.setLineDash([4, 4]);
+        ct.lineWidth = 1;
+        ct.beginPath();
+        ct.moveTo(x0 + larg / 2, y0); ct.lineTo(x0 + larg / 2, y0 + alt);
+        ct.stroke();
+        ct.setLineDash([]);
+      }
+      part.forEach(function (q) {
+        ct.fillStyle = est.iguais ? 'rgba(44,95,141,.8)'
+                     : (q.e ? 'rgba(140,47,57,.85)' : 'rgba(44,95,141,.85)');
+        ct.beginPath();
+        ct.arc(x0 + q.x * larg, y0 + q.y * alt, 2.6, 0, 2 * Math.PI);
+        ct.fill();
+      });
+      ct.fillStyle = G.COR.suave;
+      ct.font = '11px system-ui, sans-serif';
+      ct.textAlign = 'center';
+      ct.fillText(est.iguais ? 'mesmo gás, N de cada lado'
+                             : 'gás A à esquerda, gás B à direita',
+                  x0 + larg / 2, y0 + alt + 18);
+      ct.restore();
+
+      var N = est.N;
+      var errado = 2 * N * Math.LN2;         // em unidades de kB
+      var correto = est.iguais ? 0 : 2 * N * Math.LN2;
+      mostrar({
+        se: F.fmt(errado, 2) + ' k<sub>B</sub>',
+        sc: F.fmt(correto, 2) + ' k<sub>B</sub>',
+        sx: est.iguais ? '0 (nada acontece)' : F.fmt(2 * N * Math.LN2, 2) + ' k<sub>B</sub>'
+      });
+    }
+
+    function texto() {
+      nota.innerHTML = est.iguais
+        ? '<p>Dois recipientes do <b>mesmo</b> gás, mesma densidade, mesma temperatura. '
+          + 'Retire a divisória e nada acontece: nenhuma propriedade macroscópica muda, e '
+          + 'recolocando a divisória volta-se ao estado inicial. O processo é reversível, '
+          + 'logo \\(\\Delta S=0\\).</p>'
+          + '<p><b>Mas a conta ingênua diz outra coisa.</b> Com \\(Z=Z_1^N\\), sem o fator '
+          + '\\(1/N!\\), a entropia sai '
+          + '\\(S=N\\kB\\left[\\ln V+\\tfrac32\\ln T+\\text{const}\\right]\\), que contém '
+          + '\\(\\ln V\\) e não \\(\\ln(V/N)\\). Dobrando \\(V\\) e \\(N\\) juntos, ela '
+          + '<b>não</b> dobra: não é extensiva. O resultado é um ganho espúrio de '
+          + '\\(2N\\kB\\ln 2\\) ao retirar uma divisória que não separa nada. Esse é o '
+          + '<b>paradoxo de Gibbs</b>.</p>'
+          + '<p>A culpa é de ter contado como estados distintos configurações que diferem '
+          + 'apenas por uma <b>permutação de partículas idênticas</b>. Dividindo \\(Z\\) por '
+          + '\\(N!\\) e usando Stirling, o \\(\\ln V\\) vira \\(\\ln(V/N)+1\\), a entropia '
+          + 'fica extensiva e \\(\\Delta S=0\\), como deve ser.</p>'
+        : '<p>Agora os gases são <b>diferentes</b>. Retirar a divisória faz cada gás ocupar '
+          + 'o dobro do volume, e isso é irreversível: nenhuma recolocação da divisória '
+          + 'desfaz a mistura.</p>'
+          + '<p>Cada gás ganha \\(N\\kB\\ln 2\\) de entropia, e o total é '
+          + '\\[\\Delta S = 2N\\kB\\ln 2,\\]'
+          + 'que é a <b>entropia de mistura</b>. Note que aqui as duas contas concordam, '
+          + 'porque o fator \\(1/N!\\) aplica-se separadamente a cada espécie e não cancela '
+          + 'o efeito.</p>'
+          + '<p>O desconfortável é o limite: faça os dois gases cada vez mais parecidos e '
+          + '\\(\\Delta S\\) continua \\(2N\\kB\\ln 2\\), até que, no instante em que se '
+          + 'tornam idênticos, despenca a zero. Não há transição suave. A resolução é que '
+          + '"idênticas" não é uma questão de grau: ou as partículas são permutáveis ou não '
+          + 'são, e isso é uma propriedade quântica, não clássica. O \\(N!\\) é a primeira '
+          + 'aparição da indistinguibilidade no curso, e ela voltará com força no '
+          + 'Módulo 8.</p>';
+      tipografar(nota);
+    }
+
+    var ultimo = 0;
+    function quadro(ts) {
+      var dt = Math.min(0.05, (ts - ultimo) / 1000) || 0.016;
+      ultimo = ts;
+      passo(dt);
+      desenhar();
+      requestAnimationFrame(quadro);
+    }
+
+    reiniciar();
+    requestAnimationFrame(quadro);
+    window.addEventListener('resize', desenhar);
+    tipografar(corpo);
+  };
+
   /* ---------- inicialização ---------- */
   document.addEventListener('DOMContentLoaded', function () {
     Array.prototype.forEach.call(document.querySelectorAll('[data-widget]'), function (n) {

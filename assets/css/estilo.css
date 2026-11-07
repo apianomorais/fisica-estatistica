@@ -538,3 +538,18 @@ h3.unidade:first-of-type{margin-top:1.2rem}
   width:11px;min-height:12px;border-bottom:1.6px solid var(--tinta-suave);
 }
 .micro .osc i{width:7px;height:7px;border-radius:50%;background:var(--azul);margin:0 auto}
+
+/* Citação em destaque e a figura dos passeios aleatórios (capa) */
+.destaque.citacao{
+  font-family:var(--serif);font-size:1.22rem;line-height:1.45;font-style:italic;
+}
+.destaque.citacao .autoria{
+  display:block;margin-top:.7rem;font-family:var(--sans);font-style:normal;
+  font-size:.78rem;letter-spacing:.04em;text-transform:uppercase;color:var(--tinta-suave);
+}
+.figura-passeio{margin:1.5rem 0 2rem}
+.figura-passeio svg{width:100%;height:auto;display:block}
+.figura-passeio .legenda{
+  font-family:var(--sans);font-size:.84rem;color:var(--tinta-suave);
+  margin:.6rem auto 0;max-width:62ch;line-height:1.55;
+}

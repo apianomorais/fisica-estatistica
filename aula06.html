@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Módulo 6: Gás ideal | Física Estatística</title>
+<link rel="icon" type="image/png" href="assets/img/favicon.png">
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611071737">
+<script src="assets/js/comum.js?v=202611071737"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+
+<header class="topo">
+  <div class="topo-interno">
+    <a class="marca" href="index.html">Física Estatística <span>· LFCA/URCA</span></a>
+    <nav class="menu">
+      <a href="index.html">Início</a>
+      <span class="grupo">Fundamentos</span>
+      <a href="aula01.html" class="num" title="Módulo 1: Revisão de termodinâmica">1</a>
+      <a href="aula02.html" class="num" title="Módulo 2: Métodos estatísticos">2</a>
+      <span class="grupo">Microestados</span>
+      <a href="aula03.html" class="num" title="Módulo 3: Caminhante aleatório e estados microscópicos">3</a>
+      <a href="aula04.html" class="num" title="Módulo 4: Movimento browniano">4</a>
+      <span class="grupo">Ensembles</span>
+      <a href="aula05.html" class="num" title="Módulo 5: Ensembles canônico e grã-canônico">5</a>
+      <span class="grupo">Gases</span>
+      <a href="aula06.html" class="num ativo" title="Módulo 6: Gás ideal">6</a>
+    </nav>
+  </div>
+</header>
+
+<div class="envoltorio">
+
+<aside class="lateral">
+  <h4>Neste módulo</h4>
+  <ol>
+    <li><a href="#s1">1. O gás numa caixa</a></li>
+    <li><a href="#s2">2. Densidade de estados</a></li>
+    <li><a href="#s3">3. Por que o fator 1/N!</a></li>
+    <li><a href="#s4">4. A função de partição de uma partícula</a></li>
+    <li><a href="#s5">5. O comprimento de onda térmico</a></li>
+    <li><a href="#s6">6. Termodinâmica do gás ideal</a></li>
+    <li><a href="#s7">7. Quando o gás é clássico?</a></li>
+    <li><a href="#s8">8. A distribuição de Maxwell</a></li>
+    <li><a href="#s9">9. Fórmula barométrica</a></li>
+    <li><a href="#s10">10. O paradoxo de Gibbs</a></li>
+    <li><a href="#s11">11. Sackur e Tetrode</a></li>
+    <li><a href="#s12">12. Exercícios resolvidos</a></li>
+    <li><a href="#s13">13. Exercícios propostos</a></li>
+  </ol>
+</aside>
+
+<main class="conteudo">
+
+  <p class="chapeu">Módulo 6 · Gases</p>
+  <h1>Gás ideal</h1>
+  <p class="subtitulo">O sistema mais simples que existe, e ainda assim o que traz as três
+  lições mais profundas do curso: que estados se contam em células de volume \(h^3\), que
+  partículas idênticas não podem ser numeradas, e que a entropia tem um valor absoluto. Ao
+  fim deste módulo, a constante \(K\) pendente desde o Módulo 1 estará determinada.</p>
+
+  <div class="bloco def">
+    <span class="rotulo">Objetivos</span>
+    <ul>
+      <li>Obter a densidade de estados \(g(p)\,dp=4\pi V p^2dp/h^3\) a partir da caixa quântica;</li>
+      <li>Justificar o fator \(1/N!\) e saber em que regime ele vale;</li>
+      <li>Calcular \(z=V/\lambda_T^3\) e identificar o comprimento de onda térmico;</li>
+      <li>Deduzir \(PV=N\kB T\), \(U=\frac32N\kB T\) e \(\mu(T,n)\) a partir de \(F\);</li>
+      <li>Escrever a condição de validade do regime clássico, \(n\lambda_T^3\ll 1\);</li>
+      <li>Obter a distribuição de Maxwell e a fórmula barométrica;</li>
+      <li>Resolver o paradoxo de Gibbs e escrever a fórmula de Sackur e Tetrode.</li>
+    </ul>
+  </div>
+
+  <hr class="linha">
+
+  <!-- ================================================== -->
+  <h2 id="s1">1. O gás numa caixa</h2>
+
+  <p>Considere \(N\) partículas sem interação numa caixa de volume \(V=L_xL_yL_z\). Pela
+  relação de de Broglie, \(\vec p=\hbar\vec k\), e a energia de uma partícula é</p>
+
+  <p>\[\varepsilon=\frac{p^2}{2m}=\frac{\hbar^2}{2m}\left(k_x^2+k_y^2+k_z^2\right).\]</p>
+
+  <p>Com condições de contorno periódicas, os números de onda são quantizados:</p>
+
+  <p>\[k_x=\frac{2\pi}{L_x}\ell_x,\qquad
+  k_y=\frac{2\pi}{L_y}\ell_y,\qquad
+  k_z=\frac{2\pi}{L_z}\ell_z,\]</p>
+
+  <p>com \(\ell_i=0,\pm1,\pm2,\dots\) Os estados formam uma rede cúbica no espaço dos
+  \(\vec k\), com espaçamento \(2\pi/L_i\) em cada direção.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s2">2. Densidade de estados</h2>
+
+  <p>O número de valores inteiros de \(\ell_x\) para os quais \(k_x\) cai entre \(k_x\) e
+  \(k_x+dk_x\) é</p>
+
+  <p>\[\Delta\ell_x=\frac{L_x}{2\pi}\,dk_x,\]</p>
+
+  <p>e em três dimensões</p>
+
+  <p>\[\Delta\ell_x\,\Delta\ell_y\,\Delta\ell_z
+  =\frac{V}{8\pi^3}\,d^3k \equiv \rho_k\,d^3k.\]</p>
+
+  <p>Passando para o momento com \(\vec p=\hbar\vec k\), de modo que \(dk_i=dp_i/\hbar\):</p>
+
+  <p>\[\rho_p=\frac{V}{8\pi^3\hbar^3}=\boxed{\;\frac{V}{h^3}\;}\]</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">A célula de volume h³ outra vez</span>
+    <p>Este é o mesmo resultado dos Módulos 2 e 3, agora deduzido em vez de postulado: o
+    espaço de fase é dividido em células de volume \(h^3\), uma por estado, por partícula e
+    por grau de liberdade espacial. No limite clássico \(h\to 0\) a densidade de estados
+    diverge, que é a maneira matemática de dizer que a contagem clássica não existe sem a
+    mecânica quântica.</p>
+  </div>
+
+  <p>Integrando sobre as direções do momento, com \(d^3p=p^2\,dp\,\sen\theta\,d\theta\,d\varphi\):</p>
+
+  <p>\[\boxed{\;g(p)\,dp=\frac{4\pi V}{h^3}\,p^2\,dp\;}\]</p>
+
+  <p>Esta é a <strong>densidade de estados</strong>: quantos estados individuais existem com
+  módulo do momento entre \(p\) e \(p+dp\). O fator \(p^2\) vem da área da casca esférica no
+  espaço dos momentos, e é ele que, multiplicado pelo peso de Boltzmann, produzirá a forma
+  característica da distribuição de Maxwell.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s3">3. Por que o fator 1/N!</h2>
+
+  <p>Se tratássemos as partículas como distinguíveis, teríamos \(Z_N=Z_1^N\) como no módulo
+  anterior. Vejamos o que isso significa com duas partículas:</p>
+
+  <p>\[Z_2=\left(\sum_{j_1}e^{-\beta\varepsilon_{j_1}}\right)
+  \left(\sum_{j_2}e^{-\beta\varepsilon_{j_2}}\right)
+  =\underbrace{\sum_{j}e^{-2\beta\varepsilon_j}}_{\text{mesmo estado}}
+  +\underbrace{\sum_{j_1\ne j_2}e^{-\beta(\varepsilon_{j_1}+\varepsilon_{j_2})}}_{\text{estados distintos}}.\]</p>
+
+  <p>No segundo termo, a configuração "partícula A no estado 1, partícula B no estado 2"
+  aparece <em>duas</em> vezes, trocando os rótulos. Mas as partículas são idênticas: trocar
+  os rótulos não produz um estado novo, produz o mesmo estado descrito de outro jeito. Esse
+  termo está contado \(2!\) vezes a mais.</p>
+
+  <p>Generalizando para \(N\) partículas, o termo em que todas ocupam estados distintos está
+  contado \(N!\) vezes a mais:</p>
+
+  <p>\[Z_N=\underbrace{\left(\text{termos com estados repetidos}\right)}_{\text{sem correção simples}}
+  +\frac{1}{N!}\sum_{j_1\ne j_2\ne\dots\ne j_N}
+  e^{-\beta(\varepsilon_{j_1}+\dots+\varepsilon_{j_N})}.\]</p>
+
+  <div class="destaque">
+    <span class="anuncio">O regime clássico</span>
+    Se a probabilidade de dois átomos ocuparem o mesmo estado for desprezível, o primeiro
+    grupo de termos some e sobra
+    \[Z_N\approx\frac{Z_1^{\,N}}{N!}\]
+  </div>
+
+  <p>Note com cuidado a lógica: a divisão por \(N!\) <strong>não é exata</strong>. Ela é a
+  aproximação válida quando os estados são tão numerosos em relação às partículas que a
+  ocupação dupla praticamente não ocorre. Quando essa condição falha, a correção depende de
+  as partículas serem bósons ou férmions, e o resultado é a estatística quântica do Módulo 8.
+  O \(1/N!\) é o limite comum às duas.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s4">4. A função de partição de uma partícula</h2>
+
+  <p>Para uma partícula sem estrutura interna num potencial externo \(u(\vec r)\),</p>
+
+  <p>\[\varepsilon(\vec r,\vec p)=\frac{p^2}{2m}+u(\vec r),\]</p>
+
+  <p>e a soma sobre estados vira uma integral no espaço de fase dividida por \(h^3\):</p>
+
+  <p>\[z=\frac{1}{h^3}\int e^{-\beta\left[\frac{p^2}{2m}+u(\vec r)\right]}d^3p\,d^3r
+  =\underbrace{\frac{1}{h^3}\int e^{-\beta p^2/2m}d^3p}_{z^{\rm tr}}
+  \cdot\underbrace{\int e^{-\beta u(\vec r)}d^3r}_{z^{u}}.\]</p>
+
+  <p>A parte translacional se separa nas três componentes, e cada uma é uma gaussiana:</p>
+
+  <p>\[\int_{-\infty}^{\infty}e^{-ax^2}dx=\sqrt{\frac{\pi}{a}}
+  \;\Longrightarrow\;
+  z^{\rm tr}=\frac{1}{h^3}\left(2\pi m\kB T\right)^{3/2}.\]</p>
+
+  <p>Para uma caixa sem campo externo, \(u=0\) dentro e infinito fora, logo \(z^u=V\), e</p>
+
+  <p>\[\boxed{\;z=\frac{V}{h^3}\left(2\pi m\kB T\right)^{3/2}\;}\]</p>
+
+  <p>Se a partícula tiver estrutura interna (rotação, vibração, estados eletrônicos), o
+  hamiltoniano ganha um termo independente e a função de partição simplesmente fatora,
+  \(Z_1=z\cdot z^{\rm int}\), de modo que as contribuições se somam em \(F\) e em \(U\).</p>
+
+  <!-- ================================================== -->
+  <h2 id="s5">5. O comprimento de onda térmico</h2>
+
+  <p>A expressão acima fica muito mais eloquente escrita assim:</p>
+
+  <div class="destaque">
+    <span class="anuncio">Comprimento de onda térmico de de Broglie</span>
+    \[z=\frac{V}{\lambda_T^{3}},\qquad
+      \lambda_T\equiv\frac{h}{\sqrt{2\pi m\kB T}}\]
+  </div>
+
+  <p>\(\lambda_T\) é, a menos de um fator de ordem 1, o comprimento de onda de de Broglie de
+  uma partícula com energia térmica típica. E \(z\) ganha um significado geométrico direto:
+  <strong>é o número de células de tamanho \(\lambda_T^3\) que cabem no volume</strong>, ou
+  seja, o número de lugares quânticos distinguíveis onde a partícula pode estar.</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>Partícula</th><th>\(\lambda_T\) a 300 K</th><th>\(\lambda_T\) a 1 K</th>
+    <th>Comparar com</th></tr></thead>
+    <tbody>
+      <tr><td>Elétron</td><td>4,3 nm</td><td>74 nm</td><td>espaçamento atômico 0,2 nm</td></tr>
+      <tr><td>Hélio-4</td><td>0,050 nm</td><td>0,87 nm</td><td>espaçamento no líquido 0,3 nm</td></tr>
+      <tr><td>Nitrogênio</td><td>0,019 nm</td><td>0,32 nm</td><td>espaçamento no ar 3 nm</td></tr>
+      <tr><td>Argônio</td><td>0,016 nm</td><td>0,28 nm</td><td>espaçamento no ar 3 nm</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Já se vê onde a física quântica vai aparecer: o elétron num metal tem \(\lambda_T\)
+  vinte vezes maior que o espaçamento atômico, de modo que o gás de elétrons
+  <strong>nunca</strong> é clássico, nem à temperatura ambiente. O hélio líquido a 1 K tem
+  \(\lambda_T\) maior que a distância entre átomos, e por isso vira superfluido. O ar é
+  clássico com enorme folga.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s6">6. Termodinâmica do gás ideal</h2>
+
+  <p>Com \(Z=z^N/N!\) e a aproximação de Stirling \(\ln N!\approx N\ln N-N\):</p>
+
+  <p>\[F=-\kB T\ln Z=-\kB TN\ln z+\kB T\left(N\ln N-N\right)
+  =-N\kB T\ln\left[\frac{e\,z}{N}\right],\]</p>
+
+  <p>onde se usou \(N=N\ln e\). Explicitando \(z\):</p>
+
+  <p>\[\boxed{\;F=-N\kB T\ln\left[\frac{eV}{N\lambda_T^3}\right]\;}\]</p>
+
+  <p>Repare que \(F\) depende de \(V\) e \(N\) apenas pela combinação \(V/N\): a energia livre
+  é extensiva, como tem de ser. Foi o \(N!\) que garantiu isso. Agora é só diferenciar.</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>Grandeza</th><th>Derivada</th><th>Resultado</th></tr></thead>
+    <tbody>
+      <tr><td>Pressão</td><td>\(P=-\dpar{F}{V}{T,N}\)</td>
+          <td>\(P=\dfrac{N\kB T}{V}\), isto é \(PV=N\kB T\)</td></tr>
+      <tr><td>Energia</td><td>\(U=-\dfrac{\partial\ln Z}{\partial\beta}\)</td>
+          <td>\(U=\tfrac32 N\kB T\)</td></tr>
+      <tr><td>Calor específico</td><td>\(C_V=\dpar{U}{T}{V}\)</td>
+          <td>\(C_V=\tfrac32 N\kB\)</td></tr>
+      <tr><td>Potencial químico</td><td>\(\mu=\dpar{F}{N}{T,V}\)</td>
+          <td>\(\mu=\kB T\ln\left(n\lambda_T^3\right)\)</td></tr>
+      <tr><td>Entropia</td><td>\(S=-\dpar{F}{T}{V,N}\)</td>
+          <td>\(S=N\kB\left[\ln\dfrac{V}{N\lambda_T^3}+\dfrac52\right]\)</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="bloco fisica">
+    <span class="rotulo">A equação de estado, enfim deduzida</span>
+    <p>No Módulo 1, \(PV=N\kB T\) foi apresentada como um fato experimental. No Módulo 3 foi
+    obtida dos choques, com argumentos cinéticos. Aqui ela sai de uma integral gaussiana e de
+    uma derivada, sem nenhum modelo de colisão.</p>
+    <p>E note de onde ela vem exatamente: do \(V\) dentro do logaritmo em \(F\). A pressão
+    de um gás ideal é <strong>puramente entrópica</strong>. Não há energia envolvida, porque
+    \(U\) não depende do volume. O gás empurra o pistão porque há mais maneiras de arranjá-lo
+    num volume maior, e por nenhuma outra razão.</p>
+  </div>
+
+  <p>Repare ainda no potencial químico: \(\mu=\kB T\ln(n\lambda_T^3)\) é
+  <strong>negativo</strong> para um gás clássico diluído, já que \(n\lambda_T^3\ll1\). Ele
+  fica menos negativo conforme a densidade sobe, e cruza zero exatamente quando o gás deixa
+  de ser clássico. Guarde essa observação para o Módulo 8.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s7">7. Quando o gás é clássico?</h2>
+
+  <p>A condição usada na seção 3 foi que a ocupação média de cada estado seja pequena. No
+  ensemble canônico essa ocupação é</p>
+
+  <p>\[\overline n_i=\frac{N}{z}e^{-\beta\varepsilon_i}\le\frac{N}{z}=\frac{N\lambda_T^3}{V},\]</p>
+
+  <p>de modo que a condição \(\overline n_i\ll1\) se escreve</p>
+
+  <div class="destaque">
+    <span class="anuncio">Critério de classicalidade</span>
+    \[n\lambda_T^{3}\ll 1
+    \qquad\Longleftrightarrow\qquad
+    \Lambda\gg\lambda_T,\quad \Lambda\equiv\left(\frac{V}{N}\right)^{1/3}\]
+  </div>
+
+  <p>Em palavras: o gás é clássico quando o comprimento de onda das partículas é muito menor
+  que a distância média entre elas. As ondas não se superpõem, e portanto não há como
+  perceber que são idênticas.</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>Sistema</th><th>\(n\) (m⁻³)</th><th>\(T\)</th><th>\(n\lambda_T^3\)</th>
+    <th>Regime</th></tr></thead>
+    <tbody>
+      <tr><td>Ar ambiente</td><td>\(2{,}5\times10^{25}\)</td><td>300 K</td>
+          <td>\(\sim10^{-7}\)</td><td>clássico com folga</td></tr>
+      <tr><td>Hélio líquido</td><td>\(2{,}2\times10^{28}\)</td><td>2 K</td>
+          <td>\(\sim 3\)</td><td>quântico: superfluidez</td></tr>
+      <tr><td>Elétrons no cobre</td><td>\(8{,}5\times10^{28}\)</td><td>300 K</td>
+          <td>\(\sim 7\times10^{3}\)</td><td>quântico: gás de Fermi degenerado</td></tr>
+      <tr><td>Condensado de rubídio</td><td>\(10^{19}\)</td><td>100 nK</td>
+          <td>\(\gtrsim 2{,}6\)</td><td>quântico: condensado de Bose</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s8">8. A distribuição de Maxwell</h2>
+
+  <p>A probabilidade de encontrar uma partícula com posição em \(d^3r\) e momento em
+  \(d^3p\) é o peso de Boltzmann vezes o número de estados nesse elemento:</p>
+
+  <p>\[f(\vec r,\vec p)\,d^3r\,d^3p
+  =\frac{1}{h^3}\frac{e^{-\beta\varepsilon(\vec r,\vec p)}}{z}\,d^3r\,d^3p.\]</p>
+
+  <p>Sem campo externo, a parte espacial é uniforme, \(d^3r/V\), e a de momento fica</p>
+
+  <p>\[f(\vec p)\,d^3p
+  =\frac{e^{-p^2/2m\kB T}}{\left(2\pi m\kB T\right)^{3/2}}\,d^3p.\]</p>
+
+  <p>Note que isso <strong>fatora</strong> nas três componentes: cada \(p_j\) é uma gaussiana
+  independente de média zero e variância \(m\kB T\). É o teorema central do limite aparecendo
+  de graça, e justifica tratar \(v_x\), \(v_y\) e \(v_z\) como independentes.</p>
+
+  <p>Passando a coordenadas esféricas e integrando as direções, com \(p=mv\):</p>
+
+  <div class="destaque">
+    <span class="anuncio">Distribuição de Maxwell para o módulo da velocidade</span>
+    \[f(v)=4\pi\left(\frac{m}{2\pi \kB T}\right)^{3/2}v^2\,e^{-mv^2/2\kB T}\]
+  </div>
+
+  <p>O fator \(v^2\) vem da densidade de estados e cresce; a exponencial decresce. O produto
+  tem máximo, e dele saem as três velocidades características:</p>
+
+  <p>\[v_p=\sqrt{\frac{2\kB T}{m}},\qquad
+  \overline v=\sqrt{\frac{8\kB T}{\pi m}},\qquad
+  v_{\rm rms}=\sqrt{\frac{3\kB T}{m}},\]</p>
+
+  <p>sempre nessa ordem, com razões fixas \(1:1{,}128:1{,}225\) independentes de massa e
+  temperatura.</p>
+
+  <div data-widget="maxwell"></div>
+
+  <!-- ================================================== -->
+  <h2 id="s9">9. Fórmula barométrica</h2>
+
+  <p>Ligue agora a gravidade: \(u(y)=mgy\). A parte espacial da distribuição deixa de ser
+  uniforme,</p>
+
+  <p>\[n(y)=n_0\,e^{-mgy/\kB T},\]</p>
+
+  <p>que é a <strong>fórmula barométrica</strong>, com altura de escala \(H=\kB T/mg\). É
+  apenas a distribuição de Boltzmann aplicada à energia potencial, e vale verificar que ela é
+  consistente com a hidrostática: de \(dP/dy=-\rho g\) e \(P=n\kB T\) segue
+  \(dn/dy=-nmg/\kB T\), cuja solução é exatamente a exponencial acima.</p>
+
+  <p>A segunda vista do widget mostra o perfil para vários gases. Como \(H\propto 1/m\), gases
+  leves têm atmosferas mais altas, e é por isso que a composição do ar muda com a altitude.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s10">10. O paradoxo de Gibbs</h2>
+
+  <p>Volte ao exercício 5.3 do módulo anterior. Sem o fator \(1/N!\), a entropia sairia</p>
+
+  <p>\[S_{\rm errada}=N\kB\left[\ln V+\tfrac32\ln T+\text{const}\right],\]</p>
+
+  <p>que contém \(\ln V\) em vez de \(\ln(V/N)\). Dobre \(V\) e \(N\) simultaneamente: a
+  entropia deveria dobrar, e não dobra. <strong>Ela não é extensiva.</strong></p>
+
+  <p>A consequência absurda aparece ao remover uma divisória entre dois recipientes do
+  <em>mesmo</em> gás, nas mesmas condições. Nada acontece fisicamente, e ainda assim a conta
+  errada prevê um ganho \(\Delta S=2N\kB\ln2\). Esse é o <strong>paradoxo de Gibbs</strong>,
+  formulado em 1875.</p>
+
+  <div data-widget="gibbs"></div>
+
+  <div class="bloco fisica">
+    <span class="rotulo">O que o paradoxo estava dizendo</span>
+    <p>Gibbs percebeu o problema e a correção vinte e cinco anos antes de existir mecânica
+    quântica. Mas a <em>razão</em> da correção só a mecânica quântica forneceu: partículas
+    idênticas não têm identidade individual. Não é que não consigamos distingui-las por
+    limitação de instrumento; é que não existe um fato sobre qual é qual.</p>
+    <p>Esse é um daqueles raros casos em que uma inconsistência termodinâmica apontou para
+    uma revolução conceitual décadas antes que ela chegasse. O \(N!\) é uma pegada da
+    mecânica quântica deixada na física clássica.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s11">11. Sackur e Tetrode</h2>
+
+  <p>Com o \(1/N!\) no lugar, a entropia fica</p>
+
+  <div class="destaque">
+    <span class="anuncio">Fórmula de Sackur e Tetrode (1912)</span>
+    \[S=N\kB\left[\ln\!\left(\frac{V}{N\lambda_T^{3}}\right)+\frac{5}{2}\right],
+    \qquad \lambda_T=\frac{h}{\sqrt{2\pi m\kB T}}\]
+  </div>
+
+  <p>Agora olhe o que foi conquistado. No Módulo 1, integrando a relação fundamental,
+  obtivemos</p>
+
+  <p>\[s=\tfrac32\kB\ln u+\kB\ln v+K,\]</p>
+
+  <p>e dissemos que a termodinâmica não tinha como determinar \(K\). A fórmula acima tem
+  exatamente essa forma, e o \(K\) está lá, escrito:</p>
+
+  <p>\[K=\kB\left[\frac52-\ln\left(\frac{h^3}{(2\pi m)^{3/2}}\right)
+  -\tfrac32\ln\left(\tfrac{2}{3}\right)\right],\]</p>
+
+  <p>e o essencial é que <strong>ele contém \(h\)</strong>. A constante de integração que a
+  termodinâmica deixou em aberto é fixada pela constante de Planck. A entropia tem valor
+  absoluto, e esse valor é quântico.</p>
+
+  <div class="bloco ex">
+    <span class="rotulo">E funciona</span>
+    <p>Para o argônio a 298,15 K e 1 atm, a fórmula dá</p>
+    <p>\[S_{\rm molar}=154{,}74\ \mathrm{J/(mol\cdot K)},\]</p>
+    <p>contra o valor calorimétrico tabelado de \(154{,}8\) J/(mol·K), obtido integrando
+    \(C_P/T\) desde o zero absoluto em medidas feitas em laboratório. Concordância em 0,04%,
+    entre uma conta que contém \(h\) e um termômetro.</p>
+    <p>Esse acordo é um dos testes mais limpos da terceira lei e da contagem de estados.
+    Historicamente, foi também uma das primeiras determinações independentes da constante de
+    Planck fora da espectroscopia.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s12">12. Exercícios resolvidos</h2>
+
+  <div class="bloco ex">
+    <span class="rotulo">Exercício resolvido 6.1: por que a Terra perdeu o hidrogênio</span>
+    <p><b>A velocidade de escape da Terra é 11,2 km/s. Compare \(v_{\rm rms}\) de H₂, He e
+    N₂ na exosfera, onde \(T\approx 1000\) K, e explique a composição atmosférica
+    observada.</b></p>
+    <details class="solucao"><summary>Ver solução</summary>
+    <div class="corpo-solucao">
+    <p>Com \(v_{\rm rms}=\sqrt{3\kB T/m}\) e \(T=1000\) K:</p>
+    <div class="tabela-rolavel">
+    <table>
+      <thead><tr><th>Gás</th><th>\(M\) (u)</th><th>\(v_{\rm rms}\)</th>
+      <th>\(v_{\rm esc}/v_{\rm rms}\)</th><th>observado na Terra</th></tr></thead>
+      <tbody>
+        <tr><td>H₂</td><td>2,02</td><td>3,5 km/s</td><td>3,2</td><td>traços (0,5 ppm)</td></tr>
+        <tr><td>He</td><td>4,00</td><td>2,5 km/s</td><td>4,5</td><td>pouco (5 ppm)</td></tr>
+        <tr><td>N₂</td><td>28,0</td><td>0,94 km/s</td><td>11,9</td><td>78%</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p><b>O critério.</b> A fuga não depende da média, e sim da cauda da distribuição. A
+    regra empírica dos planetólogos é que um corpo retém um gás pela idade do Sistema Solar
+    se \(v_{\rm esc}/v_{\rm rms}\gtrsim 6\). Hidrogênio e hélio ficam bem abaixo disso e
+    escapam; o nitrogênio fica muito acima e permanece.</p>
+    <p><b>O hélio é instrutivo.</b> Ele é continuamente produzido no subsolo pelo decaimento
+    alfa de urânio e tório, e continuamente perdido para o espaço. A concentração atmosférica
+    de 5 ppm é um equilíbrio dinâmico entre produção e fuga, e não um resquício da formação
+    do planeta.</p>
+    <p><b>Compare com outros corpos.</b> No widget da seção 8, escolha a Lua
+    (\(v_{\rm esc}=2{,}4\) km/s): nenhum gás satisfaz o critério, e de fato a Lua não tem
+    atmosfera. Em Júpiter (\(59{,}5\) km/s) até o hidrogênio fica, e é disso que o planeta é
+    feito. Marte está no meio: perdeu a maior parte da atmosfera, e o que restou é CO₂, o
+    mais pesado da lista.</p>
+    </div></details>
+  </div>
+
+  <div class="bloco ex">
+    <span class="rotulo">Exercício resolvido 6.2: a entropia do argônio</span>
+    <p><b>Calcule a entropia molar do argônio a 298,15 K e 1 atm pela fórmula de Sackur e
+    Tetrode.</b></p>
+    <details class="solucao"><summary>Ver solução</summary>
+    <div class="corpo-solucao">
+    <p><b>Comprimento de onda térmico.</b> Com \(M=39{,}948\) u, isto é
+    \(m=6{,}634\times10^{-26}\) kg:</p>
+    <p>\[\lambda_T=\frac{h}{\sqrt{2\pi m\kB T}}
+    =\frac{6{,}626\times10^{-34}}{\sqrt{2\pi\times6{,}634\times10^{-26}
+    \times1{,}381\times10^{-23}\times298{,}15}}.\]</p>
+    <p>O radicando vale \(1{,}716\times10^{-45}\), cuja raiz é \(4{,}143\times10^{-23}\),
+    logo</p>
+    <p>\[\lambda_T=1{,}600\times10^{-11}\ \mathrm{m}=16{,}00\ \mathrm{pm}.\]</p>
+
+    <p><b>Volume por partícula.</b> De \(PV=N\kB T\),</p>
+    <p>\[\frac{V}{N}=\frac{\kB T}{P}=\frac{1{,}381\times10^{-23}\times298{,}15}{101325}
+    =4{,}064\times10^{-26}\ \mathrm{m^3}.\]</p>
+
+    <p><b>A razão.</b></p>
+    <p>\[\frac{V}{N\lambda_T^3}=\frac{4{,}064\times10^{-26}}{(1{,}600\times10^{-11})^3}
+    =\frac{4{,}064\times10^{-26}}{4{,}096\times10^{-33}}=9{,}92\times10^{6}.\]</p>
+    <p>Note de passagem: esse número é \(1/(n\lambda_T^3)\approx10^{7}\), confirmando com
+    enorme folga o regime clássico.</p>
+
+    <p><b>Entropia.</b></p>
+    <p>\[S=N_A\kB\left[\ln\left(9{,}92\times10^{6}\right)+2{,}5\right]
+    =8{,}314\times\left[16{,}11+2{,}5\right]=154{,}7\ \mathrm{J/(mol\cdot K)}.\]</p>
+    <p>O valor calorimétrico tabelado é 154,8 J/(mol·K). A diferença é de 0,04%, dentro da
+    incerteza experimental.</p>
+    <p><b>O que isso prova.</b> Que a contagem de estados em células de volume \(h^3\) está
+    certa. Se o \(h^3\) fosse trocado por qualquer outra constante, o logaritmo mudaria e o
+    acordo desapareceria. É uma medida de \(h\) feita com um calorímetro.</p>
+    </div></details>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s13">13. Exercícios propostos</h2>
+
+  <div class="bloco def">
+    <span class="rotulo">Para resolver</span>
+    <ol>
+      <li><b>6.1</b> Verifique por integração direta que a distribuição de Maxwell é
+      normalizada, e obtenha \(\overline v\), \(v_{\rm rms}\) e \(v_p\). Mostre que as razões
+      \(v_p:\overline v:v_{\rm rms}\) valem \(1:\sqrt{4/\pi}:\sqrt{3/2}\), independentes de
+      \(m\) e \(T\).</li>
+
+      <li><b>6.2</b> Mostre que a distribuição de Maxwell escrita em termos da energia é
+      \(f(\varepsilon)\propto\sqrt{\varepsilon}\,e^{-\beta\varepsilon}\), e que o seu máximo
+      está em \(\varepsilon=\kB T/2\), e não em \(\frac32\kB T\). Explique por que o máximo e
+      a média não coincidem.</li>
+
+      <li><b>6.3</b> Calcule \(\lambda_T\) para um elétron a 300 K e compare com o
+      espaçamento atômico no cobre (0,23 nm). Conclua se o gás de elétrons de condução é
+      clássico e estime a temperatura em que passaria a ser.</li>
+
+      <li><b>6.4</b> Deduza a fórmula barométrica pela hidrostática, partindo de
+      \(dP/dy=-\rho g\) e \(P=n\kB T\), e confirme que coincide com a distribuição de
+      Boltzmann em \(u=mgy\). Calcule a altura de escala do N₂ a 290 K.</li>
+
+      <li><b>6.5</b> Dois recipientes de 1 L contêm, cada um, 1 mmol de gás a 300 K: no
+      primeiro caso, nitrogênio nos dois; no segundo, nitrogênio e argônio. Calcule
+      \(\Delta S\) ao remover a divisória nos dois casos e explique a diferença.</li>
+
+      <li><b>6.6</b> <b>Efusão.</b> Mostre que o fluxo de moléculas que atravessa um furo
+      pequeno de área \(A\) numa parede é \(\Phi=\frac14 n\overline v A\). Use isso para
+      explicar a lei de Graham, \(\Phi\propto1/\sqrt m\), e estime quanto tempo um balão de
+      hélio leva para murchar em comparação com um de ar.</li>
+
+      <li><b>6.7</b> Partindo de \(F\) para o gás ideal, mostre que num processo adiabático
+      quase-estático vale \(TV^{2/3}=\) const, e identifique \(\gamma=5/3\).</li>
+
+      <li><b>6.8</b> Mostre que \(\mu=\kB T\ln(n\lambda_T^3)\) é negativo no regime clássico
+      e que cruza zero quando \(n\lambda_T^3=1\). Calcule a densidade correspondente para
+      hélio a 4 K e compare com a densidade do hélio líquido.</li>
+    </ol>
+  </div>
+
+  <nav class="nav-aulas">
+    <a href="aula05.html"><small>Módulo anterior</small>← 5. Canônico e grã-canônico</a>
+    <span class="em-breve"><small>Em preparação</small>7. Gases clássicos</span>
+  </nav>
+
+</main>
+</div>
+
+<footer class="rodape">
+  <img class="logo-rodape" src="assets/img/logo-lfca.png" alt="LFCA | URCA">
+  <p><strong>Prof. Apiano Morais</strong> · <a href="mailto:apiano.morais@urca.br">apiano.morais@urca.br</a><br>
+  Laboratório de Física Computacional Aplicada (LFCA) · Universidade Regional do Cariri</p>
+</footer>
+
+<script src="assets/js/widgets.js?v=202611071737"></script>
+</body>
+</html>
