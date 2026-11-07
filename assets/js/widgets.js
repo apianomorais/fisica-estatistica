@@ -3077,6 +3077,319 @@
     tipografar(corpo);
   };
 
+
+  /* =================================================================
+     17. A distribuição de Boltzmann e a função de partição
+     Os níveis de energia com suas populações, e Z construída termo a
+     termo. Tudo o mais sai por diferenciação de ln Z.
+     ================================================================= */
+  REGISTRO.boltzmann = function (raiz) {
+    var corpo = moldura(raiz, 'Distribuição de Boltzmann: a função de partição em ação');
+
+    /* Níveis em unidades da escala de energia de cada sistema.
+       g é a degenerescência. T em unidades da mesma escala sobre kB. */
+    var SIS = {
+      dois: {
+        rot: 'Dois níveis',
+        niveis: function () { return [{ E: 0, g: 1 }, { E: 1, g: 1 }]; },
+        esc: '\u03b5'
+      },
+      osc: {
+        rot: 'Oscilador harmônico',
+        niveis: function () {
+          var v = [];
+          for (var n = 0; n < 9; n++) v.push({ E: n + 0.5, g: 1 });
+          return v;
+        },
+        esc: '\u210f\u03c9'
+      },
+      hid: {
+        rot: 'Níveis degenerados (g = 2n+1)',
+        niveis: function () {
+          var v = [];
+          for (var n = 0; n < 6; n++) v.push({ E: n, g: 2 * n + 1 });
+          return v;
+        },
+        esc: '\u0394'
+      }
+    };
+
+    var est = { sis: 'dois', T: 0.7 };
+
+    var ctr0 = el('div', { class: 'controles' });
+    corpo.appendChild(ctr0);
+    opcoes(ctr0, Object.keys(SIS).map(function (k) {
+      return { rot: SIS[k].rot, v: k };
+    }), 0, function (v) { est.sis = v; desenhar(); });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    deslizante(corpo, 'temperatura \\(\\kB T\\), em unidades da escala de energia',
+      0.05, 5, 0.05, 0.7,
+      function (v) { est.T = v; desenhar(); },
+      function (v) { return v.toFixed(2).replace('.', ','); });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'Z por partícula', k: 'z' },
+      { rot: 'f = \u2212k<sub>B</sub>T ln Z', k: 'f' },
+      { rot: 'u = \u2212\u2202 ln Z/\u2202\u03b2', k: 'u' },
+      { rot: 's/k<sub>B</sub>', k: 's' },
+      { rot: 'c/k<sub>B</sub>', k: 'c' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    /* Z, u e c calculados diretamente da soma sobre os níveis */
+    function termo() {
+      var nv = SIS[est.sis].niveis(), b = 1 / est.T;
+      var Z = 0, s1 = 0, s2 = 0;
+      nv.forEach(function (n) {
+        var w = n.g * Math.exp(-b * n.E);
+        Z += w; s1 += w * n.E; s2 += w * n.E * n.E;
+      });
+      var u = s1 / Z;
+      var var2 = s2 / Z - u * u;             // <E²> - <E>² = kB T² c
+      return { nv: nv, Z: Z, u: u, c: var2 * b * b,
+               f: -est.T * Math.log(Z), s: (u + est.T * Math.log(Z)) / est.T, b: b };
+    }
+
+    function desenhar() {
+      var r = termo();
+      var p = G.preparar(cv, Math.min(320, 130 + 26 * r.nv.length));
+      var ct = p.ct;
+      var Emax = r.nv[r.nv.length - 1].E + 0.6;
+
+      var mx = 54, my = 18, alt = p.A - 2 * my - 18;
+      var larguraBar = Math.min(p.L * 0.42, 320);
+      var x0 = mx, x1 = x0 + larguraBar;
+
+      function Y(E) { return my + alt - E / Emax * alt; }
+
+      // eixo de energia
+      ct.save();
+      ct.strokeStyle = G.COR.suave; ct.lineWidth = 1.2;
+      ct.beginPath();
+      ct.moveTo(x0 - 8, my); ct.lineTo(x0 - 8, my + alt);
+      ct.stroke();
+      ct.fillStyle = G.COR.suave;
+      ct.font = '600 11px system-ui, sans-serif';
+      ct.save();
+      ct.translate(16, my + alt / 2); ct.rotate(-Math.PI / 2);
+      ct.textAlign = 'center';
+      ct.fillText('energia, em unidades de ' + SIS[est.sis].esc, 0, 0);
+      ct.restore();
+      ct.restore();
+
+      // níveis e barras de população
+      var pmaxB = 0;
+      r.nv.forEach(function (n) {
+        pmaxB = Math.max(pmaxB, n.g * Math.exp(-r.b * n.E) / r.Z);
+      });
+      r.nv.forEach(function (n) {
+        var pr = n.g * Math.exp(-r.b * n.E) / r.Z;
+        var y = Y(n.E);
+        ct.save();
+        ct.strokeStyle = G.COR.tinta;
+        ct.lineWidth = 2;
+        ct.beginPath();
+        ct.moveTo(x0, y); ct.lineTo(x0 + 46, y);
+        ct.stroke();
+        // barra proporcional à população
+        ct.fillStyle = G.COR.azulClaro;
+        var w = (pr / pmaxB) * (x1 - x0 - 58);
+        ct.fillRect(x0 + 54, y - 8, w, 16);
+        ct.fillStyle = G.COR.tinta;
+        ct.font = '11px system-ui, sans-serif';
+        ct.textAlign = 'left';
+        ct.textBaseline = 'middle';
+        ct.fillText(F.pct(pr, 1) + (n.g > 1 ? '  (g = ' + n.g + ')' : ''),
+                    x0 + 58 + w + 6, y);
+        ct.restore();
+      });
+
+      /* ---- a soma que forma Z ---- */
+      var gx = x1 + 70, gl = p.L - gx - 14;
+      if (gl > 150) {
+        ct.save();
+        ct.fillStyle = G.COR.tinta;
+        ct.font = '600 12px system-ui, sans-serif';
+        ct.textAlign = 'left';
+        ct.textBaseline = 'top';
+        ct.fillText('Z = \u03a3 g e^(\u2212E/kT)', gx, my);
+        ct.font = '11px ui-monospace, Menlo, monospace';
+        var yy = my + 22;
+        var acum = 0;
+        r.nv.slice(0, 9).forEach(function (n) {
+          var w = n.g * Math.exp(-r.b * n.E);
+          acum += w;
+          ct.fillStyle = G.COR.suave;
+          ct.fillText('E = ' + n.E.toFixed(1).replace('.', ',')
+            + '   ' + (n.g > 1 ? n.g + '\u00d7' : '  ')
+            + ' e^(\u2212' + (r.b * n.E).toFixed(2).replace('.', ',') + ')'
+            + ' = ' + w.toFixed(4).replace('.', ','), gx, yy);
+          yy += 16;
+        });
+        if (r.nv.length > 9) {
+          ct.fillText('\u2026', gx, yy); yy += 16;
+        }
+        ct.strokeStyle = G.COR.borda || '#d8dee6';
+        ct.beginPath(); ct.moveTo(gx, yy - 4); ct.lineTo(gx + 190, yy - 4); ct.stroke();
+        ct.fillStyle = G.COR.azul;
+        ct.font = '600 12px ui-monospace, Menlo, monospace';
+        ct.fillText('Z = ' + r.Z.toFixed(4).replace('.', ','), gx, yy + 2);
+        ct.restore();
+      }
+
+      mostrar({
+        z: F.fmt(r.Z, 4), f: F.fmt(r.f, 4), u: F.fmt(r.u, 4),
+        s: F.fmt(r.s, 4), c: F.fmt(r.c, 4)
+      });
+
+      nota.innerHTML =
+        '<p>As barras são as probabilidades \\(\\wp_i=g_i e^{-E_i/\\kB T}/Z\\). Baixe a '
+        + 'temperatura e todas migram para o nível fundamental; suba-a e elas se igualam, '
+        + 'porque \\(e^{-E/\\kB T}\\to 1\\) para todos os níveis. A competição entre o peso '
+        + 'de Boltzmann, que favorece a energia baixa, e a degenerescência \\(g_i\\), que '
+        + 'favorece a energia alta, é o que decide o estado de equilíbrio.</p>'
+        + '<p>Tudo o mais nos cartões saiu de \\(Z\\) por diferenciação, sem nenhuma '
+        + 'informação adicional: \\(f=-\\kB T\\ln Z\\), '
+        + '\\(u=-\\partial\\ln Z/\\partial\\beta\\), \\(s=(u-f)/T\\) e '
+        + '\\(c=\\partial u/\\partial T\\). Note ainda que o cálculo de \\(c\\) feito aqui '
+        + 'usa \\(\\kB T^2 c = \\med{E^2}-\\med{E}^2\\): o calor específico <b>é</b> a '
+        + 'flutuação da energia, assunto da próxima seção.</p>';
+      tipografar(nota);
+    }
+
+    registrarRedesenho(desenhar);
+    tipografar(corpo);
+  };
+
+  /* =================================================================
+     18. Flutuações de energia: o canônico vira o microcanônico
+     A distribuição da energia total de N partículas em banho térmico,
+     com a largura relativa caindo como 1/raiz(N).
+     ================================================================= */
+  REGISTRO.flutuacoes = function (raiz) {
+    var corpo = moldura(raiz, 'Flutuações de energia e por que os dois ensembles concordam');
+
+    var est = { N: 40, T: 0.7 };
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+
+    deslizante(ctr, 'partículas \\(N\\)', 4, 2000, 4, 40,
+      function (v) { est.N = v; desenhar(); });
+    deslizante(ctr, 'temperatura \\(\\kB T/\\epsilon\\)', 0.1, 4, 0.05, 0.7,
+      function (v) { est.T = v; desenhar(); },
+      function (v) { return v.toFixed(2).replace('.', ','); });
+
+    var mostrar = cartoes(corpo, [
+      { rot: '\u27e8U\u27e9/\u03b5', k: 'u' },
+      { rot: '\u03c3<sub>U</sub>/\u03b5', k: 'sg' },
+      { rot: '\u03c3<sub>U</sub>/\u27e8U\u27e9', k: 'rel' },
+      { rot: '\u221a(k<sub>B</sub>T\u00b2C) previsto', k: 'tp' },
+      { rot: 'a mesma razão se N = 10\u00b2\u00b3', k: 'n23' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function desenhar() {
+      var N = est.N, b = 1 / est.T;
+      /* Sistema de N partículas de dois níveis em banho térmico:
+         P(U = k.eps) proporcional a C(N,k) e^{-b k}. */
+      var lnP = [], maior = -Infinity, k;
+      for (k = 0; k <= N; k++) {
+        var L = F.lnBinom(N, k) - b * k;
+        lnP.push(L);
+        if (L > maior) maior = L;
+      }
+      var P = [], soma = 0;
+      for (k = 0; k <= N; k++) { P.push(Math.exp(lnP[k] - maior)); soma += P[k]; }
+      var md = 0, md2 = 0;
+      for (k = 0; k <= N; k++) {
+        P[k] /= soma; md += k * P[k]; md2 += k * k * P[k];
+      }
+      var sig = Math.sqrt(Math.max(0, md2 - md * md));
+
+      /* previsão analítica: u = 1/(1+e^b) por partícula, c = b² e^b/(1+e^b)²,
+         e sigma_U² = N kB T² c, em unidades de epsilon */
+      var eb = Math.exp(b);
+      var uPrev = N / (1 + eb);
+      var cPrev = b * b * eb / ((1 + eb) * (1 + eb));
+      var sigPrev = Math.sqrt(N * est.T * est.T * cPrev);
+
+      var lo = Math.max(0, md - 5 * sig - 1), hi = Math.min(N, md + 5 * sig + 1);
+      var pmax = 0;
+      for (k = 0; k <= N; k++) pmax = Math.max(pmax, P[k]);
+
+      var ax = G.eixos(cv, {
+        xmin: lo, xmax: hi, ymin: 0, ymax: pmax * 1.18, altura: 300,
+        rotX: 'energia total U/\u03b5 (número de partículas excitadas)',
+        rotY: 'probabilidade',
+        marcasX: G.marcasLineares(lo, hi, 5, 0),
+        formataY: function (v) { return v.toFixed(3).replace('.', ','); }
+      });
+      var dados = [];
+      for (k = Math.floor(lo); k <= Math.ceil(hi); k++) {
+        if (k >= 0 && k <= N) dados.push({ x: k, y: P[k] });
+      }
+      G.barras(ax, dados, G.COR.azulClaro, 0.86);
+      G.vertical(ax, md, G.COR.vinho, '\u27e8U\u27e9');
+      // faixa de um desvio padrão
+      ax.ct.save();
+      ax.ct.strokeStyle = G.COR.ambar;
+      ax.ct.lineWidth = 1.6;
+      ax.ct.setLineDash([4, 3]);
+      [md - sig, md + sig].forEach(function (x) {
+        if (x >= lo && x <= hi) {
+          ax.ct.beginPath();
+          ax.ct.moveTo(ax.X(x), ax.y0); ax.ct.lineTo(ax.X(x), ax.y1);
+          ax.ct.stroke();
+        }
+      });
+      ax.ct.restore();
+      G.legenda(ax, [
+        { cor: G.COR.azulClaro, texto: 'P(U) no ensemble canônico' },
+        { cor: G.COR.ambar, texto: '\u27e8U\u27e9 \u00b1 \u03c3' }
+      ]);
+
+      var rel = md > 0 ? sig / md : 0;
+      mostrar({
+        u: F.fmt(md, 3), sg: F.fmt(sig, 4),
+        rel: md > 0 ? F.pct(rel, 3) : '\u00b7',
+        tp: F.fmt(sigPrev, 4),
+        n23: md > 0 ? F.fmt(rel * Math.sqrt(N / 6.022e23), 3) : '\u00b7'
+      });
+
+      nota.innerHTML =
+        '<p>No ensemble canônico a energia <b>não</b> é fixa: o sistema troca calor com o '
+        + 'banho e \\(U\\) flutua. A distribuição acima é '
+        + '\\(\\wp(U)\\propto\\Omega(U)\\,e^{-U/\\kB T}\\), o produto de uma multiplicidade '
+        + 'que cresce por um peso de Boltzmann que decresce. O resultado é um pico.</p>'
+        + '<p>A largura obedece a uma identidade notável:</p>'
+        + '\\[\\sigma_U^2=\\med{U^2}-\\med{U}^2=\\kB T^2 C_V.\\]'
+        + '<p>Compare os cartões: o \\(\\sigma_U\\) medido da distribuição e o previsto por '
+        + '\\(\\sqrt{\\kB T^2C}\\) coincidem. A flutuação da energia <b>é</b> o calor '
+        + 'específico, e esse é o primeiro exemplo do teorema da flutuação e dissipação que '
+        + 'apareceu no Módulo 4.</p>'
+        + '<p>Agora o essencial. Como \\(U\\propto N\\) e \\(\\sigma_U\\propto\\sqrt N\\), a '
+        + 'largura relativa cai como \\(1/\\sqrt N\\). Com \\(N=' + N + '\\) ela vale '
+        + (md > 0 ? F.pct(rel, 2) : '\u00b7')
+        + '; com \\(N=10^{23}\\) seria da ordem de \\(10^{-11}\\). É por isso que o '
+        + 'resultado do ensemble canônico, onde \\(U\\) flutua, é o mesmo do microcanônico, '
+        + 'onde \\(U\\) é fixa: <b>no limite termodinâmico a distinção deixa de ter '
+        + 'consequência</b>. Escolhe-se o ensemble pela conveniência do cálculo, e não pela '
+        + 'física.</p>';
+      tipografar(nota);
+    }
+
+    registrarRedesenho(desenhar);
+    tipografar(corpo);
+  };
+
   /* ---------- inicialização ---------- */
   document.addEventListener('DOMContentLoaded', function () {
     Array.prototype.forEach.call(document.querySelectorAll('[data-widget]'), function (n) {

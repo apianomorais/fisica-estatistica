@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Módulo 5: Ensembles canônico e grã-canônico | Física Estatística</title>
+<link rel="icon" type="image/png" href="assets/img/favicon.png">
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611071729">
+<script src="assets/js/comum.js?v=202611071729"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+
+<header class="topo">
+  <div class="topo-interno">
+    <a class="marca" href="index.html">Física Estatística <span>· LFCA/URCA</span></a>
+    <nav class="menu">
+      <a href="index.html">Início</a>
+      <span class="grupo">Fundamentos</span>
+      <a href="aula01.html" class="num" title="Módulo 1: Revisão de termodinâmica">1</a>
+      <a href="aula02.html" class="num" title="Módulo 2: Métodos estatísticos">2</a>
+      <span class="grupo">Microestados</span>
+      <a href="aula03.html" class="num" title="Módulo 3: Caminhante aleatório e estados microscópicos">3</a>
+      <a href="aula04.html" class="num" title="Módulo 4: Movimento browniano">4</a>
+      <span class="grupo">Ensembles</span>
+      <a href="aula05.html" class="num ativo" title="Módulo 5: Ensembles canônico e grã-canônico">5</a>
+    </nav>
+  </div>
+</header>
+
+<div class="envoltorio">
+
+<aside class="lateral">
+  <h4>Neste módulo</h4>
+  <ol>
+    <li><a href="#s1">1. O problema com o microcanônico</a></li>
+    <li><a href="#s2">2. Um sistema em banho térmico</a></li>
+    <li><a href="#s3">3. A função de partição</a></li>
+    <li><a href="#s4">4. De Z sai tudo</a></li>
+    <li><a href="#s5">5. Energia média e calor específico</a></li>
+    <li><a href="#s6">6. Flutuações de energia</a></li>
+    <li><a href="#s7">7. Sistemas independentes: Z = Z₁ᴺ</a></li>
+    <li><a href="#s8">8. Dois níveis, canonicamente</a></li>
+    <li><a href="#s9">9. Sólido de Einstein</a></li>
+    <li><a href="#s10">10. Paramagneto ideal</a></li>
+    <li><a href="#s11">11. O ensemble grã-canônico</a></li>
+    <li><a href="#s12">12. A grande função de partição</a></li>
+    <li><a href="#s13">13. Número médio de partículas</a></li>
+    <li><a href="#s14">14. Exercícios resolvidos</a></li>
+    <li><a href="#s15">15. Exercícios propostos</a></li>
+  </ol>
+</aside>
+
+<main class="conteudo">
+
+  <p class="chapeu">Módulo 5 · Ensembles</p>
+  <h1>Ensembles canônico e grã-canônico</h1>
+  <p class="subtitulo">Este é o módulo em que a física estatística deixa de ser difícil. No
+  microcanônico, cada problema exigia um truque combinatório próprio. Aqui aparece uma única
+  função, \(Z\), que se calcula somando exponenciais, e da qual toda a termodinâmica sai por
+  diferenciação. Os três sistemas do Módulo 3 serão refeitos em meia página cada.</p>
+
+  <div class="bloco def">
+    <span class="rotulo">Objetivos</span>
+    <ul>
+      <li>Deduzir a distribuição de Boltzmann expandindo \(\ln\Omega\) do reservatório;</li>
+      <li>Definir \(Z\) e demonstrar \(F=-\kB T\ln Z\);</li>
+      <li>Obter \(U\), \(S\) e \(C\) por diferenciação de \(\ln Z\);</li>
+      <li>Mostrar que \(\sigma_U^2=\kB T^2C_V\) e concluir que os ensembles concordam;</li>
+      <li>Refazer os três sistemas do Módulo 3 usando \(Z=Z_1^N\);</li>
+      <li>Construir o ensemble grã-canônico e o potencial \(\Phi=-\kB T\ln\Xi\).</li>
+    </ul>
+  </div>
+
+  <hr class="linha">
+
+  <!-- ================================================== -->
+  <h2 id="s1">1. O problema com o microcanônico</h2>
+
+  <p>O Módulo 3 funcionou, mas a um preço. Cada sistema exigiu que soubéssemos contar
+  \(\Omega(U,N)\) exatamente, o que significou uma combinatória diferente a cada vez: um
+  coeficiente binomial para os dois níveis, barras e estrelas para o sólido de Einstein. Para
+  um gás real, com interações, essa contagem é simplesmente impossível.</p>
+
+  <p>Há também um incômodo conceitual. Um sistema isolado, com energia rigorosamente fixa,
+  é uma ficção: nenhum laboratório tem isolamento perfeito. O que se tem, quase sempre, é um
+  sistema em contato com o ambiente, trocando calor, com <em>temperatura</em> fixa e energia
+  flutuante.</p>
+
+  <div class="destaque">
+    <span class="anuncio">A troca que organiza este módulo</span>
+    Deixar de fixar \(U\) e passar a fixar \(T\). A variável independente muda, e com ela o
+    potencial termodinâmico apropriado deixa de ser \(S\) e passa a ser \(F\).
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s2">2. Um sistema em banho térmico</h2>
+
+  <p>Considere um sistema pequeno \(B\) em contato térmico com um reservatório \(A\) muito
+  maior. Os dois juntos estão isolados, com energia total \(U_0\) fixa. Pergunta: qual é a
+  probabilidade de encontrar \(B\) num microestado específico \(i\), de energia \(U_i\)?</p>
+
+  <p>Pela equiprobabilidade a priori aplicada ao conjunto isolado, essa probabilidade é
+  proporcional ao número de microestados que o <em>reservatório</em> pode ter, já que o
+  estado de \(B\) está fixado:</p>
+
+  <p>\[\wp_i = C\,\Omega_A(U_0-U_i).\]</p>
+
+  <div class="bloco alerta">
+    <span class="rotulo">Leia esta linha devagar</span>
+    <p>É o passo mais importante do módulo, e o mais fácil de ler depressa demais. A
+    probabilidade de um estado do sistema pequeno é governada por quantos estados <em>o
+    resto do universo</em> ainda pode ter. Quanto mais energia \(B\) toma para si, menos
+    sobra para \(A\), menos maneiras \(A\) tem de se arranjar, e portanto menos provável é
+    aquele estado de \(B\).</p>
+  </div>
+
+  <p>Tomando o logaritmo e expandindo em série de Taylor em torno de \(U_0\), o que é
+  legítimo porque \(U_i\ll U_0\):</p>
+
+  <p>\[\ln\wp_i=\ln C+\ln\Omega_A(U_0)
+  -U_i\left(\frac{\partial\ln\Omega_A}{\partial U}\right)_{U_0}
+  +\frac{1}{2}U_i^2\left(\frac{\partial^2\ln\Omega_A}{\partial U^2}\right)_{U_0}+\dots\]</p>
+
+  <p>Mas \(S=\kB\ln\Omega\) e \(\partial S/\partial U=1/T\), logo</p>
+
+  <p>\[\frac{\partial\ln\Omega_A}{\partial U}=\frac{1}{\kB T}.\]</p>
+
+  <p>E o termo seguinte? Ele é a derivada de \(1/\kB T\) em relação à energia do
+  reservatório. Como \(A\) é enorme, sua temperatura não muda quando cede \(U_i\), de modo
+  que essa derivada é nula. <strong>É exatamente aqui que se usa a hipótese de reservatório
+  grande.</strong> Sobra</p>
+
+  <p>\[\ln\wp_i\approx \tilde C-\frac{U_i}{\kB T},\]</p>
+
+  <p>e exponenciando:</p>
+
+  <div class="destaque">
+    <span class="anuncio">Distribuição de Boltzmann</span>
+    \[\wp_i=\frac{e^{-U_i/\kB T}}{Z}=\frac{e^{-\beta U_i}}{Z},
+    \qquad \beta\equiv\frac{1}{\kB T}\]
+  </div>
+
+  <p>Note o que foi obtido e o que não foi. A forma exponencial é <em>consequência</em> da
+  contagem de microestados do reservatório, e não um postulado. E note também que a
+  probabilidade depende do estado do sistema <strong>apenas através da sua energia</strong>:
+  dois microestados de mesma energia são igualmente prováveis, exatamente como no
+  microcanônico.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s3">3. A função de partição</h2>
+
+  <p>A constante \(Z\) é fixada pela normalização, \(\sum_i\wp_i=1\):</p>
+
+  <p>\[\boxed{\;Z=\sum_{i}e^{-\beta U_i}\;}\]</p>
+
+  <p>com a soma sobre <strong>todos os microestados</strong>, não sobre valores de energia.
+  Quando vários microestados compartilham a mesma energia, convém agrupá-los pela
+  degenerescência:</p>
+
+  <p>\[Z=\sum_{U}\Omega(U)\,e^{-\beta U}.\]</p>
+
+  <p>Essa segunda forma é reveladora. Escrevendo \(\Omega=e^{S/\kB}\),</p>
+
+  <p>\[Z=\sum_U e^{S/\kB-\beta U}=\sum_U e^{-\beta(U-TS)}=\sum_U e^{-\beta F(U)}.\]</p>
+
+  <p>O somando é o peso de Boltzmann da energia livre. Como a soma é dominada pelo seu termo
+  máximo, com largura relativa \(1/\sqrt N\), ela é essencialmente igual a esse termo:</p>
+
+  <p>\[Z\approx e^{-\beta F}\quad\Longrightarrow\quad
+  \boxed{\;F=-\kB T\ln Z\;}\]</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">A ponte, enfim</span>
+    <p>Esta é a equação central do curso. De um lado, \(Z\), uma soma puramente mecânica
+    sobre os estados possíveis do sistema. Do outro, \(F\), uma função termodinâmica medida
+    em calorímetros.</p>
+    <p>Lembre do Módulo 1: \(F\) tem variáveis naturais \(T\) e \(V\), exatamente as que o
+    ensemble canônico fixa. Não é coincidência; é a razão pela qual esse ensemble produz
+    \(F\) e não outro potencial. Do Módulo 1 também: de \(F\) saem \(S=-\partial F/\partial
+    T\) e \(P=-\partial F/\partial V\), e tudo o mais em seguida.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s4">4. De Z sai tudo</h2>
+
+  <p>O procedimento inteiro da física estatística canônica cabe numa caixa:</p>
+
+  <div class="bloco def">
+    <span class="rotulo">O roteiro canônico</span>
+    <ol>
+      <li>Liste os estados do sistema e suas energias;</li>
+      <li>Calcule \(Z=\sum_i e^{-\beta U_i}\);</li>
+      <li>Obtenha \(F=-\kB T\ln Z\);</li>
+      <li>Diferencie \(F\) para tudo o mais.</li>
+    </ol>
+    <div class="tabela-rolavel">
+    <table>
+      <thead><tr><th>Grandeza</th><th>De \(F\)</th><th>Direto de \(\ln Z\)</th></tr></thead>
+      <tbody>
+        <tr><td>Entropia</td><td>\(S=-\dpar{F}{T}{V}\)</td>
+            <td>\(S=\kB\ln Z+\kB\beta\,U\)</td></tr>
+        <tr><td>Energia média</td><td>\(U=F+TS\)</td>
+            <td>\(U=-\dfrac{\partial\ln Z}{\partial\beta}\)</td></tr>
+        <tr><td>Pressão</td><td>\(P=-\dpar{F}{V}{T}\)</td>
+            <td>\(P=\kB T\dfrac{\partial\ln Z}{\partial V}\)</td></tr>
+        <tr><td>Calor específico</td><td>\(C=T\dpar{S}{T}{V}\)</td>
+            <td>\(C=\kB\beta^2\dfrac{\partial^2\ln Z}{\partial\beta^2}\)</td></tr>
+        <tr><td>Magnetização</td><td>\(M=-\dpar{F}{B}{T}\)</td>
+            <td>\(M=\kB T\dfrac{\partial\ln Z}{\partial B}\)</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <div data-widget="boltzmann"></div>
+
+  <!-- ================================================== -->
+  <h2 id="s5">5. Energia média e calor específico</h2>
+
+  <p>A energia média é, por definição,</p>
+
+  <p>\[\overline{U}=\sum_i U_i\,\wp_i=\frac{1}{Z}\sum_i U_i e^{-\beta U_i}.\]</p>
+
+  <p>Aqui reaparece o truque da derivada do Módulo 3, agora na sua forma definitiva. Observe
+  que</p>
+
+  <p>\[\frac{\partial Z}{\partial\beta}
+  =\frac{\partial}{\partial\beta}\sum_i e^{-\beta U_i}
+  =-\sum_i U_i e^{-\beta U_i},\]</p>
+
+  <p>de modo que</p>
+
+  <p>\[\boxed{\;\overline{U}=-\frac{1}{Z}\frac{\partial Z}{\partial\beta}
+  =-\frac{\partial\ln Z}{\partial\beta}\;}\]</p>
+
+  <p>Derivando outra vez obtém-se o segundo momento, e com ele o calor específico. Esse é o
+  padrão geral: <strong>a n-ésima derivada de \(\ln Z\) em relação a \(\beta\) dá o n-ésimo
+  cumulante da energia</strong>. Por isso \(\ln Z\) é chamada de função geradora de
+  cumulantes, e por isso tudo sai dela.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s6">6. Flutuações de energia</h2>
+
+  <p>Calculemos a segunda derivada explicitamente:</p>
+
+  <p>\[\frac{\partial^2\ln Z}{\partial\beta^2}
+  =-\frac{\partial\overline U}{\partial\beta}
+  =\overline{U^2}-\overline{U}^{\,2}=\sigma_U^2.\]</p>
+
+  <p>Por outro lado, \(\partial/\partial\beta = -\kB T^2\,\partial/\partial T\), e
+  \(\partial\overline U/\partial T=C_V\). Juntando:</p>
+
+  <div class="destaque">
+    <span class="anuncio">Flutuação e resposta</span>
+    \[\sigma_U^2=\kB T^2 C_V\]
+  </div>
+
+  <p>É o mesmo tipo de identidade que a relação de Einstein do Módulo 4: de um lado uma
+  flutuação espontânea em equilíbrio, do outro uma função resposta que se mede perturbando o
+  sistema. Elas são a mesma coisa.</p>
+
+  <p>E agora a consequência decisiva. Como \(U\) e \(C_V\) são extensivos, ambos crescem com
+  \(N\), de modo que</p>
+
+  <p>\[\frac{\sigma_U}{\overline U}\propto\frac{\sqrt N}{N}=\frac{1}{\sqrt N}.\]</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Por que os dois ensembles dão o mesmo resultado</span>
+    <p>O microcanônico fixa \(U\); o canônico deixa \(U\) flutuar. São hipóteses físicas
+    diferentes, e ainda assim produzem a mesma termodinâmica. A razão está na linha acima:
+    com \(N\sim 10^{23}\), a energia flutua uma parte em \(10^{11}\). Dizer que \(U\) é fixa
+    ou que \(U\) flutua tanto assim é dizer a mesma coisa.</p>
+    <p>A escolha do ensemble passa então a ser uma questão de <strong>conveniência de
+    cálculo</strong>, e o canônico quase sempre vence, porque somar exponenciais livremente é
+    muito mais fácil do que contar estados sob um vínculo de energia fixa.</p>
+  </div>
+
+  <div data-widget="flutuacoes"></div>
+
+  <!-- ================================================== -->
+  <h2 id="s7">7. Sistemas independentes: Z = Z₁ᴺ</h2>
+
+  <p>Aqui está a propriedade que torna o formalismo prático. Se o hamiltoniano é uma soma de
+  termos independentes,</p>
+
+  <p>\[H=H_1+H_2+\dots+H_N,\]</p>
+
+  <p>então a exponencial fatora, e a soma sobre todos os estados do conjunto se separa em
+  produto de somas independentes:</p>
+
+  <p>\[Z=\sum_{\text{todos}} e^{-\beta(U^{(1)}+\dots+U^{(N)})}
+  =\left(\sum_{i_1}e^{-\beta U^{(1)}_{i_1}}\right)\cdots
+  \left(\sum_{i_N}e^{-\beta U^{(N)}_{i_N}}\right)
+  =Z_1Z_2\cdots Z_N.\]</p>
+
+  <p>E se as partículas forem idênticas,</p>
+
+  <p>\[\boxed{\;Z=Z_1^{\,N}\quad\Longrightarrow\quad F=-N\kB T\ln Z_1\;}\]</p>
+
+  <p>O problema de \(N\) partículas colapsou no problema de <em>uma</em>. É por isso que as
+  três próximas seções cabem em meia página cada, enquanto no Módulo 3 ocuparam várias.</p>
+
+  <div class="bloco alerta">
+    <span class="rotulo">Uma ressalva que custará caro depois</span>
+    <p>\(Z=Z_1^N\) vale para partículas <strong>distinguíveis</strong>, como osciladores
+    presos a sítios de um cristal ou spins numa rede. Para um gás, em que as partículas são
+    idênticas e podem trocar de lugar, contar cada permutação como um estado novo é um erro,
+    e esse erro tem nome: <strong>paradoxo de Gibbs</strong>. A correção é dividir por \(N!\),
+    e entender de onde ela vem é o assunto do Módulo 6.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s8">8. Dois níveis, canonicamente</h2>
+
+  <p>Cada partícula tem energias \(0\) e \(\epsilon\). A função de partição de uma só:</p>
+
+  <p>\[Z_1=e^{-\beta\cdot 0}+e^{-\beta\epsilon}=1+e^{-\beta\epsilon}.\]</p>
+
+  <p>Para \(N\) partículas independentes, \(Z=\left(1+e^{-\beta\epsilon}\right)^N\), e a
+  energia livre por partícula é</p>
+
+  <p>\[f=-\kB T\ln\left(1+e^{-\epsilon/\kB T}\right).\]</p>
+
+  <p>A energia média sai da derivada:</p>
+
+  <p>\[u=-\frac{\partial\ln Z_1}{\partial\beta}
+  =-\frac{1}{1+e^{-\beta\epsilon}}\cdot\left(-\epsilon e^{-\beta\epsilon}\right)
+  =\frac{\epsilon\,e^{-\beta\epsilon}}{1+e^{-\beta\epsilon}}
+  =\frac{\epsilon}{e^{\beta\epsilon}+1}.\]</p>
+
+  <div class="destaque">
+    <span class="anuncio">É o mesmo resultado</span>
+    No Módulo 3, contando microestados e aplicando Stirling, obtivemos
+    \(u=\epsilon/(1+e^{\epsilon/\kB T})\). Aqui, em quatro linhas.
+  </div>
+
+  <p>Compare o esforço. Lá foram necessários o coeficiente binomial, a aproximação de
+  Stirling, o cancelamento dos termos em \(\ln N\), a derivada de \(s\) em relação a \(u\) e
+  a inversão da relação resultante. Aqui, somar duas exponenciais e derivar uma vez.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s9">9. Sólido de Einstein</h2>
+
+  <p>Cada oscilador tem níveis \(U_n=\left(n+\frac12\right)\hbar\omega\), com
+  \(n=0,1,2,\dots\). A soma agora é infinita, mas é uma série geométrica:</p>
+
+  <p>\[Z_1=\sum_{n=0}^{\infty}e^{-\beta(n+\frac12)\hbar\omega}
+  =e^{-\beta\hbar\omega/2}\sum_{n=0}^{\infty}\left(e^{-\beta\hbar\omega}\right)^n
+  =\frac{e^{-\beta\hbar\omega/2}}{1-e^{-\beta\hbar\omega}}.\]</p>
+
+  <p>Tomando o logaritmo,</p>
+
+  <p>\[\ln Z_1=-\tfrac{1}{2}\beta\hbar\omega-\ln\left(1-e^{-\beta\hbar\omega}\right),\]</p>
+
+  <p>e derivando em relação a \(\beta\):</p>
+
+  <p>\[\boxed{\;u=-\frac{\partial\ln Z_1}{\partial\beta}
+  =\frac{\hbar\omega}{2}+\frac{\hbar\omega}{e^{\beta\hbar\omega}-1}\;}\]</p>
+
+  <p>Idêntico ao resultado do Módulo 3, obtido lá com barras e estrelas. O calor específico
+  segue por mais uma derivada:</p>
+
+  <p>\[c=\kB\left(\frac{\hbar\omega}{\kB T}\right)^2
+  \frac{e^{\beta\hbar\omega}}{\left(e^{\beta\hbar\omega}-1\right)^2},\]</p>
+
+  <p>que tende a \(\kB\) quando \(\beta\to 0\), recuperando Dulong e Petit.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">O segundo termo tem nome</span>
+    <p>A parcela \(\hbar\omega/(e^{\beta\hbar\omega}-1)\) é \(\hbar\omega\) vezes</p>
+    <p>\[\overline{n}=\frac{1}{e^{\beta\hbar\omega}-1},\]</p>
+    <p>que é o número médio de quanta no oscilador. Essa função é a
+    <strong>distribuição de Bose e Einstein</strong>, e ela acaba de aparecer sozinha, sem
+    que ninguém a tenha introduzido. No Módulo 8 ela reaparecerá como a lei de ocupação de
+    bósons, e o sólido de Einstein será reinterpretado como um gás de fônons.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s10">10. Paramagneto ideal</h2>
+
+  <p>Cada spin tem energia \(\mp\mu_0B\), conforme esteja alinhado ou antialinhado:</p>
+
+  <p>\[Z_1=e^{\beta\mu_0B}+e^{-\beta\mu_0B}=2\cosh(\beta\mu_0B).\]</p>
+
+  <p>Logo \(Z=2^N\cosh^N(\beta\mu_0B)\) e</p>
+
+  <p>\[f=-\kB T\ln\left[2\cosh\left(\frac{\mu_0B}{\kB T}\right)\right].\]</p>
+
+  <p>Agora a magnetização por partícula, que é uma derivada em relação ao <em>campo</em>:</p>
+
+  <p>\[m=-\dpar{f}{B}{T}
+  =\kB T\cdot\frac{1}{\cosh(\beta\mu_0 B)}\cdot
+  \sinh(\beta\mu_0B)\cdot\beta\mu_0
+  =\mu_0\tanh\left(\frac{\mu_0B}{\kB T}\right),\]</p>
+
+  <p>e a energia, \(u=-\mu_0B\tanh(\beta\mu_0B)\). Os mesmos resultados do Módulo 3, em
+  três linhas. A susceptibilidade é mais uma derivada:</p>
+
+  <p>\[\chi=\frac{\partial m}{\partial B}
+  =\frac{\mu_0^2}{\kB T}\operatorname{sech}^2\left(\frac{\mu_0B}{\kB T}\right)
+  \;\xrightarrow[\;B\to 0\;]{}\;\frac{\mu_0^2}{\kB T},\]</p>
+
+  <p>que é a lei de Curie.</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>Sistema</th><th>\(Z_1\)</th><th>\(u(T)\)</th><th>Limite de T alta</th></tr></thead>
+    <tbody>
+      <tr><td>Dois níveis</td><td>\(1+e^{-\beta\epsilon}\)</td>
+          <td>\(\dfrac{\epsilon}{e^{\beta\epsilon}+1}\)</td><td>\(\epsilon/2\), saturação</td></tr>
+      <tr><td>Oscilador</td><td>\(\dfrac{e^{-\beta\hbar\omega/2}}{1-e^{-\beta\hbar\omega}}\)</td>
+          <td>\(\dfrac{\hbar\omega}{2}+\dfrac{\hbar\omega}{e^{\beta\hbar\omega}-1}\)</td>
+          <td>\(\kB T\), equipartição</td></tr>
+      <tr><td>Spin 1/2</td><td>\(2\cosh(\beta\mu_0B)\)</td>
+          <td>\(-\mu_0B\tanh(\beta\mu_0B)\)</td><td>\(0\), desordem total</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s11">11. O ensemble grã-canônico</h2>
+
+  <p>Falta um caso. Em muitos problemas o sistema troca com o reservatório não só energia,
+  mas também <strong>partículas</strong>: uma superfície que adsorve moléculas de um gás, um
+  volume imaginário dentro de um fluido, elétrons num sólido. Nesses casos o que é fixo não é
+  \(N\), e sim o potencial químico \(\mu\).</p>
+
+  <p>A dedução é literalmente a mesma, com uma variável a mais. A probabilidade de o sistema
+  estar no estado \(i\), com energia \(U_i\) e \(N_i\) partículas, é</p>
+
+  <p>\[\wp_i=C\,\Omega_A(U_0-U_i,\;N_0-N_i).\]</p>
+
+  <p>Expandindo o logaritmo em duas variáveis:</p>
+
+  <p>\[\ln\wp_i=\text{const}
+  -U_i\left(\frac{\partial\ln\Omega_A}{\partial U}\right)
+  -N_i\left(\frac{\partial\ln\Omega_A}{\partial N}\right)+\dots\]</p>
+
+  <p>e usando \(\partial S/\partial U=1/T\) e \(\partial S/\partial N=-\mu/T\), que são as
+  definições do Módulo 3:</p>
+
+  <p>\[\frac{\partial\ln\Omega_A}{\partial U}=\frac{1}{\kB T},\qquad
+  \frac{\partial\ln\Omega_A}{\partial N}=-\frac{\mu}{\kB T}.\]</p>
+
+  <p>Portanto</p>
+
+  <div class="destaque">
+    <span class="anuncio">Distribuição grã-canônica</span>
+    \[\wp_i=\frac{e^{-\beta(U_i-\mu N_i)}}{\Xi}\]
+  </div>
+
+  <p>Note o sinal: o fator \(e^{+\beta\mu N_i}\) <em>favorece</em> estados com muitas
+  partículas quando \(\mu\) é alto. O potencial químico é, literalmente, o preço de admissão
+  de uma partícula no sistema.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s12">12. A grande função de partição</h2>
+
+  <p>A normalização define a <strong>grande função de partição</strong>:</p>
+
+  <p>\[\boxed{\;\Xi=\sum_{i}e^{-\beta(U_i-\mu N_i)}
+  =\sum_{N=0}^{\infty}e^{\beta\mu N}\,Z_N\;}\]</p>
+
+  <p>A segunda forma é a mais útil: agrupa-se a soma por número de partículas, e cada grupo
+  é uma função de partição canônica ordinária \(Z_N\), ponderada pela
+  <strong>fugacidade</strong> \(z\equiv e^{\beta\mu}\). Em termos dela,
+  \(\Xi=\sum_N z^N Z_N\): a grande função de partição é a função geradora das \(Z_N\).</p>
+
+  <p>O potencial termodinâmico associado é</p>
+
+  <p>\[\Phi=-\kB T\ln\Xi,\]</p>
+
+  <p>em completa analogia com \(F=-\kB T\ln Z\). Para identificar \(\Phi\), lembre do Módulo 1
+  que as transformações de Legendre trocam variáveis por seus conjugados. Partindo de
+  \(F=U-TS\) e trocando \(N\) por \(\mu\):</p>
+
+  <p>\[\Phi=U-TS-\mu N=F-\mu N.\]</p>
+
+  <p>E como para um sistema homogêneo vale a relação de Euler \(U=TS-PV+\mu N\), segue um
+  resultado de aparência surpreendente:</p>
+
+  <div class="destaque">
+    <span class="anuncio">O grande potencial é simplesmente menos PV</span>
+    \[\Phi=-PV=-\kB T\ln\Xi\]
+  </div>
+
+  <p>Calcular \(\Xi\) dá a equação de estado de graça. É por isso que o ensemble grã-canônico
+  é a ferramenta natural para gases, e será o formalismo de todo o Módulo 8, com férmions e
+  bósons.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s13">13. Número médio de partículas</h2>
+
+  <p>Assim como \(U\) saiu de uma derivada em \(\beta\), o número de partículas sai de uma
+  derivada em \(\mu\):</p>
+
+  <p>\[\overline{N}=\sum_i N_i\wp_i
+  =\frac{1}{\Xi}\sum_i N_i e^{-\beta(U_i-\mu N_i)}
+  =\kB T\,\frac{\partial\ln\Xi}{\partial\mu}
+  =-\dpar{\Phi}{\mu}{T,V}.\]</p>
+
+  <p>E derivando outra vez obtém-se a flutuação, exatamente como antes:</p>
+
+  <p>\[\sigma_N^2=\overline{N^2}-\overline{N}^{\,2}
+  =\kB T\frac{\partial\overline N}{\partial\mu}.\]</p>
+
+  <p>Mais uma relação de flutuação e resposta. Ela se liga à compressibilidade isotérmica por
+  \(\sigma_N^2/\overline N=\kB T\,\overline n\,\kappa_T\), com \(\overline n=\overline N/V\),
+  e diverge nos pontos críticos: é a <strong>opalescência crítica</strong>, o fenômeno em que
+  um fluido fica leitoso perto da transição porque as flutuações de densidade crescem até o
+  tamanho do comprimento de onda da luz. Foi uma das treze determinações de \(N_A\) que
+  Perrin reuniu.</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>Ensemble</th><th>Fixo</th><th>Flutua</th><th>Peso</th>
+    <th>Potencial</th></tr></thead>
+    <tbody>
+      <tr><td>Microcanônico</td><td>\(U, V, N\)</td><td>nada</td><td>uniforme</td>
+          <td>\(S=\kB\ln\Omega\)</td></tr>
+      <tr><td>Canônico</td><td>\(T, V, N\)</td><td>\(U\)</td><td>\(e^{-\beta U}\)</td>
+          <td>\(F=-\kB T\ln Z\)</td></tr>
+      <tr><td>Grã-canônico</td><td>\(T, V, \mu\)</td><td>\(U\) e \(N\)</td>
+          <td>\(e^{-\beta(U-\mu N)}\)</td><td>\(\Phi=-\kB T\ln\Xi=-PV\)</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>No limite termodinâmico os três dão a mesma física, porque todas as flutuações
+  relativas vão a zero como \(1/\sqrt N\). A escolha é de conveniência, e a regra prática é
+  simples: fixe aquilo que o problema fixa, e deixe o resto flutuar.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s14">14. Exercícios resolvidos</h2>
+
+  <div class="bloco ex">
+    <span class="rotulo">Exercício resolvido 5.1: o rotor de dois estados com degenerescência</span>
+    <p><b>Um sistema tem um estado fundamental não degenerado de energia zero e um estado
+    excitado de energia \(\epsilon\) com degenerescência \(g\). Calcule \(Z_1\), \(u(T)\) e
+    \(c(T)\), e mostre onde fica o pico de Schottky.</b></p>
+    <details class="solucao"><summary>Ver solução</summary>
+    <div class="corpo-solucao">
+    <p><b>Função de partição.</b> Basta somar sobre os estados, contando a degenerescência:</p>
+    <p>\[Z_1=1+g\,e^{-\beta\epsilon}.\]</p>
+    <p><b>Energia.</b></p>
+    <p>\[u=-\frac{\partial\ln Z_1}{\partial\beta}
+    =\frac{g\epsilon e^{-\beta\epsilon}}{1+ge^{-\beta\epsilon}}
+    =\frac{\epsilon}{1+g^{-1}e^{\beta\epsilon}}.\]</p>
+    <p>Compare com o caso \(g=1\): a degenerescência age exatamente como um deslocamento
+    efetivo da energia, \(\epsilon_{\text{ef}}=\epsilon-\kB T\ln g\). Isso tem uma leitura
+    física direta: subir para o nível excitado custa energia \(\epsilon\), mas
+    <em>rende</em> entropia \(\kB\ln g\), e o que decide é a energia livre.</p>
+    <p><b>Calor específico.</b> Com \(x=\beta\epsilon\),</p>
+    <p>\[\frac{c}{\kB}=\frac{g\,x^2e^{x}}{\left(e^{x}+g\right)^2}.\]</p>
+    <p>Derivando e igualando a zero, a condição do máximo é
+    \(2(e^x+g)=x(e^x-g)\). Para \(g=1\) isso reproduz \(x^*=2{,}3994\) do Módulo 3; para
+    \(g=3\), resolve-se numericamente \(x^*=2{,}98\), isto é
+    \(\kB T^*/\epsilon=0{,}336\).</p>
+    <p><b>Para que serve.</b> Íons de terras raras em cristais têm níveis com
+    degenerescências determinadas pela simetria do sítio. Medindo a posição e a altura do
+    pico de Schottky, obtém-se simultaneamente \(\epsilon\) e \(g\), o que informa sobre a
+    simetria local sem difração alguma.</p>
+    </div></details>
+  </div>
+
+  <div class="bloco ex">
+    <span class="rotulo">Exercício resolvido 5.2: adsorção de Langmuir, grã-canonicamente</span>
+    <p><b>Uma superfície tem \(N\) sítios independentes. Cada sítio está vazio (energia 0) ou
+    ocupado por uma molécula (energia \(-\epsilon\)). A superfície está em contato com um gás
+    de potencial químico \(\mu\). Calcule a fração de sítios ocupados.</b></p>
+    <details class="solucao"><summary>Ver solução</summary>
+    <div class="corpo-solucao">
+    <p>No Módulo 3 esse problema exigiu contar \(\Omega(U,N)\) e aplicar Stirling. No
+    grã-canônico ele se resolve em um sítio só, porque os sítios são independentes e cada um
+    troca partículas com o gás livremente.</p>
+    <p><b>Um sítio.</b> Há dois estados: vazio, com \(N_i=0\) e \(U_i=0\); e ocupado, com
+    \(N_i=1\) e \(U_i=-\epsilon\). Logo</p>
+    <p>\[\Xi_1=e^{-\beta(0-\mu\cdot 0)}+e^{-\beta(-\epsilon-\mu)}
+    =1+e^{\beta(\epsilon+\mu)}.\]</p>
+    <p><b>Ocupação média.</b> A probabilidade de o sítio estar ocupado é o seu peso dividido
+    por \(\Xi_1\):</p>
+    <p>\[\theta=\frac{e^{\beta(\epsilon+\mu)}}{1+e^{\beta(\epsilon+\mu)}}
+    =\boxed{\;\frac{1}{1+e^{-\beta(\epsilon+\mu)}}\;}\]</p>
+    <p><b>Em termos da pressão.</b> Para um gás ideal, \(\mu=\kB T\ln(P/P_0(T))\), de modo que
+    \(e^{\beta\mu}=P/P_0\). Substituindo,</p>
+    <p>\[\theta=\frac{P}{P+P_0e^{-\beta\epsilon}}\equiv\frac{P}{P+K(T)},\]</p>
+    <p>que é a <strong>isoterma de Langmuir</strong>, de 1918, base de toda a química de
+    superfícies e de catálise. Ela satura em \(\theta\to 1\) a pressão alta, porque os sítios
+    acabam.</p>
+    <p><b>Repare na forma.</b> \(\theta=1/(1+e^{-\beta(\epsilon+\mu)})\) é exatamente a
+    <strong>distribuição de Fermi e Dirac</strong>, que encontraremos no Módulo 8. Não é
+    coincidência: em ambos os casos cada sítio ou estado comporta no máximo uma partícula, e
+    é só isso que a fórmula está dizendo.</p>
+    </div></details>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s15">15. Exercícios propostos</h2>
+
+  <div class="bloco def">
+    <span class="rotulo">Para resolver</span>
+    <ol>
+      <li><b>5.1</b> Mostre que \(S=\kB\ln Z+U/T\) partindo de \(F=U-TS\) e
+      \(F=-\kB T\ln Z\). Em seguida verifique, para o sistema de dois níveis, que essa
+      expressão reproduz a \(s(u)\) obtida no Módulo 3.</li>
+
+      <li><b>5.2</b> Para uma partícula livre de massa \(m\) numa caixa unidimensional de
+      lado \(L\), a soma sobre os níveis \(E_n=\hbar^2\pi^2n^2/2mL^2\) pode ser trocada por
+      uma integral quando \(\kB T\gg E_1\). Mostre que \(Z_1=L/\lambda\), com
+      \(\lambda=h/\sqrt{2\pi m\kB T}\) o comprimento de onda térmico de de Broglie.</li>
+
+      <li><b>5.3</b> Usando o resultado anterior em três dimensões, \(Z_1=V/\lambda^3\),
+      obtenha \(F\), \(P\) e \(U\) para \(N\) partículas supondo \(Z=Z_1^N\). Verifique que
+      \(PV=N\kB T\) e \(U=\frac32 N\kB T\), e mostre que a entropia resultante <b>não</b> é
+      extensiva. Esse é o paradoxo de Gibbs, resolvido no Módulo 6.</li>
+
+      <li><b>5.4</b> Um sistema tem níveis igualmente espaçados \(E_n=n\epsilon\),
+      \(n=0,1,2,\dots\), sem degenerescência. Calcule \(Z_1\) pela série geométrica, obtenha
+      \(u(T)\) e mostre que \(u\to\kB T\) a alta temperatura.</li>
+
+      <li><b>5.5</b> Para o paramagneto, calcule a entropia por spin e verifique que
+      \(s\to\kB\ln 2\) quando \(B\to 0\) ou \(T\to\infty\). Interprete esse valor contando
+      microestados diretamente.</li>
+
+      <li><b>5.6</b> Demonstre \(\sigma_U^2=\kB T^2C_V\) por cálculo direto, derivando
+      \(\overline U=-\partial\ln Z/\partial\beta\) mais uma vez em relação a \(\beta\).
+      Depois confirme numericamente no widget da seção 6.</li>
+
+      <li><b>5.7</b> No ensemble grã-canônico, mostre que
+      \(\sigma_N^2=\kB T\,\partial\overline N/\partial\mu\) e, para o gás ideal clássico, que
+      isso dá \(\sigma_N^2=\overline N\), a estatística de Poisson. Comente por que esse é o
+      resultado esperado para partículas que não se enxergam.</li>
+
+      <li><b>5.8</b> <b>Paramagneto de Brillouin.</b> Um íon de spin \(J\) tem \(2J+1\)
+      estados com energias \(-g\mu_B B m\), \(m=-J,\dots,J\). Calcule \(Z_1\) somando a
+      progressão geométrica e mostre que a magnetização é \(g\mu_B J B_J(x)\), com \(B_J\) a
+      função de Brillouin. Verifique que \(J=1/2\) devolve a tangente hiperbólica e que
+      \(J\to\infty\) devolve a função de Langevin.</li>
+    </ol>
+  </div>
+
+  <nav class="nav-aulas">
+    <a href="aula04.html"><small>Módulo anterior</small>← 4. Movimento browniano</a>
+    <span class="em-breve"><small>Em preparação</small>6. Gás ideal</span>
+  </nav>
+
+</main>
+</div>
+
+<footer class="rodape">
+  <img class="logo-rodape" src="assets/img/logo-lfca.png" alt="LFCA | URCA">
+  <p><strong>Prof. Apiano Morais</strong> · <a href="mailto:apiano.morais@urca.br">apiano.morais@urca.br</a><br>
+  Laboratório de Física Computacional Aplicada (LFCA) · Universidade Regional do Cariri</p>
+</footer>
+
+<script src="assets/js/widgets.js?v=202611071729"></script>
+</body>
+</html>
