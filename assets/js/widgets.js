@@ -687,6 +687,434 @@
     tipografar(corpo);
   };
 
+
+  /* =================================================================
+     5. Dois dados: a frequência vira densidade de probabilidade
+     Reproduz a contagem dos slides. Com poucos lançamentos o
+     histograma é irregular; com muitos ele assenta sobre a FDP exata,
+     que se obtém contando as 36 configurações.
+     ================================================================= */
+  REGISTRO.dados = function (raiz) {
+    var corpo = moldura(raiz, 'Dois dados: da contagem à densidade de probabilidade');
+
+    var cont = new Array(13).fill(0);
+    var total = 0;
+    var EXATA = [];
+    for (var s = 2; s <= 12; s++) EXATA[s] = (6 - Math.abs(s - 7)) / 36;
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    var bot = el('div', { class: 'botoes' });
+    [['+1', 1], ['+10', 10], ['+100', 100], ['+1000', 1000]].forEach(function (b) {
+      var x = el('button', { type: 'button', class: 'sec', texto: b[0] });
+      x.addEventListener('click', function () { lancar(b[1]); });
+      bot.appendChild(x);
+    });
+    var zerar = el('button', { type: 'button', texto: 'zerar' });
+    zerar.addEventListener('click', function () {
+      cont = new Array(13).fill(0); total = 0; desenhar();
+    });
+    bot.appendChild(zerar);
+    ctr.appendChild(bot);
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'lançamentos', k: 'n' }, { rot: 'média medida', k: 'm' },
+      { rot: 'média exata', k: 'me' }, { rot: 'desvio medido', k: 'd' },
+      { rot: 'desvio exato', k: 'de' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function lancar(k) {
+      for (var i = 0; i < k; i++) {
+        var a = 1 + Math.floor(Math.random() * 6);
+        var b = 1 + Math.floor(Math.random() * 6);
+        cont[a + b]++; total++;
+      }
+      desenhar();
+    }
+
+    function desenhar() {
+      var ax = G.eixos(cv, {
+        xmin: 1.4, xmax: 12.6, ymin: 0, ymax: 0.21, altura: 290,
+        rotX: 'soma dos dois dados', rotY: 'frequência relativa',
+        marcasX: G.marcasInteiras(2, 12, 11),
+        formataY: function (v) { return v.toFixed(2).replace('.', ','); }
+      });
+
+      var barras = [];
+      for (var s = 2; s <= 12; s++) {
+        barras.push({ x: s, y: total ? cont[s] / total : 0 });
+      }
+      G.barras(ax, barras, G.COR.azulClaro, 0.72);
+
+      // a FDP exata, como degraus
+      ax.ct.save();
+      ax.ct.strokeStyle = G.COR.vinho;
+      ax.ct.lineWidth = 2;
+      ax.ct.beginPath();
+      for (var k = 2; k <= 12; k++) {
+        var meia = (ax.X(3) - ax.X(2)) * 0.36;
+        var y = ax.Y(EXATA[k]);
+        ax.ct.moveTo(ax.X(k) - meia, y);
+        ax.ct.lineTo(ax.X(k) + meia, y);
+      }
+      ax.ct.stroke();
+      ax.ct.restore();
+      G.legenda(ax, [
+        { cor: G.COR.azulClaro, texto: 'frequência observada' },
+        { cor: G.COR.vinho, texto: 'FDP exata, das 36 configurações' }
+      ]);
+
+      var m = 0, m2 = 0;
+      for (var j = 2; j <= 12; j++) {
+        var p = total ? cont[j] / total : 0;
+        m += j * p; m2 += j * j * p;
+      }
+      var dp = Math.sqrt(Math.max(0, m2 - m * m));
+      mostrar({
+        n: String(total),
+        m: total ? F.fmt(m, 3) : '·',
+        me: '7,000',
+        d: total ? F.fmt(dp, 3) : '·',
+        de: F.fmt(Math.sqrt(35 / 6), 3)
+      });
+
+      // distância máxima entre o observado e o exato
+      var dmax = 0;
+      for (var q = 2; q <= 12; q++) {
+        dmax = Math.max(dmax, Math.abs((total ? cont[q] / total : 0) - EXATA[q]));
+      }
+      nota.innerHTML = total === 0
+        ? 'Lance os dados. Com poucos lançamentos a contagem é irregular; conforme ela cresce, '
+          + 'as barras assentam sobre a distribuição exata.'
+        : 'Maior diferença entre a barra observada e a FDP exata: <b>' + F.fmt(dmax, 4)
+          + '</b>. Ela encolhe como \\(1/\\sqrt{n}\\): com ' + total + ' lançamentos esperamos '
+          + 'algo da ordem de ' + F.fmt(1 / Math.sqrt(total), 4)
+          + '. É assim que uma frequência vira uma probabilidade, e é a mesma razão pela qual '
+          + 'um gás com \\(10^{23}\\) moléculas tem pressão bem definida.';
+      tipografar(nota);
+    }
+
+    registrarRedesenho(desenhar);
+    tipografar(corpo);
+  };
+
+  /* =================================================================
+     6. Princípio de Hamilton: a ação é mínima no caminho real
+     Em vez de afirmar, calcula. O caminho é deformado por dois modos
+     senoidais e a ação S = integral de L dt é obtida numericamente.
+     ================================================================= */
+  REGISTRO.acao = function (raiz) {
+    var corpo = moldura(raiz, 'O princípio de Hamilton: calcule a ação e veja onde ela é mínima');
+
+    var g = 9.8, m = 1, T = 2;          // queda e retorno em 2 s
+    var est = { a1: 0, a2: 0, sis: 'queda' };
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+
+    opcoes(ctr, [
+      { rot: 'Lançamento vertical', v: 'queda' },
+      { rot: 'Oscilador harmônico', v: 'osc' }
+    ], 0, function (v) { est.sis = v; desenhar(); });
+
+    var d1 = deslizante(ctr, 'deformação \\(a_1\\sen(\\pi t/T)\\)', -3, 3, 0.05, 0,
+      function (v) { est.a1 = v; desenhar(); },
+      function (v) { return v.toFixed(2).replace('.', ','); });
+    var d2 = deslizante(ctr, 'deformação \\(a_2\\sen(2\\pi t/T)\\)', -3, 3, 0.05, 0,
+      function (v) { est.a2 = v; desenhar(); },
+      function (v) { return v.toFixed(2).replace('.', ','); });
+
+    var bZ = el('button', { type: 'button', class: 'sec', texto: 'voltar ao caminho real' });
+    bZ.addEventListener('click', function () {
+      [d1, d2].forEach(function (d) {
+        d.value = 0; d.dispatchEvent(new Event('input'));
+      });
+    });
+    ctr.appendChild(el('div', { class: 'botoes' }, [bZ]));
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'ação S do caminho', k: 'S' },
+      { rot: 'ação do caminho real', k: 'S0' },
+      { rot: 'excesso S − S₀', k: 'dS' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    /* caminho verdadeiro e sua deformação */
+    function real(t) {
+      if (est.sis === 'queda') return 0.5 * g * t * (T - t);   // sai e volta a zero
+      return Math.sin(Math.PI * t / T);                        // meio período, extremos fixos
+    }
+    function desvio(t, a1, a2) {
+      return a1 * Math.sin(Math.PI * t / T) + a2 * Math.sin(2 * Math.PI * t / T);
+    }
+    function caminho(t, a1, a2) { return real(t) + desvio(t, a1, a2); }
+
+    /* S = integral de (T_cin - V) dt, por Simpson sobre o caminho dado */
+    function acao(a1, a2) {
+      var n = 2000, h = T / n, soma = 0;
+      function L(t) {
+        var dt = 1e-6;
+        var q = caminho(t, a1, a2);
+        var qp = (caminho(Math.min(T, t + dt), a1, a2)
+                - caminho(Math.max(0, t - dt), a1, a2))
+                / (Math.min(T, t + dt) - Math.max(0, t - dt));
+        var cin = 0.5 * m * qp * qp;
+        var pot = est.sis === 'queda'
+          ? m * g * q
+          : 0.5 * m * Math.pow(Math.PI / T, 2) * q * q;   // ω = π/T
+        return cin - pot;
+      }
+      for (var i = 0; i <= n; i++) {
+        var peso = (i === 0 || i === n) ? 1 : (i % 2 ? 4 : 2);
+        soma += peso * L(i * h);
+      }
+      return soma * h / 3;
+    }
+
+    function desenhar() {
+      var qs = [], i, t;
+      for (i = 0; i <= 200; i++) {
+        t = T * i / 200;
+        qs.push(caminho(t, est.a1, est.a2), real(t));
+      }
+      var ymin = Math.min.apply(null, qs), ymax = Math.max.apply(null, qs);
+      var folga = 0.15 * (ymax - ymin || 1);
+
+      var ax = G.eixos(cv, {
+        xmin: 0, xmax: T, ymin: ymin - folga, ymax: ymax + folga, altura: 300,
+        rotX: 'tempo t (s)', rotY: est.sis === 'queda' ? 'altura q (m)' : 'posição q (m)',
+        marcasX: G.marcasLineares(0, T, 4, 1),
+        formataY: function (v) { return v.toFixed(1).replace('.', ','); }
+      });
+
+      G.curva(ax, function (x) { return real(x); }, G.COR.grade, 4);
+      G.curva(ax, function (x) { return real(x); }, G.COR.vinho, 1.6, [5, 4]);
+      G.curva(ax, function (x) { return caminho(x, est.a1, est.a2); }, G.COR.azul, 2.4);
+      G.legenda(ax, [
+        { cor: G.COR.azul, texto: 'caminho escolhido' },
+        { cor: G.COR.vinho, texto: 'caminho real (solução de Newton)' }
+      ]);
+
+      var S = acao(est.a1, est.a2), S0 = acao(0, 0);
+      mostrar({ S: F.fmt(S, 4), S0: F.fmt(S0, 4), dS: F.fmt(S - S0, 4) });
+
+      var e = S - S0;
+      nota.innerHTML = Math.abs(est.a1) < 1e-9 && Math.abs(est.a2) < 1e-9
+        ? 'Este é o caminho que Newton prevê. Mexa nos deslizantes: <b>qualquer</b> deformação '
+          + 'aumenta a ação. O caminho real não é especial por ser bonito, e sim por ser o '
+          + 'ponto estacionário de \\(S=\\int L\\,dt\\).'
+        : 'O caminho azul não é o real, e a ação subiu <b>' + F.fmt(e, 4) + ' J·s</b>. '
+          + 'Repare que o excesso é <b>quadrático</b> nas deformações: dobrando \\(a_1\\), ele '
+          + 'quadruplica. É por isso que a primeira variação se anula, \\(\\delta S=0\\), e dela '
+          + 'saem as equações de Euler e Lagrange.';
+      tipografar(nota);
+    }
+
+    registrarRedesenho(desenhar);
+    tipografar(corpo);
+  };
+
+  /* =================================================================
+     7. Espaço de fase e o teorema de Liouville
+     Uma mancha de condições iniciais escoa pelo espaço de fase. A
+     integração é simplética, de modo que a área da mancha se conserva
+     por construção: o widget mede essa área e mostra que não muda.
+     ================================================================= */
+  REGISTRO.liouville = function (raiz) {
+    var corpo = moldura(raiz, 'Teorema de Liouville: a nuvem se deforma, a área não muda');
+
+    var SIS = {
+      osc: { rot: 'Oscilador harmônico', dV: function (q) { return q; },
+             q0: 1.5, p0: 0, cq: 0, cp: 0, lq: 2.6, lp: 2.6 },
+      pend: { rot: 'Pêndulo', dV: function (q) { return Math.sin(q); },
+              q0: 1.7, p0: 0, cq: 0, cp: 0, lq: 4.4, lp: 3.0 },
+      queda: { rot: 'Queda livre', dV: function () { return 1; },
+               q0: 0, p0: 1.0, cq: 1.4, cp: 0, lq: 3.2, lp: 2.6 }
+    };
+
+    var est = { sis: 'osc', rodando: true, lado: 0.45 };
+    var borda = [], tempo = 0, area0 = 0;
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+
+    opcoes(ctr, Object.keys(SIS).map(function (k) {
+      return { rot: SIS[k].rot, v: k };
+    }), 0, function (v) { est.sis = v; reiniciar(); });
+
+    deslizante(ctr, 'lado da mancha inicial', 0.15, 0.9, 0.05, 0.45,
+      function (v) { est.lado = v; reiniciar(); },
+      function (v) { return v.toFixed(2).replace('.', ','); });
+
+    var bP = el('button', { type: 'button', texto: 'pausar' });
+    var bR = el('button', { type: 'button', class: 'sec', texto: 'reiniciar' });
+    bP.addEventListener('click', function () {
+      est.rodando = !est.rodando;
+      bP.textContent = est.rodando ? 'pausar' : 'continuar';
+    });
+    bR.addEventListener('click', reiniciar);
+    ctr.appendChild(el('div', { class: 'botoes' }, [bP, bR]));
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'tempo decorrido', k: 't' }, { rot: 'área inicial', k: 'a0' },
+      { rot: 'área agora', k: 'a' }, { rot: 'variação medida', k: 'e' }
+    ]);
+    var nota = el('div', { class: 'saida', html:
+      '<p>Cada ponto da borda é um sistema com condições iniciais ligeiramente diferentes, e '
+      + 'cada um segue as equações canônicas \\(\\dot q = \\partial H/\\partial p\\), '
+      + '\\(\\dot p = -\\partial H/\\partial q\\). A mancha estica, torce e às vezes se enrola, '
+      + 'mas a área que ela encerra permanece a mesma: é o teorema de Liouville, '
+      + '\\(d\\rho/dt = 0\\), a incompressibilidade do escoamento no espaço de fase.</p>'
+      + '<p>A consequência é profunda. A informação sobre o estado inicial nunca é destruída '
+      + 'pela dinâmica, apenas espalhada em filamentos finos demais para serem acompanhados. '
+      + 'É dessa impossibilidade prática, e não de uma perda real de informação, que nasce a '
+      + 'necessidade de uma descrição estatística.</p>'
+      + '<p>A área é medida pelo polígono de 400 pontos que traça a borda. A integração é '
+      + 'simplética e conserva a área exatamente; qualquer variação que apareça no cartão é '
+      + 'do polígono, que corta as curvas quando a mancha se estica muito. No pêndulo, com '
+      + 'uma mancha grande o bastante para cruzar a separatriz, a borda vira um filamento e '
+      + 'nenhum número finito de pontos dá conta dela: a própria medida mostra o limite.</p>' });
+    corpo.appendChild(nota);
+
+    function reiniciar() {
+      var s = SIS[est.sis], L = est.lado, n = 400, i;
+      borda = [];
+      for (i = 0; i < n; i++) {   // percorre o quadrado inicial no sentido anti-horário
+        var u = 4 * i / n;
+        var dq, dp;
+        if (u < 1) { dq = -L / 2 + u * L; dp = -L / 2; }
+        else if (u < 2) { dq = L / 2; dp = -L / 2 + (u - 1) * L; }
+        else if (u < 3) { dq = L / 2 - (u - 2) * L; dp = L / 2; }
+        else { dq = -L / 2; dp = L / 2 - (u - 3) * L; }
+        borda.push({ q: s.q0 + dq, p: s.p0 + dp });
+      }
+      tempo = 0;
+      area0 = area();
+    }
+
+    function area() {   // fórmula do cadarço
+      var A = 0, n = borda.length;
+      for (var i = 0; i < n; i++) {
+        var a = borda[i], b = borda[(i + 1) % n];
+        A += a.q * b.p - b.q * a.p;
+      }
+      return Math.abs(A) / 2;
+    }
+
+    /* Verlet de velocidade: integrador simplético, preserva a área
+       do espaço de fase até a precisão da máquina. */
+    function passo(dt) {
+      var dV = SIS[est.sis].dV;
+      for (var i = 0; i < borda.length; i++) {
+        var o = borda[i];
+        var a1 = -dV(o.q);
+        o.p += 0.5 * dt * a1;
+        o.q += dt * o.p;
+        o.p += 0.5 * dt * (-dV(o.q));
+      }
+      tempo += dt;
+    }
+
+    function desenhar() {
+      var s = SIS[est.sis];
+      var ax = G.eixos(cv, {
+        xmin: s.cq - s.lq, xmax: s.cq + s.lq,
+        ymin: s.cp - s.lp, ymax: s.cp + s.lp, altura: 330,
+        rotX: 'coordenada q', rotY: 'momento p',
+        marcasX: G.marcasLineares(s.cq - s.lq, s.cq + s.lq, 4, 1),
+        formataY: function (v) { return v.toFixed(1).replace('.', ','); }
+      });
+
+      // curvas de nível da energia, que são as trajetórias
+      var ct = ax.ct;
+      ct.save();
+      ct.strokeStyle = G.COR.grade;
+      ct.lineWidth = 1;
+      [0.3, 0.8, 1.5, 2.4, 3.5].forEach(function (E) {
+        ct.beginPath();
+        var primeiro = true;
+        for (var k = 0; k <= 400; k++) {
+          var q = s.cq - s.lq + 2 * s.lq * k / 400;
+          var V = est.sis === 'osc' ? 0.5 * q * q
+                : est.sis === 'pend' ? 1 - Math.cos(q)
+                : q;
+          var p2 = 2 * (E - V);
+          if (p2 < 0) { primeiro = true; continue; }
+          var p = Math.sqrt(p2);
+          if (primeiro) { ct.moveTo(ax.X(q), ax.Y(p)); primeiro = false; }
+          else ct.lineTo(ax.X(q), ax.Y(p));
+        }
+        ct.stroke();
+        ct.beginPath();
+        primeiro = true;
+        for (var k2 = 0; k2 <= 400; k2++) {
+          var q2 = s.cq - s.lq + 2 * s.lq * k2 / 400;
+          var V2 = est.sis === 'osc' ? 0.5 * q2 * q2
+                 : est.sis === 'pend' ? 1 - Math.cos(q2)
+                 : q2;
+          var pp = 2 * (E - V2);
+          if (pp < 0) { primeiro = true; continue; }
+          var pn = -Math.sqrt(pp);
+          if (primeiro) { ct.moveTo(ax.X(q2), ax.Y(pn)); primeiro = false; }
+          else ct.lineTo(ax.X(q2), ax.Y(pn));
+        }
+        ct.stroke();
+      });
+      ct.restore();
+
+      // a mancha
+      ct.save();
+      ct.beginPath();
+      borda.forEach(function (o, i) {
+        var x = ax.X(o.q), y = ax.Y(o.p);
+        if (i) ct.lineTo(x, y); else ct.moveTo(x, y);
+      });
+      ct.closePath();
+      ct.fillStyle = 'rgba(44,95,141,.26)';
+      ct.fill();
+      ct.strokeStyle = G.COR.azul;
+      ct.lineWidth = 2;
+      ct.stroke();
+      ct.fillStyle = G.COR.azul;
+      for (var b = 0; b < borda.length; b += 10) {
+        ct.beginPath();
+        ct.arc(ax.X(borda[b].q), ax.Y(borda[b].p), 1.6, 0, 2 * Math.PI);
+        ct.fill();
+      }
+      ct.restore();
+
+      var A = area();
+      mostrar({
+        t: F.fmt(tempo, 2), a0: F.fmt(area0, 4), a: F.fmt(A, 4),
+        e: area0 ? F.pct((A - area0) / area0, 3) : '·'
+      });
+    }
+
+    var ultimo = 0;
+    function quadro(t) {
+      var dt = Math.min(0.04, (t - ultimo) / 1000) || 0.016;
+      ultimo = t;
+      if (est.rodando) { for (var k = 0; k < 4; k++) passo(dt / 4); }
+      desenhar();
+      requestAnimationFrame(quadro);
+    }
+
+    reiniciar();
+    requestAnimationFrame(quadro);
+    window.addEventListener('resize', desenhar);
+    tipografar(corpo);
+  };
+
   /* ---------- inicialização ---------- */
   document.addEventListener('DOMContentLoaded', function () {
     Array.prototype.forEach.call(document.querySelectorAll('[data-widget]'), function (n) {

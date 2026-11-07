@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Módulo 2: Métodos estatísticos | Física Estatística</title>
+<link rel="icon" type="image/png" href="assets/img/favicon.png">
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611071645">
+<script src="assets/js/comum.js?v=202611071645"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+
+<header class="topo">
+  <div class="topo-interno">
+    <a class="marca" href="index.html">Física Estatística <span>· LFCA/URCA</span></a>
+    <nav class="menu">
+      <a href="index.html">Início</a>
+      <span class="grupo">Fundamentos</span>
+      <a href="aula01.html" class="num" title="Módulo 1: Revisão de termodinâmica">1</a>
+      <a href="aula02.html" class="num ativo" title="Módulo 2: Métodos estatísticos">2</a>
+    </nav>
+  </div>
+</header>
+
+<div class="envoltorio">
+
+<aside class="lateral">
+  <h4>Neste módulo</h4>
+  <ol>
+    <li><a href="#s1">1. Da contagem à probabilidade</a></li>
+    <li><a href="#s2">2. Densidade de probabilidade</a></li>
+    <li><a href="#s3">3. Valor médio e suas propriedades</a></li>
+    <li><a href="#s4">4. Desvio e dispersão</a></li>
+    <li><a href="#s5">5. Variáveis contínuas</a></li>
+    <li><a href="#s6">6. Coordenadas generalizadas</a></li>
+    <li><a href="#s7">7. O princípio de Hamilton</a></li>
+    <li><a href="#s8">8. As equações de Euler e Lagrange</a></li>
+    <li><a href="#s9">9. De volta a Newton</a></li>
+    <li><a href="#s10">10. Momentos e o hamiltoniano</a></li>
+    <li><a href="#s11">11. Equações canônicas e Poisson</a></li>
+    <li><a href="#s12">12. Espaço de fase e ensembles</a></li>
+    <li><a href="#s13">13. O teorema de Liouville</a></li>
+    <li><a href="#s14">14. Os ensembles de equilíbrio</a></li>
+    <li><a href="#s15">15. Equiprobabilidade e ergodicidade</a></li>
+    <li><a href="#s16">16. Exercícios resolvidos</a></li>
+    <li><a href="#s17">17. Exercícios propostos</a></li>
+  </ol>
+</aside>
+
+<main class="conteudo">
+
+  <p class="chapeu">Módulo 2 · Fundamentos</p>
+  <h1>Métodos estatísticos</h1>
+  <p class="subtitulo">Duas ferramentas precisam estar afiadas antes de contar microestados:
+  a linguagem das probabilidades, que diz o que é uma média e quanto ela flutua, e a mecânica
+  de Hamilton, que transforma o estado de um sistema num único ponto num espaço. Juntas, elas
+  produzem o objeto central do curso: uma nuvem de pontos escoando pelo espaço de fase.</p>
+
+  <div class="bloco def">
+    <span class="rotulo">Objetivos</span>
+    <ul>
+      <li>Obter uma densidade de probabilidade por contagem e verificar a normalização;</li>
+      <li>Calcular médias e demonstrar que \(\overline{f+g}=\overline f+\overline g\) e \(\overline{Cf}=C\overline f\);</li>
+      <li>Mostrar que \(\overline{\Delta x}=0\) e usar a dispersão \(\overline{(\Delta x)^2}=\overline{x^2}-\overline{x}^2\);</li>
+      <li>Deduzir as equações de Euler e Lagrange do princípio de Hamilton;</li>
+      <li>Construir o hamiltoniano por transformação de Legendre e escrever as equações canônicas;</li>
+      <li>Demonstrar o teorema de Liouville e enunciar o que ele garante e o que não garante.</li>
+    </ul>
+  </div>
+
+  <hr class="linha">
+
+  <!-- ================================================== -->
+  <h2 id="s1">1. Da contagem à probabilidade</h2>
+
+  <p>Comece pelo caso mais simples possível. Lance dois dados honestos e anote a soma. O
+  resultado é um inteiro entre 2 e 12, e à primeira vista nada mais se pode dizer: o valor da
+  próxima jogada é imprevisível.</p>
+
+  <p>Mas repita. Com dez lançamentos a contagem é errática. Com cem, um padrão começa a se
+  formar. Com dez mil, o histograma assenta sobre uma forma triangular com pico em 7, e
+  repetir o experimento não muda mais essa forma. Dividindo cada contagem pelo total, obtém-se
+  a <strong>densidade de probabilidade</strong>.</p>
+
+  <div data-widget="dados"></div>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Duas maneiras de chegar à mesma distribuição</span>
+    <p>O widget obtém a distribuição por <em>frequência</em>: conta e divide. Mas aqui é
+    possível obtê-la também por <em>enumeração</em>, sem lançar nada. Há \(6\times 6=36\)
+    configurações possíveis, todas igualmente prováveis a priori, e basta contar quantas dão
+    cada soma: uma dá 2, duas dão 3, três dão 4, e assim por diante até seis darem 7.</p>
+    <p>Guarde esta dualidade, porque é o programa do curso inteiro. A física estatística
+    calcula as propriedades de um gás por <strong>enumeração de microestados igualmente
+    prováveis</strong>, exatamente como contamos as 36 configurações dos dados, e não por
+    observação repetida. O gás faz a parte experimental sozinho, visitando os microestados
+    depressa demais para que vejamos outra coisa que não a média.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s2">2. Densidade de probabilidade</h2>
+
+  <p>Seja \(x\) uma variável que assume \(M\) valores discretos \(x_1,\dots,x_M\), cada um com
+  probabilidade \(\wp(x_i)\). A única exigência é a <strong>normalização</strong>:</p>
+
+  <p>\[\sum_{i=1}^{M}\wp(x_i)=1.\]</p>
+
+  <p>Ela diz apenas que alguma coisa acontece. Para os dois dados, somar os onze valores da
+  tabela abaixo dá exatamente 1.</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>\(x\)</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th>
+    <th>8</th><th>9</th><th>10</th><th>11</th><th>12</th></tr></thead>
+    <tbody>
+      <tr><th>casos</th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td>
+      <td>5</td><td>4</td><td>3</td><td>2</td><td>1</td></tr>
+      <tr><th>\(\wp(x)\)</th><td>0,0278</td><td>0,0556</td><td>0,0833</td><td>0,1111</td>
+      <td>0,1389</td><td>0,1667</td><td>0,1389</td><td>0,1111</td><td>0,0833</td>
+      <td>0,0556</td><td>0,0278</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s3">3. Valor médio e suas propriedades</h2>
+
+  <p>O valor médio de \(x\) é a soma dos valores pesados por suas probabilidades:</p>
+
+  <p>\[\overline{x}=\frac{x_1\wp(x_1)+\dots+x_M\wp(x_M)}{\wp(x_1)+\dots+\wp(x_M)}
+  =\sum_{i=1}^{M}x_i\,\wp(x_i),\]</p>
+
+  <p>onde o denominador sumiu porque vale 1. Para uma função qualquer da variável,</p>
+
+  <p>\[\overline{f(x)}=\sum_{i=1}^{M}f(x_i)\,\wp(x_i).\]</p>
+
+  <p>Dessa definição saem duas propriedades que usaremos sem pensar pelo resto do curso.</p>
+
+  <div class="bloco def">
+    <span class="rotulo">A média é linear</span>
+    <p><strong>Soma.</strong> Para duas funções bem comportadas,</p>
+    <p>\[\overline{f(x)+g(x)}=\sum_i\big[f(x_i)+g(x_i)\big]\wp(x_i)
+    =\sum_i f(x_i)\wp(x_i)+\sum_i g(x_i)\wp(x_i)=\overline{f}+\overline{g}.\]</p>
+    <p><strong>Constante.</strong> Para \(C\) real,</p>
+    <p>\[\overline{C f(x)}=\sum_i C f(x_i)\wp(x_i)=C\sum_i f(x_i)\wp(x_i)=C\,\overline{f}.\]</p>
+  </div>
+
+  <div class="bloco alerta">
+    <span class="rotulo">O que a linearidade não cobre</span>
+    <p>A média da soma é a soma das médias <em>sempre</em>. Já a média do produto só é o
+    produto das médias quando as variáveis são <strong>independentes</strong>. Em geral
+    \(\overline{xy}\ne\overline{x}\,\overline{y}\), e a diferença é precisamente a
+    covariância. No Módulo 5 essa diferença será uma grandeza física: a flutuação da energia
+    num sistema em contato com um banho térmico.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s4">4. Desvio e dispersão</h2>
+
+  <p>A média localiza o centro da distribuição. O desvio de cada valor em relação a ela é</p>
+
+  <p>\[\Delta x_i = x_i-\overline{x}.\]</p>
+
+  <p>Seu valor médio é inútil, e vale a pena ver por quê:</p>
+
+  <p>\[\overline{\Delta x}=\sum_i (x_i-\overline{x})\wp(x_i)
+  =\sum_i x_i\wp(x_i)-\overline{x}\sum_i \wp(x_i)=\overline{x}-\overline{x}=0.\]</p>
+
+  <p>Os desvios positivos cancelam os negativos exatamente, por construção. Para medir
+  largura é preciso eliminar o sinal, e a escolha que leva a toda a matemática útil é elevar
+  ao quadrado. A <strong>dispersão</strong>, ou segundo momento em torno da média, é</p>
+
+  <p>\[\overline{(\Delta x)^2}=\sum_i (x_i-\overline{x})^2\wp(x_i).\]</p>
+
+  <p>Expandindo o quadrado e usando a linearidade obtém-se a fórmula de trabalho, que é como
+  se calcula na prática:</p>
+
+  <p>\[\overline{(\Delta x)^2}=\overline{x^2}-\overline{x}^{\,2}.\]</p>
+
+  <p>A raiz quadrada da dispersão é o desvio padrão, \(\sigma=\sqrt{\overline{x^2}-\overline{x}^2}\).
+  Para os dois dados, \(\overline{x}=7\) e \(\sigma=\sqrt{35/6}\approx 2{,}415\): confira nos
+  cartões do widget da seção 1 que a medida converge para esses valores.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Por que \(1/\sqrt{N}\) governa tudo</span>
+    <p>Se \(X=\sum_{k=1}^{N}x_k\) é a soma de \(N\) variáveis independentes de mesma
+    distribuição, então \(\overline{X}=N\overline{x}\) enquanto a dispersão também soma,
+    \(\sigma_X^2=N\sigma_x^2\), de modo que \(\sigma_X=\sqrt{N}\,\sigma_x\). A flutuação
+    <em>relativa</em> é</p>
+    <p>\[\frac{\sigma_X}{\overline{X}}=\frac{1}{\sqrt{N}}\,\frac{\sigma_x}{\overline{x}}.\]</p>
+    <p>Com \(N\sim 10^{23}\), isso é uma parte em \(10^{11}\). É a razão matemática pela qual a
+    termodinâmica existe: a média deixa de ser um resumo estatístico e passa a ser,
+    para todos os efeitos, o próprio valor da grandeza.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s5">5. Variáveis contínuas</h2>
+
+  <p>Quando \(x\) varia continuamente, perguntar a probabilidade de um valor exato não faz
+  sentido: ela é zero. O que tem sentido é a probabilidade de cair num intervalo, e o objeto
+  natural passa a ser a densidade \(\wp(x)\), definida de modo que \(\wp(x)\,dx\) seja a
+  probabilidade de encontrar a variável entre \(x\) e \(x+dx\). As somas viram integrais:</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th></th><th>Discreto</th><th>Contínuo</th></tr></thead>
+    <tbody>
+      <tr><th>Normalização</th><td>\(\sum_i \wp(x_i)=1\)</td>
+          <td>\(\int \wp(x)\,dx=1\)</td></tr>
+      <tr><th>Média</th><td>\(\sum_i x_i\wp(x_i)\)</td>
+          <td>\(\int x\,\wp(x)\,dx\)</td></tr>
+      <tr><th>Média de uma função</th><td>\(\sum_i f(x_i)\wp(x_i)\)</td>
+          <td>\(\int f(x)\,\wp(x)\,dx\)</td></tr>
+      <tr><th>Dispersão</th><td colspan="2">\(\overline{x^2}-\overline{x}^{\,2}\), nos dois casos</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Repare que \(\wp(x)\) agora tem <strong>dimensão</strong>: inverso da dimensão de \(x\),
+  para que \(\wp\,dx\) seja um número puro. Essa observação parece burocrática e não é. No
+  espaço de fase, mais adiante, a densidade terá dimensão de inverso de
+  \((\text{posição}\times\text{momento})^f\), e perguntar qual é a unidade natural dessa
+  quantidade leva diretamente à constante de Planck.</p>
+
+  <p>As ferramentas de probabilidade usadas aqui (binomial, Poisson, gaussiana, propagação de
+  erros) estão desenvolvidas em detalhe no material de
+  <a href="https://apianomorais.github.io/probabilidade-estatistica/">Probabilidade e
+  Estatística</a>. Neste curso elas aparecem como instrumento, e o foco passa agora para a
+  mecânica.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s6">6. Coordenadas generalizadas</h2>
+
+  <p>Na mecânica clássica o estado de um sistema é dado pelas posições e velocidades de suas
+  partes. Nada obriga a usar coordenadas cartesianas: para um pêndulo, o ângulo \(\theta\) com
+  a vertical basta; para um corpo rígido, convém dar as três cartesianas do centro de massa
+  mais os três ângulos de orientação; para duas partículas que interagem, as coordenadas do
+  centro de massa, a distância entre elas e os ângulos da linha que as une.</p>
+
+  <p>Chamamos de <strong>coordenadas generalizadas</strong> um conjunto
+  \(q_1,q_2,\dots,q_f\) suficiente para especificar completamente a configuração, junto com as
+  <strong>velocidades generalizadas</strong> \(\dot q_1,\dots,\dot q_f\).</p>
+
+  <div class="cartoes">
+    <div class="cartao">
+      <h3>Sistema holonômico</h3>
+      <p>Cada coordenada pode variar independentemente sem violar nenhum vínculo. O número
+      mínimo de coordenadas nessa condição é o número de <strong>graus de liberdade</strong>
+      \(f\). O pêndulo tem \(f=1\); \(N\) partículas livres no espaço têm \(f=3N\).</p>
+    </div>
+    <div class="cartao">
+      <h3>Sistema não holonômico</h3>
+      <p>Os vínculos ligam as coordenadas por relações que impedem a variação independente,
+      tipicamente envolvendo velocidades. Uma roda que rola sem deslizar é o exemplo clássico.
+      A formulação lagrangiana usual não se aplica diretamente.</p>
+    </div>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s7">7. O princípio de Hamilton</h2>
+
+  <p>Aqui a mecânica muda de forma. Em vez de perguntar que força age sobre a partícula agora,
+  pergunta-se qual é, entre todos os caminhos que levam da configuração inicial em \(t_1\) à
+  final em \(t_2\), aquele que a natureza escolhe. A resposta é o <strong>princípio de
+  Hamilton</strong>:</p>
+
+  <div class="destaque">
+    <span class="anuncio">O caminho real torna a ação estacionária</span>
+    \[\delta S = \delta\int_{t_1}^{t_2} L\,dt = 0\]
+  </div>
+
+  <p>A função \(L\), a <strong>lagrangiana</strong>, depende das coordenadas e das velocidades
+  e, em sistemas não conservativos, também explicitamente do tempo:</p>
+
+  <p>\[L=L(q_1,\dots,q_f,\dot q_1,\dots,\dot q_f,t).\]</p>
+
+  <p>Para sistemas mecânicos simples, em que as forças derivam de um potencial e as
+  velocidades são pequenas diante da luz,</p>
+
+  <p>\[L = T - V,\]</p>
+
+  <p>com \(T\) a energia cinética, soma dos \(mv^2/2\) das partes, e \(V\) a energia potencial,
+  o trabalho necessário para trazer o sistema de uma configuração padrão até a atual. Para
+  velocidades relativísticas, \(T\) é substituída por
+  \(\sum m_0c^2\left[1-\sqrt{1-v^2/c^2}\right]\).</p>
+
+  <div class="bloco alerta">
+    <span class="rotulo">Estacionário, não necessariamente mínimo</span>
+    <p>Diz-se com frequência "princípio da mínima ação", e para tempos curtos o caminho real
+    de fato minimiza. Para intervalos longos ele pode ser um ponto de sela. O que o princípio
+    exige é que a <strong>primeira variação se anule</strong>, não que a ação seja um mínimo.
+    No widget abaixo, deforme o caminho e observe: o excesso de ação cresce de forma
+    quadrática nas deformações, o que é a assinatura de \(\delta S=0\).</p>
+  </div>
+
+  <div data-widget="acao"></div>
+
+  <!-- ================================================== -->
+  <h2 id="s8">8. As equações de Euler e Lagrange</h2>
+
+  <p>Vamos extrair as equações de movimento do princípio. Como as variações não alteram os
+  instantes \(t_1\) e \(t_2\), a variação entra na integral:</p>
+
+  <p>\[\int_{t_1}^{t_2}\delta L\,dt=0,\qquad
+  \delta L=\sum_{i=1}^{f}\left(\frac{\partial L}{\partial q_i}\delta q_i
+  +\frac{\partial L}{\partial \dot q_i}\delta \dot q_i\right).\]</p>
+
+  <p>O passo decisivo é notar que variar a velocidade é o mesmo que derivar a variação da
+  posição. De \(\dot q_i+\delta\dot q_i=\frac{d}{dt}(q_i+\delta q_i)\) segue</p>
+
+  <p>\[\delta\dot q_i=\frac{d}{dt}\delta q_i.\]</p>
+
+  <p>Isso permite integrar por partes o segundo termo:</p>
+
+  <p>\[\int_{t_1}^{t_2}\frac{\partial L}{\partial\dot q_i}\frac{d}{dt}\delta q_i\,dt
+  =\underbrace{\left[\frac{\partial L}{\partial\dot q_i}\delta q_i\right]_{t_1}^{t_2}}_{=\,0}
+  -\int_{t_1}^{t_2}\frac{d}{dt}\!\left(\frac{\partial L}{\partial\dot q_i}\right)\delta q_i\,dt.\]</p>
+
+  <p>O termo de fronteira se anula porque o caminho real e o deslocado partem da mesma
+  configuração e chegam à mesma: \(\delta q_i=0\) em \(t_1\) e em \(t_2\). Restam</p>
+
+  <p>\[\int_{t_1}^{t_2}\sum_{i=1}^{f}\left(\frac{\partial L}{\partial q_i}
+  -\frac{d}{dt}\frac{\partial L}{\partial \dot q_i}\right)\delta q_i\,dt=0.\]</p>
+
+  <p>Num sistema holonômico as variações \(\delta q_i\) são arbitrárias e independentes. Uma
+  integral que se anula para <em>qualquer</em> \(\delta q_i\) só pode ter integrando nulo, e
+  cada parcela tem de anular-se separadamente:</p>
+
+  <p>\[\boxed{\;\frac{d}{dt}\frac{\partial L}{\partial \dot q_i}
+  -\frac{\partial L}{\partial q_i}=0,\qquad i=1,\dots,f.\;}\]</p>
+
+  <p>São as <strong>equações de Euler e Lagrange</strong>: \(f\) equações diferenciais de
+  segunda ordem, uma por grau de liberdade.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s9">9. De volta a Newton</h2>
+
+  <p>Vale verificar que nada de novo foi inventado. Para \(N\) partículas em coordenadas
+  cartesianas,</p>
+
+  <p>\[T=\sum_{k=1}^{N}\tfrac{1}{2}m_k\left(\dot x_k^2+\dot y_k^2+\dot z_k^2\right),
+  \qquad V=V(x_1,\dots,z_N,t),\qquad L=T-V.\]</p>
+
+  <p>Para a coordenada \(x_k\): \(\partial L/\partial\dot x_k=m_k\dot x_k\) e
+  \(\partial L/\partial x_k=-\partial V/\partial x_k\). A equação de Euler e Lagrange dá</p>
+
+  <p>\[\frac{d}{dt}\left(m_k\dot x_k\right)+\frac{\partial V}{\partial x_k}=0
+  \quad\Longrightarrow\quad
+  F_{x,k}=-\frac{\partial V}{\partial x_k}=\frac{d}{dt}\left(m_k\dot x_k\right),\]</p>
+
+  <p>que é a segunda lei de Newton. São \(3N\) equações idênticas às que já conhecíamos.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Então para que trocar de formalismo</span>
+    <p>Por três razões, e as três importam aqui. A formulação lagrangiana <strong>não depende
+    da escolha de coordenadas</strong>, o que permite usar ângulos e distâncias sem precisar
+    decompor forças. Ela liga <strong>simetrias a leis de conservação</strong> pelo teorema de
+    Noether: se \(L\) não depende de \(q_i\), o momento \(p_i\) se conserva. E, decisivamente
+    para nós, ela conduz ao <strong>hamiltoniano</strong>, que descreve o estado por posições e
+    momentos em vez de posições e velocidades. É essa troca que torna possível o espaço de
+    fase, e com ele toda a física estatística.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s10">10. Momentos generalizados e o hamiltoniano</h2>
+
+  <p>Define-se o <strong>momento generalizado</strong> conjugado a \(q_i\) por</p>
+
+  <p>\[p_i=\frac{\partial L}{\partial \dot q_i}.\]</p>
+
+  <p>Em coordenadas cartesianas isso devolve \(m_k\dot x_k\), o momento linear de sempre. Em
+  coordenadas angulares devolve o momento angular. O nome "generalizado" é literal.</p>
+
+  <p>O <strong>hamiltoniano</strong> nasce de uma transformação de Legendre que troca as
+  velocidades pelos momentos, exatamente como no Módulo 1 trocamos \(S\) por \(T\) para
+  construir \(F\):</p>
+
+  <p>\[H=\sum_{i=1}^{f}p_i\dot q_i - L.\]</p>
+
+  <p>Diferenciando e usando \(p_i=\partial L/\partial\dot q_i\), os termos em \(d\dot q_i\)
+  cancelam-se aos pares:</p>
+
+  <p>\[dH=\sum_i p_i\,d\dot q_i+\sum_i \dot q_i\,dp_i
+  -\sum_i \frac{\partial L}{\partial q_i}dq_i
+  -\underbrace{\sum_i \frac{\partial L}{\partial \dot q_i}d\dot q_i}_{=\,\sum_i p_i\,d\dot q_i}
+  -\frac{\partial L}{\partial t}dt,\]</p>
+
+  <p>\[dH=\sum_i \dot q_i\,dp_i-\sum_i \frac{\partial L}{\partial q_i}dq_i
+  -\frac{\partial L}{\partial t}dt.\]</p>
+
+  <p>As velocidades desapareceram: \(H\) é função de \(q_i\), \(p_i\) e \(t\). Comparando com
+  a diferencial geral \(dH=\sum_i\frac{\partial H}{\partial p_i}dp_i
+  +\sum_i\frac{\partial H}{\partial q_i}dq_i+\frac{\partial H}{\partial t}dt\):</p>
+
+  <p>\[\frac{\partial H}{\partial p_i}=\dot q_i,\qquad
+  \frac{\partial H}{\partial q_i}=-\frac{\partial L}{\partial q_i},\qquad
+  \frac{\partial H}{\partial t}=-\frac{\partial L}{\partial t}.\]</p>
+
+  <div class="bloco alerta">
+    <span class="rotulo">Uma nota de notação</span>
+    <p>Neste curso \(H\) é o hamiltoniano, a entalpia é \(E=U+PV\) e o campo magnético é
+    \(\mathcal{H}\). Fique atento ao consultar livros, porque boa parte deles reserva \(H\)
+    para a entalpia.</p>
+  </div>
+
+  <p>Para sistemas conservativos com coordenadas que não dependem explicitamente do tempo,
+  \(T\) é uma função quadrática homogênea das velocidades, e o teorema de Euler sobre funções
+  homogêneas dá \(\sum_i p_i\dot q_i=2T\). Nesse caso</p>
+
+  <p>\[H=2T-(T-V)=T+V=E,\]</p>
+
+  <p>e o hamiltoniano é a energia total. É o caso que nos interessa, mas vale lembrar que a
+  igualdade não é definição: é consequência de duas hipóteses.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s11">11. Equações canônicas e parênteses de Poisson</h2>
+
+  <p>Combinando a definição do momento com Euler e Lagrange,</p>
+
+  <p>\[\dot p_i=\frac{d}{dt}\frac{\partial L}{\partial \dot q_i}
+  =\frac{\partial L}{\partial q_i}=-\frac{\partial H}{\partial q_i},\]</p>
+
+  <p>o que, junto com \(\dot q_i = \partial H/\partial p_i\), fecha o sistema:</p>
+
+  <div class="destaque">
+    <span class="anuncio">Equações canônicas de Hamilton</span>
+    \[\dot q_i = \frac{\partial H}{\partial p_i},\qquad
+      \dot p_i = -\frac{\partial H}{\partial q_i}\]
+  </div>
+
+  <p>São \(2f\) equações de <em>primeira</em> ordem, no lugar de \(f\) de segunda. A troca
+  parece neutra e não é: agora o estado do sistema é um ponto único num espaço de \(2f\)
+  dimensões, e a dinâmica é um campo de velocidades nesse espaço. É a formulação que a física
+  estatística precisa.</p>
+
+  <p>Para qualquer função \(A(q,p)\) das coordenadas e momentos, a taxa de variação ao longo do
+  movimento é</p>
+
+  <p>\[\frac{dA}{dt}=\sum_i\left(\frac{\partial A}{\partial q_i}\dot q_i
+  +\frac{\partial A}{\partial p_i}\dot p_i\right)
+  =\sum_i\left(\frac{\partial A}{\partial q_i}\frac{\partial H}{\partial p_i}
+  -\frac{\partial A}{\partial p_i}\frac{\partial H}{\partial q_i}\right)\equiv\{A,H\},\]</p>
+
+  <p>onde se define o <strong>parêntese de Poisson</strong> de duas funções por</p>
+
+  <p>\[\{A,B\}=\sum_{i=1}^{f}\left(\frac{\partial A}{\partial q_i}\frac{\partial B}{\partial p_i}
+  -\frac{\partial A}{\partial p_i}\frac{\partial B}{\partial q_i}\right).\]</p>
+
+  <p>Com ele, toda a mecânica cabe numa linha: \(\dot A=\{A,H\}+\partial A/\partial t\). Em
+  particular \(\{H,H\}=0\), de modo que a energia se conserva sempre que \(H\) não depende
+  explicitamente do tempo. E qualquer grandeza cujo parêntese de Poisson com \(H\) se anule é
+  uma constante de movimento.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s12">12. Espaço de fase e ensembles</h2>
+
+  <p>Construa um espaço euclidiano de \(2f\) dimensões, com um eixo para cada coordenada
+  \(q_1,\dots,q_f\) e um para cada momento \(p_1,\dots,p_f\). Esse é o <strong>espaço de
+  fase</strong>. Um único ponto nele especifica completamente o estado mecânico do sistema
+  inteiro, e a evolução temporal é uma trajetória.</p>
+
+  <p>Gibbs propôs então olhar não para um sistema, mas para uma coleção imensa de cópias do
+  mesmo sistema, todas com a mesma estrutura e distribuídas sobre os estados possíveis. Essa
+  coleção é um <strong>ensemble</strong>, e no espaço de fase ela aparece como uma nuvem de
+  pontos representativos. A evolução do ensemble é o escoamento dessa nuvem.</p>
+
+  <p>Define-se a densidade de pontos</p>
+
+  <p>\[\rho=\rho(q_1,\dots,q_f,p_1,\dots,p_f,t),\]</p>
+
+  <p>de modo que o número de sistemas num hipervolume infinitesimal seja</p>
+
+  <p>\[\delta N=\rho\,\delta q_1\cdots\delta q_f\,\delta p_1\cdots\delta p_f.\]</p>
+
+  <p>Normalizando \(\int\!\cdots\!\int \rho\,dq_1\cdots dp_f=1\), a densidade passa a ser
+  diretamente a probabilidade por unidade de volume de encontrar, num sistema sorteado ao
+  acaso do ensemble, aquele estado.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Por que inventar um ensemble</span>
+    <p>Parece um artifício, e a motivação é honesta: <strong>não sabemos</strong> o estado
+    microscópico do gás à nossa frente, e nunca saberemos. O que sabemos são as poucas
+    grandezas macroscópicas que medimos. O ensemble é a maneira de ser explícito sobre essa
+    ignorância: em vez de inventar um microestado, consideramos todos os compatíveis com o que
+    se sabe e tomamos médias. A física estatística é, nesse sentido exato, a arte de calcular
+    com informação incompleta sem mentir sobre o quanto falta.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s13">13. O teorema de Liouville</h2>
+
+  <p>A pergunta agora é como \(\rho\) evolui. Considere um hipervolume fixo no espaço de fase
+  e conte os pontos que entram e saem. Pelas duas faces perpendiculares ao eixo \(q_1\), o
+  fluxo de entrada por unidade de tempo é \(\rho\,\dot q_1\,\delta q_2\cdots\delta p_f\) e o de
+  saída é o mesmo produto avaliado em \(q_1+\delta q_1\), isto é</p>
+
+  <p>\[\left(\rho+\frac{\partial\rho}{\partial q_1}\delta q_1\right)
+  \left(\dot q_1+\frac{\partial\dot q_1}{\partial q_1}\delta q_1\right)
+  \delta q_2\cdots\delta p_f.\]</p>
+
+  <p>Subtraindo, somando sobre os \(2f\) eixos e desprezando infinitésimos de ordem superior,</p>
+
+  <p>\[\frac{d(\delta N)}{dt}=-\sum_{i=1}^{f}\left[
+  \rho\left(\frac{\partial \dot q_i}{\partial q_i}+\frac{\partial \dot p_i}{\partial p_i}\right)
+  +\left(\frac{\partial\rho}{\partial q_i}\dot q_i+\frac{\partial\rho}{\partial p_i}\dot p_i\right)
+  \right]\delta q_1\cdots\delta p_f.\]</p>
+
+  <p>E agora entram as equações canônicas. Como \(\dot q_i=\partial H/\partial p_i\) e
+  \(\dot p_i=-\partial H/\partial q_i\),</p>
+
+  <p>\[\frac{\partial \dot q_i}{\partial q_i}=\frac{\partial^2 H}{\partial q_i\,\partial p_i},
+  \qquad
+  \frac{\partial \dot p_i}{\partial p_i}=-\frac{\partial^2 H}{\partial p_i\,\partial q_i},\]</p>
+
+  <p>e as derivadas segundas cruzadas são iguais. Logo o primeiro colchete se anula
+  identicamente:</p>
+
+  <p>\[\frac{\partial \dot q_i}{\partial q_i}+\frac{\partial \dot p_i}{\partial p_i}=0.\]</p>
+
+  <p>Este é o coração do teorema: o escoamento no espaço de fase tem <strong>divergência
+  nula</strong>. Ele é incompressível, não por hipótese sobre o sistema, mas porque as
+  equações de Hamilton têm essa estrutura. Restando apenas o segundo colchete e lembrando que
+  \(\delta N=\rho\,\delta q_1\cdots\delta p_f\),</p>
+
+  <p>\[\frac{\partial\rho}{\partial t}
+  =-\sum_{i=1}^{f}\left(\frac{\partial\rho}{\partial q_i}\dot q_i
+  +\frac{\partial\rho}{\partial p_i}\dot p_i\right)
+  =-\{\rho,H\}.\]</p>
+
+  <p>Mas a derivada total de \(\rho\) ao longo de uma trajetória é exatamente</p>
+
+  <p>\[\frac{d\rho}{dt}=\frac{\partial\rho}{\partial t}
+  +\sum_i\left(\frac{\partial\rho}{\partial q_i}\dot q_i
+  +\frac{\partial\rho}{\partial p_i}\dot p_i\right),\]</p>
+
+  <p>e os dois últimos termos cancelam o primeiro. Portanto:</p>
+
+  <div class="destaque">
+    <span class="anuncio">Teorema de Liouville</span>
+    \[\frac{d\rho}{dt}=0
+    \qquad\text{ou, de forma equivalente,}\qquad
+    \frac{\partial\rho}{\partial t}+\{\rho,H\}=0\]
+  </div>
+
+  <p>Um observador que viaje junto com um ponto representativo vê a densidade à sua volta
+  sempre a mesma. A nuvem se deforma, estica, enrola, mas não se comprime nem se rarefaz. O
+  widget abaixo mede a área da mancha enquanto ela escoa.</p>
+
+  <div data-widget="liouville"></div>
+
+  <div class="bloco alerta">
+    <span class="rotulo">O que o teorema garante e o que não garante</span>
+    <p><strong>Garante:</strong> o volume de fase é conservado pela dinâmica hamiltoniana, e
+    portanto qualquer \(\rho\) que seja função apenas de constantes de movimento (a energia,
+    tipicamente) satisfaz \(\partial\rho/\partial t=0\) e descreve um ensemble em
+    <strong>equilíbrio estatístico</strong>. É isso que dá consistência aos ensembles da
+    próxima seção.</p>
+    <p><strong>Não garante:</strong> que o sistema tenda ao equilíbrio. Liouville é reversível
+    no tempo e conserva a informação; ele não produz entropia. No pêndulo do widget,
+    experimente uma mancha grande o bastante para cruzar a separatriz: ela se estica em
+    filamentos cada vez mais finos que acabam se espalhando por toda a região acessível, com a
+    <em>área</em> intacta. O equilíbrio macroscópico surge quando esses filamentos ficam finos
+    demais para qualquer medida, não quando a área encolhe. A seta do tempo não está aqui: é
+    um problema em aberto que atravessa a física estatística desde Boltzmann.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s14">14. Os ensembles de equilíbrio</h2>
+
+  <p>Qualquer \(\rho\) que dependa das coordenadas e momentos apenas através de constantes de
+  movimento está em equilíbrio estatístico. Quatro escolhas se destacam.</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>Ensemble</th><th>Densidade</th><th>O que representa</th></tr></thead>
+    <tbody>
+      <tr><td><b>Uniforme</b></td><td>\(\rho=\) constante em todo o espaço acessível</td>
+          <td>nenhuma região privilegiada; os pontos não se aglomeram em parte alguma</td></tr>
+      <tr><td><b>Microcanônico</b></td>
+          <td>\(\rho=\) constante para \(E\le H\le E+\delta E\), e zero fora</td>
+          <td>sistema isolado, com energia conhecida dentro de uma faixa estreita</td></tr>
+      <tr><td><b>De superfície</b></td>
+          <td>\(\sigma=\dfrac{\text{constante}}{|\nabla E|}=\dfrac{\text{constante}}{v_p}\)</td>
+          <td>o limite \(\delta E\to 0\): todos os sistemas com exatamente a mesma energia</td></tr>
+      <tr><td><b>Canônico</b></td><td>\(\rho=N\,e^{(\psi-E)/\theta}\)</td>
+          <td>sistema em contato com um reservatório à temperatura fixa</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>No ensemble de superfície a densidade não é uniforme sobre a superfície de energia, e a
+  razão é geométrica: onde a superfície \(H=E\) está mais "apertada", isto é, onde o gradiente
+  \(|\nabla E|\) é grande, os pontos atravessam depressa e se acumulam menos. O fator
+  \(1/v_p\), com \(v_p\) a velocidade dos pontos representativos no espaço de fase, corrige
+  exatamente isso.</p>
+
+  <p>No ensemble canônico, \(\psi\) e \(\theta\) são constantes, e não independentes:
+  integrando \(\rho\) sobre todo o espaço de fase e exigindo que o total seja \(N\),</p>
+
+  <p>\[e^{-\psi/\theta}=\int\!\cdots\!\int e^{-E/\theta}\,dq_1\cdots dp_f.\]</p>
+
+  <p>Guarde esta integral. No Módulo 5 ela se chamará <strong>função de partição</strong>,
+  \(\theta\) será identificado com \(\kB T\) e \(\psi\) com a energia livre de Helmholtz
+  \(F\). Tudo o que precisaremos fazer é levar a sério o que já está escrito aqui.</p>
+
+  <p>Note ainda por que o canônico concentra a probabilidade perto da energia média, apesar do
+  peso \(e^{-E/\theta}\) decrescer sempre. Em sistemas com muitos graus de liberdade, o
+  <em>volume</em> de espaço de fase disponível cresce violentamente com a energia. O produto
+  de um volume que explode por um peso que decai tem um pico estreitíssimo, e é ele que define
+  a energia observada.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s15">15. Equiprobabilidade e ergodicidade</h2>
+
+  <p>Falta um ingrediente que nenhuma dedução fornece, e que precisa ser postulado.</p>
+
+  <div class="bloco def">
+    <span class="rotulo">Hipótese de igual probabilidade a priori</span>
+    <p>Regiões de mesmo volume no espaço de fase, compatíveis com o que se sabe do sistema,
+    são igualmente prováveis. Escrevendo as extensões em fase das regiões \(R_1, R_2,\dots\)
+    como</p>
+    <p>\[v_k=\int_{R_k}\!\cdots\!\int dq_1\cdots dq_f\,dp_1\cdots dp_f,\]</p>
+    <p>a hipótese diz que a probabilidade atribuída a \(R_k\) é proporcional a \(v_k\).</p>
+  </div>
+
+  <p>Repare que a escolha não é arbitrária: é a <em>única</em> compatível com o teorema de
+  Liouville. Se os pontos começarem uniformemente distribuídos sobre a superfície de energia,
+  continuarão assim para sempre, porque o escoamento não comprime nada. Qualquer outra
+  distribuição mudaria com o tempo e não descreveria equilíbrio.</p>
+
+  <p>A <strong>hipótese ergódica</strong> vai adiante e afirma que, ao longo de tempos longos,
+  o tempo que um sistema passa numa região do espaço de fase de mesma energia é proporcional
+  ao volume dessa região. Sua consequência prática é a identidade de que todo o curso depende:</p>
+
+  <div class="destaque">
+    <span class="anuncio">Média temporal = média de ensemble</span>
+    O que um único sistema faz ao longo do tempo é o que a coleção inteira de sistemas faz num
+    único instante. É isso que permite comparar uma conta feita sobre um ensemble imaginário
+    com a medida feita num laboratório real.
+  </div>
+
+  <div class="bloco alerta">
+    <span class="rotulo">Hipótese, não teorema</span>
+    <p>Liouville não implica ergodicidade. Ele garante que uma distribuição uniforme
+    permanece uniforme; não garante que uma trajetória única visite toda a superfície de
+    energia. Sistemas integráveis são o contraexemplo imediato: o oscilador harmônico do
+    widget tem trajetórias que são elipses fechadas, e uma só delas jamais cobre a região
+    acessível. Provar ergodicidade para sistemas realistas é matematicamente muito difícil, e
+    para a grande maioria ela continua sendo uma hipótese de trabalho bem sucedida, e não um
+    resultado demonstrado.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s16">16. Exercícios resolvidos</h2>
+
+  <div class="bloco ex">
+    <span class="rotulo">Exercício resolvido 2.1: a dispersão da soma de dois dados</span>
+    <p><b>Calcule \(\overline{x}\) e \(\overline{(\Delta x)^2}\) para a soma de dois dados
+    honestos, usando a tabela da seção 2, e confirme pelo caminho mais curto.</b></p>
+    <details class="solucao"><summary>Ver solução</summary>
+    <div class="corpo-solucao">
+    <p><b>Caminho direto.</b> Com \(\wp(x)=(6-|x-7|)/36\),</p>
+    <p>\[\overline{x}=\sum_{x=2}^{12}x\,\wp(x)
+    =\frac{2\cdot 1+3\cdot 2+4\cdot 3+5\cdot 4+6\cdot 5+7\cdot 6+8\cdot 5+9\cdot 4
+    +10\cdot 3+11\cdot 2+12\cdot 1}{36}=\frac{252}{36}=7.\]</p>
+    <p>Para o segundo momento, \(\overline{x^2}=\sum x^2\wp(x)=1974/36=54{,}8\overline{3}\),
+    logo</p>
+    <p>\[\overline{(\Delta x)^2}=\overline{x^2}-\overline{x}^{\,2}
+    =\frac{1974}{36}-49=\frac{1974-1764}{36}=\frac{210}{36}=\frac{35}{6}\approx 5{,}833.\]</p>
+    <p>E \(\sigma=\sqrt{35/6}\approx 2{,}415\).</p>
+
+    <p><b>Caminho curto.</b> A soma é \(x=d_1+d_2\) com os dados independentes. Para um dado
+    só, \(\overline{d}=3{,}5\) e \(\overline{d^2}=(1+4+9+16+25+36)/6=91/6\), de modo que
+    \(\sigma_d^2=91/6-49/4=35/12\). Como médias somam sempre e dispersões somam quando há
+    independência,</p>
+    <p>\[\overline{x}=2\times 3{,}5=7,\qquad
+    \sigma_x^2=2\times\frac{35}{12}=\frac{35}{6}.\]</p>
+    <p>Os mesmos números, com muito menos trabalho. É a primeira aparição de um padrão que se
+    repetirá: a grandeza extensiva de um sistema composto se obtém somando as dos
+    componentes, desde que eles sejam estatisticamente independentes.</p>
+    </div></details>
+  </div>
+
+  <div class="bloco ex">
+    <span class="rotulo">Exercício resolvido 2.2: o pêndulo pelo caminho lagrangiano</span>
+    <p><b>Obtenha a equação de movimento de um pêndulo simples de massa \(m\) e comprimento
+    \(\ell\), e em seguida seu hamiltoniano e as equações canônicas.</b></p>
+    <details class="solucao"><summary>Ver solução</summary>
+    <div class="corpo-solucao">
+    <p><b>Coordenada.</b> O vínculo é o fio inextensível, que é holonômico, e sobra um grau de
+    liberdade: o ângulo \(\theta\) com a vertical.</p>
+    <p><b>Lagrangiana.</b> A velocidade da massa é \(\ell\dot\theta\) e a altura em relação ao
+    ponto mais baixo é \(\ell(1-\cos\theta)\):</p>
+    <p>\[T=\tfrac{1}{2}m\ell^2\dot\theta^2,\qquad V=mg\ell(1-\cos\theta),\qquad
+    L=\tfrac{1}{2}m\ell^2\dot\theta^2-mg\ell(1-\cos\theta).\]</p>
+    <p><b>Equação de movimento.</b> Com
+    \(\partial L/\partial\dot\theta=m\ell^2\dot\theta\) e
+    \(\partial L/\partial\theta=-mg\ell\sen\theta\):</p>
+    <p>\[\frac{d}{dt}\left(m\ell^2\dot\theta\right)+mg\ell\sen\theta=0
+    \quad\Longrightarrow\quad \ddot\theta+\frac{g}{\ell}\sen\theta=0.\]</p>
+    <p>Nenhuma força de tração precisou ser escrita: ela é uma força de vínculo, e o
+    formalismo a elimina sozinho. Era esse o ganho prometido na seção 9.</p>
+    <p><b>Hamiltoniano.</b> O momento conjugado é
+    \(p_\theta=\partial L/\partial\dot\theta=m\ell^2\dot\theta\), um momento angular. Logo
+    \(\dot\theta=p_\theta/(m\ell^2)\) e</p>
+    <p>\[H=p_\theta\dot\theta-L=\frac{p_\theta^2}{2m\ell^2}+mg\ell(1-\cos\theta).\]</p>
+    <p>Como era de esperar, \(H=T+V\): as coordenadas não dependem do tempo e \(T\) é
+    quadrática nas velocidades.</p>
+    <p><b>Equações canônicas.</b></p>
+    <p>\[\dot\theta=\frac{\partial H}{\partial p_\theta}=\frac{p_\theta}{m\ell^2},
+    \qquad
+    \dot p_\theta=-\frac{\partial H}{\partial \theta}=-mg\ell\sen\theta.\]</p>
+    <p>Duas equações de primeira ordem no lugar de uma de segunda. Eliminando \(p_\theta\)
+    recupera-se \(\ddot\theta+(g/\ell)\sen\theta=0\), mas a forma canônica é a que se desenha
+    no espaço de fase: escolha "Pêndulo" no widget da seção 13 e são exatamente estas as
+    curvas de nível e as trajetórias mostradas.</p>
+    </div></details>
+  </div>
+
+  <div class="bloco ex">
+    <span class="rotulo">Exercício resolvido 2.3: a área de fase do oscilador harmônico</span>
+    <p><b>Mostre que a trajetória do oscilador harmônico no espaço de fase é uma elipse e que
+    a área que ela encerra é \(E/\nu\), com \(\nu\) a frequência.</b></p>
+    <details class="solucao"><summary>Ver solução</summary>
+    <div class="corpo-solucao">
+    <p>O hamiltoniano é</p>
+    <p>\[H=\frac{p^2}{2m}+\frac{1}{2}m\omega^2q^2=E.\]</p>
+    <p>Dividindo por \(E\), a curva de energia constante fica</p>
+    <p>\[\frac{q^2}{\left(\sqrt{2E/m\omega^2}\right)^2}
+    +\frac{p^2}{\left(\sqrt{2mE}\right)^2}=1,\]</p>
+    <p>uma elipse de semieixos \(a=\sqrt{2E/(m\omega^2)}\) e \(b=\sqrt{2mE}\). Sua área é</p>
+    <p>\[A=\pi a b=\pi\sqrt{\frac{2E}{m\omega^2}}\sqrt{2mE}
+    =\frac{2\pi E}{\omega}=\frac{E}{\nu},\]</p>
+    <p>com \(\omega=2\pi\nu\).</p>
+    <p><b>Por que isto importa.</b> A área de fase tem dimensão de energia dividida por
+    frequência, que é dimensão de <strong>ação</strong>, a mesma de \(\hbar\). Planck, ao
+    quantizar o oscilador, escreveu \(E=nh\nu\), o que pelo resultado acima significa que a
+    área de fase permitida é \(A=nh\): <em>cada estado quântico ocupa uma célula de área
+    \(h\) no espaço de fase</em>.</p>
+    <p>É assim que a constante de Planck entra na contagem de microestados, e é por isso que
+    todas as integrais de fase do curso virão divididas por \(h^f\). Sem esse fator não há como
+    contar estados, apenas medir volumes, e a entropia ficaria indeterminada por uma
+    constante: exatamente a constante \(K\) que ficou pendente no fim do Módulo 1.</p>
+    </div></details>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s17">17. Exercícios propostos</h2>
+
+  <div class="bloco def">
+    <span class="rotulo">Para resolver</span>
+    <ol>
+      <li><b>2.1</b> Um dado honesto de seis faces é lançado. Calcule \(\overline{x}\),
+      \(\overline{x^2}\) e \(\sigma\). Em seguida calcule \(\overline{1/x}\) e verifique
+      explicitamente que \(\overline{1/x}\ne 1/\overline{x}\).</li>
+
+      <li><b>2.2</b> Demonstre que \(\overline{(\Delta x)^2}=\overline{x^2}-\overline{x}^{\,2}\)
+      partindo da definição, e use o resultado para mostrar que
+      \(\overline{x^2}\ge\overline{x}^{\,2}\) sempre, com igualdade apenas se \(x\) for
+      constante.</li>
+
+      <li><b>2.3</b> Escreva a lagrangiana de uma partícula de massa \(m\) em coordenadas
+      polares planas \((r,\varphi)\) sob um potencial central \(V(r)\). Mostre que
+      \(p_\varphi\) é constante e identifique essa conservação com a segunda lei de Kepler.</li>
+
+      <li><b>2.4</b> Para o oscilador harmônico, verifique por cálculo direto que
+      \(\{q,p\}=1\) e que \(\{H,H\}=0\). Em seguida mostre que a quantidade
+      \(A=p\cos\omega t - m\omega q\sen\omega t\) é constante de movimento, calculando
+      \(\{A,H\}+\partial A/\partial t\).</li>
+
+      <li><b>2.5</b> Uma mancha retangular de lados \(\delta q\) e \(\delta p\) é solta no
+      espaço de fase de uma partícula livre (\(H=p^2/2m\)). Mostre analiticamente que após um
+      tempo \(t\) ela vira um paralelogramo de mesma área, e explique o cisalhamento em
+      palavras. Confirme no widget da seção 13 escolhendo "Queda livre".</li>
+
+      <li><b>2.6</b> No widget da seção 13, escolha o pêndulo e aumente o lado da mancha até
+      que ela cruze a separatriz. Descreva o que acontece com a forma e com a área, e explique
+      por que isso ilustra a diferença entre equilíbrio macroscópico e conservação do volume de
+      fase.</li>
+
+      <li><b>2.7</b> Um sistema tem \(f=2\) e hamiltoniano
+      \(H=\frac{p_1^2+p_2^2}{2m}+\frac{1}{2}m\omega^2(q_1^2+q_2^2)\). Calcule o volume de fase
+      contido na superfície \(H\le E\) e mostre que ele cresce como \(E^2\). Generalize para
+      \(f\) osciladores e comente por que esse crescimento violento é o que faz o ensemble
+      canônico ter um pico estreito.</li>
+    </ol>
+  </div>
+
+  <nav class="nav-aulas">
+    <a href="aula01.html"><small>Módulo anterior</small>← 1. Revisão de termodinâmica</a>
+    <span class="em-breve"><small>Em preparação</small>3. Caminhante aleatório</span>
+  </nav>
+
+</main>
+</div>
+
+<footer class="rodape">
+  <img class="logo-rodape" src="assets/img/logo-lfca.png" alt="LFCA | URCA">
+  <p><strong>Prof. Apiano Morais</strong> · <a href="mailto:apiano.morais@urca.br">apiano.morais@urca.br</a><br>
+  Laboratório de Física Computacional Aplicada (LFCA) · Universidade Regional do Cariri</p>
+</footer>
+
+<script src="assets/js/widgets.js?v=202611071645"></script>
+</body>
+</html>
