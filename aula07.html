@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Módulo 7: Gases clássicos | Física Estatística</title>
 <link rel="icon" type="image/png" href="assets/img/favicon.png">
-<link rel="stylesheet" href="assets/css/estilo.css?v=202611071747">
-<script src="assets/js/comum.js?v=202611071747"></script>
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611071806">
+<script src="assets/js/comum.js?v=202611071806"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
 <body>
@@ -117,11 +117,11 @@
   trivial, \(Z^{\rm conf}_N=V^N\), devolvendo o gás ideal. Com interação, supondo que ela
   seja soma de termos de pares,</p>
 
-  <p>\[U=\sum_{i<j}^{N}u(r_{ij}),\qquad r_{ij}=|\vec r_i-\vec r_j|,\]</p>
+  <p>\[U=\sum_{i&lt;j}^{N}u(r_{ij}),\qquad r_{ij}=|\vec r_i-\vec r_j|,\]</p>
 
   <p>a exponencial vira um produto sobre os \(N(N-1)/2\) pares:</p>
 
-  <p>\[Z^{\rm conf}_N=\int\prod_{i<j}e^{-\beta u(r_{ij})}\,d^{3N}r.\]</p>
+  <p>\[Z^{\rm conf}_N=\int\prod_{i&lt;j}e^{-\beta u(r_{ij})}\,d^{3N}r.\]</p>
 
   <!-- ================================================== -->
   <h2 id="s3">3. A função de Mayer</h2>
@@ -143,7 +143,7 @@
 
   <p>Com ela,</p>
 
-  <p>\[Z^{\rm conf}_N=\int\prod_{i<j}\left[1+\Phi(r_{ij})\right]d^{3N}r.\]</p>
+  <p>\[Z^{\rm conf}_N=\int\prod_{i&lt;j}\left[1+\Phi(r_{ij})\right]d^{3N}r.\]</p>
 
   <div data-widget="virial"></div>
 
@@ -152,8 +152,8 @@
 
   <p>Agora o produto se expande em potências de \(\Phi\):</p>
 
-  <p>\[\prod_{i<j}\left[1+\Phi_{ij}\right]
-  =1+\sum_{i<j}\Phi_{ij}+\sum_{\text{pares de pares}}\Phi_{ij}\Phi_{k\ell}+\dots\]</p>
+  <p>\[\prod_{i&lt;j}\left[1+\Phi_{ij}\right]
+  =1+\sum_{i&lt;j}\Phi_{ij}+\sum_{\text{pares de pares}}\Phi_{ij}\Phi_{k\ell}+\dots\]</p>
 
   <p>Cada termo corresponde a um conjunto de moléculas que interagem entre si, um
   <strong>aglomerado</strong>, e é daí que vem o nome <em>expansão em aglomerados</em>. O
@@ -210,7 +210,7 @@
   <table>
     <thead><tr><th>Região</th><th>\(u(r)\)</th><th>\(\Phi(r)\)</th><th>Contribuição a \(B_2\)</th></tr></thead>
     <tbody>
-      <tr><td>\(r<d\)</td><td>\(+\infty\)</td><td>\(-1\) exatamente</td>
+      <tr><td>\(r&lt;d\)</td><td>\(+\infty\)</td><td>\(-1\) exatamente</td>
           <td>\(+\dfrac{2\pi}{3}d^3\equiv b\), positiva e sem \(T\)</td></tr>
       <tr><td>\(r>d\)</td><td>pequena e negativa</td>
           <td>\(\approx-\beta u(r)\)</td>
@@ -381,9 +381,29 @@
     \(\epsilon/\kB\). Com os parâmetros tabelados, isso prevê 325 K para o nitrogênio contra
     327 K medidos, e 409 K para o argônio contra 410 K. O acordo é excelente.</p>
     <p>Lennard-Jones acerta onde van der Waals erra porque não trunca o potencial em caroço
-    duro mais atração fraca: ele tem a repulsão suave e a atração \(1/r^6\) corretas. A moral
-    é que \(B_2\) é sensível à <strong>forma</strong> do potencial, e medi-lo
-    experimentalmente é, na prática, uma maneira de sondar \(u(r)\).</p>
+    duro mais atração fraca. Convém, porém, separar o que nele é deduzido do que é
+    conveniência de cálculo.</p>
+    <p>A cauda atrativa \(1/r^6\) é deduzida. Ela é a <strong>força de dispersão de
+    London</strong>: duas moléculas neutras e sem dipolo permanente ainda assim se atraem,
+    porque a flutuação quântica da nuvem eletrônica de uma induz um dipolo na outra, e o
+    acoplamento dipolo-dipolo tratado em segunda ordem de perturbação dá exatamente
+    \(-C_6/r^6\). O resultado é de 1930 (F. London, <em>Zur Theorie und Systematik der
+    Molekularkräfte</em>, Zeitschrift für Physik <b>63</b>, 245, com a dedução feita no artigo
+    anterior de Eisenschitz e London, Z. Phys. <b>60</b>, 491).</p>
+    <p>Já o expoente 12 não é deduzido de nada. A repulsão verdadeira vem da superposição das
+    nuvens eletrônicas sob o princípio de exclusão e decai <em>exponencialmente</em>, não como
+    potência: é a forma de Born e Mayer, de 1932. O 12 foi adotado porque é o quadrado do 6 e
+    sai praticamente de graça no cálculo. O que ele acerta, e que importa aqui, é apenas ser
+    <strong>suave</strong>: o caroço duro faz o potencial saltar para infinito numa distância
+    fixa, ao passo que a repulsão real é penetrável, e um pouco mais a cada colisão mais
+    energética. É essa penetrabilidade que falta ao modelo da seção 6, e é por isso que ele
+    erra \(T_B\) por 20%.</p>
+    <p>A moral é que \(B_2\) é sensível à <strong>forma</strong> do potencial, e medi-lo
+    experimentalmente é, na prática, uma maneira de sondar \(u(r)\). Isso não é uma leitura
+    posterior: o artigo em que o potencial foi proposto se chama <em>On the determination of
+    molecular fields. II. From the equation of state of a gas</em> (Proc. R. Soc. A
+    <b>106</b>, 463, 1924), e faz exatamente isso, extrair \(u(r)\) a partir da equação de
+    estado medida.</p>
   </div>
 
   <!-- ================================================== -->
@@ -437,8 +457,16 @@
 
   <p>\[E\approx pc.\]</p>
 
-  <p>É o caso de fótons, de neutrinos e de elétrons em estrelas muito densas. Refaça a função
-  de partição com essa energia:</p>
+  <p>É o caso de fótons, de neutrinos e de elétrons em estrelas muito densas.</p>
+
+  <p>Antes da conta, vale olhar o espaço de fase, porque é lá que o resultado fica evidente.
+  A camada esférica \(4\pi p^2dp\), que conta quantos estados existem com momento de módulo
+  entre \(p\) e \(p+dp\), é pura geometria e não muda. O que muda é o peso de Boltzmann que a
+  multiplica, porque muda a relação entre energia e momento:</p>
+
+  <div data-widget="relativistico"></div>
+
+  <p>Refaça então a função de partição com essa energia:</p>
 
   <p>\[Z_1=\frac{4\pi V}{h^3}\int_0^{\infty}e^{-\beta pc}p^2\,dp
   =\frac{4\pi V}{h^3}\cdot\frac{2}{(\beta c)^3}
@@ -551,7 +579,7 @@
     <span class="rotulo">Para resolver</span>
     <ol>
       <li><b>7.1</b> Calcule \(B_2(T)\) exatamente para o potencial de poço quadrado:
-      \(u=\infty\) para \(r<d\), \(u=-\epsilon\) para \(d<r<\lambda d\), e \(u=0\) além
+      \(u=\infty\) para \(r&lt;d\), \(u=-\epsilon\) para \(d&lt;r<\lambda d\), e \(u=0\) além
       disso. Mostre que \(T_B=\epsilon/\left[\kB\ln\frac{\lambda^3}{\lambda^3-1}\right]\) e
       confirme no widget da seção 3.</li>
 
@@ -598,6 +626,6 @@
   Laboratório de Física Computacional Aplicada (LFCA) · Universidade Regional do Cariri</p>
 </footer>
 
-<script src="assets/js/widgets.js?v=202611071747"></script>
+<script src="assets/js/widgets.js?v=202611071806"></script>
 </body>
 </html>

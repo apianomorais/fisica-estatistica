@@ -64,7 +64,15 @@ for p in paginas:
         erros.append('%s: caractere de controle 0x%02x no arquivo '
                      '(provável \\f ou \\b do LaTeX corrompido)' % (p, ord(ch)))
 
-    # 9. tags equilibradas nos contêineres principais
+    # 9. nenhum "<" seguido de letra dentro de matemática: o navegador o lê
+    #    como abertura de tag e come a equação até o próximo ">"
+    for mat in re.finditer(r'\\\((.*?)\\\)|\\\[(.*?)\\\]', t, re.S):
+        trecho = mat.group(1) or mat.group(2) or ''
+        if re.search(r'<(?=[A-Za-z/])', trecho):
+            erros.append('%s: "<" cru antes de letra em "%s" '
+                         '(escreva &lt;)' % (p, trecho.replace('\n', ' ')[:60]))
+
+    # 10. tags equilibradas nos contêineres principais
     for tag in ('div', 'main', 'section', 'details', 'table'):
         a = len(re.findall(r'<%s[\s>]' % tag, t))
         b = len(re.findall(r'</%s>' % tag, t))

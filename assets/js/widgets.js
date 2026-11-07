@@ -4195,6 +4195,1199 @@
     tipografar(corpo);
   };
 
+  /* =================================================================
+     22b. O gás relativístico no espaço de fase
+     A camada esférica 4πp²dp é a mesma nos dois casos: o espaço de fase
+     não sabe de relatividade. O que muda é o peso de Boltzmann, porque
+     muda como a energia depende do momento. Daí sai o 3/2 virando 3.
+     ================================================================= */
+  REGISTRO.relativistico = function (raiz) {
+    var corpo = moldura(raiz, 'Espaço de fase: por que a energia dobra');
+
+    var est = { logth: -2, vista: 'disp' };
+
+    var ctr0 = el('div', { class: 'controles' });
+    corpo.appendChild(ctr0);
+    opcoes(ctr0, [
+      { rot: 'Energia contra momento', v: 'disp' },
+      { rot: 'Camada no espaço dos momentos', v: 'mom' },
+      { rot: 'Distribuição de energia', v: 'ene' }
+    ], 0, function (v) { est.vista = v; desenhar(); });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'temperatura k<sub>B</sub>T/mc²', -3, 2, 0.05, -2,
+      function (v) { est.logth = v; desenhar(); },
+      function (v) { return F.fmt(Math.pow(10, v), 4); });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'k<sub>B</sub>T/mc²', k: 'th' },
+      { rot: '⟨ε⟩/k<sub>B</sub>T', k: 'me' },
+      { rot: 'c/k<sub>B</sub>', k: 'cv' },
+      { rot: 'γ efetivo', k: 'ga' },
+      { rot: 'T para elétrons', k: 'te' },
+      { rot: 'T para prótons', k: 'tp' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    /* as temperaturas aqui varrem seis ordens de grandeza: sempre em potências de dez */
+    function expo(x) {
+      var e = x.toExponential(2).split('e');
+      return e[0].replace('.', ',') + '×10<sup>' + Number(e[1]) + '</sup>';
+    }
+
+    /* tudo em unidades de mc² e mc: x = p/mc, e(x) = energia cinética/mc² */
+    function ecin(x) { return Math.sqrt(1 + x * x) - 1; }
+
+    /* O integrando x²e^{-e(x)/θ} é estreito para θ pequeno (largura ~√θ) e
+       largo para θ grande (largura ~θ). O limite superior acompanha os dois. */
+    function topo(th) { return 8 * Math.sqrt(th) + 40 * th; }
+
+    function momentos(th) {
+      var T = topo(th);
+      var w = function (x) {
+        var y = ecin(x) / th;
+        return y > 700 ? 0 : x * x * Math.exp(-y);
+      };
+      var den = F.simpson(w, 0, T, 3000);
+      var num = F.simpson(function (x) { return ecin(x) * w(x); }, 0, T, 3000);
+      return den > 0 ? num / den / th : 1.5;
+    }
+
+    function desenhar() {
+      var th = Math.pow(10, est.logth);
+      var med = momentos(th);
+      var h = th * 1e-3;
+      var cv1 = ((th + h) * momentos(th + h) - (th - h) * momentos(th - h)) / (2 * h);
+      /* γ = (c + kB)/c para um gás ideal com esse calor específico */
+      var gama = (cv1 + 1) / cv1;
+      /* momento típico: onde x²e^{-e/θ} é máximo */
+      var xpico = F.bissecao(function (x) {
+        return 2 / x - (x / Math.sqrt(1 + x * x)) / th;
+      }, 1e-6, 1e4, 1e-12) || Math.sqrt(2 * th);
+
+      if (est.vista === 'disp') {
+        var xm = Math.max(3, 4 * xpico);
+        var ax = G.eixos(cv, {
+          xmin: 0, xmax: xm, ymin: 0, ymax: Math.max(2, ecin(xm)) * 1.05, altura: 300,
+          rotX: 'momento p/mc', rotY: 'energia cinética ε/mc²',
+          marcasX: G.marcasLineares(0, xm, 6, 1),
+          formataY: function (v) { return F.fmt(v, 1); }
+        });
+        G.curva(ax, function (x) { return x * x / 2; }, G.COR.azul, 2, [6, 4]);
+        G.curva(ax, function (x) { return x; }, G.COR.ambar, 2, [6, 4]);
+        G.curva(ax, ecin, G.COR.vinho, 2.8);
+        G.vertical(ax, xpico, G.COR.verde, 'p típico', true);
+        G.legenda(ax, [
+          { cor: G.COR.vinho, texto: 'exata: √(p²c²+m²c⁴) − mc²' },
+          { cor: G.COR.azul, texto: 'não relativística: p²/2m' },
+          { cor: G.COR.ambar, texto: 'ultrarrelativística: pc' }
+        ]);
+      } else if (est.vista === 'mom') {
+        var xm2 = Math.max(4 * xpico, 1e-3);
+        var w = function (x) {
+          var y = ecin(x) / th;
+          return y > 700 ? 0 : x * x * Math.exp(-y);
+        };
+        var norm = F.simpson(w, 0, topo(th), 3000);
+        /* os dois limites, com a mesma normalização, para ver de qual
+           dos dois a curva exata está perto nesta temperatura */
+        var wnr = function (x) {
+          var y = x * x / (2 * th);
+          return y > 700 ? 0 : x * x * Math.exp(-y);
+        };
+        var wur = function (x) {
+          var y = x / th;
+          return y > 700 ? 0 : x * x * Math.exp(-y);
+        };
+        var nnr = F.simpson(wnr, 0, topo(th), 3000);
+        var nur = F.simpson(wur, 0, topo(th) + 40 * th, 3000);
+        /* a escala vertical tem de caber as três curvas */
+        var alto = 0;
+        for (var q = 0; q <= 300; q++) {
+          var xq = xm2 * q / 300;
+          alto = Math.max(alto, w(xq) / norm, wnr(xq) / nnr, wur(xq) / nur);
+        }
+        var ax2 = G.eixos(cv, {
+          xmin: 0, xmax: xm2, ymin: 0, ymax: 1.15 * alto, altura: 300,
+          rotX: 'momento p/mc',
+          rotY: 'partículas por intervalo de momento',
+          marcasX: G.marcasLineares(0, xm2, 6, xm2 < 1 ? 2 : 1),
+          formataY: function () { return ''; }
+        });
+        /* a camada esférica sozinha, sem o peso de Boltzmann */
+        var esc = 0.96 * 1.15 * alto / (xm2 * xm2);
+        G.curva(ax2, function (x) { return esc * x * x; }, G.COR.suave, 1.4, [3, 3]);
+        G.area(ax2, function (x) { return w(x) / norm; }, 0, xm2, 'rgba(140,47,57,.16)');
+        /* a exata por baixo e grossa, os limites tracejados por cima: assim
+           o que coincide aparece como tracejado montado sobre a curva cheia */
+        G.curva(ax2, function (x) { return w(x) / norm; }, G.COR.vinho, 3.4);
+        G.curva(ax2, function (x) { return wnr(x) / nnr; }, G.COR.azul, 1.8, [6, 4]);
+        G.curva(ax2, function (x) { return wur(x) / nur; }, G.COR.ambar, 1.8, [6, 4]);
+        G.vertical(ax2, xpico, G.COR.verde, 'p típico', true);
+        G.legenda(ax2, [
+          { cor: G.COR.suave, texto: 'camada 4πp²dp: só geometria' },
+          { cor: G.COR.vinho, texto: 'camada × peso exato' },
+          { cor: G.COR.azul, texto: 'peso não relativístico' },
+          { cor: G.COR.ambar, texto: 'peso ultrarrelativístico' }
+        ]);
+      } else {
+        var ax3 = G.eixos(cv, {
+          xmin: 0, xmax: 10, ymin: 0, ymax: 0.62, altura: 300,
+          rotX: 'energia ε/k\u2088T', rotY: 'densidade de probabilidade',
+          marcasX: G.marcasLineares(0, 10, 10, 0),
+          formataY: function () { return ''; }
+        });
+        /* √π/2 e 2 são as normalizações de Γ(3/2) e Γ(3) */
+        var fnr = function (u) {
+          return u <= 0 ? 0 : 2 / Math.sqrt(Math.PI) * Math.sqrt(u) * Math.exp(-u);
+        };
+        var fur = function (u) {
+          return u <= 0 ? 0 : 0.5 * u * u * Math.exp(-u);
+        };
+        G.area(ax3, fnr, 0, 10, 'rgba(44,95,141,.16)');
+        G.area(ax3, fur, 0, 10, 'rgba(181,131,31,.16)');
+        G.curva(ax3, fnr, G.COR.azul, 2.8);
+        G.curva(ax3, fur, G.COR.ambar, 2.8);
+        G.vertical(ax3, 1.5, G.COR.azul, '3/2', true);
+        G.vertical(ax3, 3, G.COR.ambar, '3', true);
+        G.legenda(ax3, [
+          { cor: G.COR.azul, texto: 'não relativístico: g(ε) ∝ √ε' },
+          { cor: G.COR.ambar, texto: 'ultrarrelativístico: g(ε) ∝ ε²' }
+        ]);
+      }
+
+      mostrar({
+        th: F.fmt(th, 4),
+        me: F.fmt(med, 3),
+        cv: F.fmt(cv1, 3),
+        ga: F.fmt(gama, 3),
+        te: expo(th * 5.9299e9) + ' K',
+        tp: expo(th * 1.0889e13) + ' K'
+      });
+
+      nota.innerHTML = est.vista === 'disp'
+        ? '<p>A curva exata encosta na parábola quando \\(p\\ll mc\\) e na reta quando '
+          + '\\(p\\gg mc\\). A linha verde marca o momento típico das partículas na '
+          + 'temperatura escolhida, e é só isso que decide em que regime o gás está: '
+          + 'relatividade aqui não é uma propriedade da partícula, é uma propriedade do '
+          + '<em>gás</em>.</p>'
+          + '<p>Para elétrons, \\(mc^2/\\kB=5{,}9\\times10^9\\) K, de modo que um gás de '
+          + 'elétrons só fica relativístico a bilhões de kelvin. Numa anã branca, porém, não é '
+          + 'a temperatura que empurra os elétrons para cima na curva, e sim a densidade: a '
+          + 'exclusão de Pauli obriga o momento de Fermi a crescer como \\(n^{1/3}\\), e em '
+          + 'Sirius B ele já vale \\(p_Fc\\approx0{,}55\\) MeV, acima de \\(mc^2\\). É o '
+          + 'assunto do Módulo 8.</p>'
+        : est.vista === 'mom'
+        ? '<p>Esta é a figura que explica tudo. A curva tracejada é a <b>camada esférica</b> '
+          + 'do espaço dos momentos, \\(4\\pi p^2dp\\): quantos estados existem com módulo de '
+          + 'momento entre \\(p\\) e \\(p+dp\\). Ela é pura geometria e <em>não muda</em> com '
+          + 'a relatividade.</p>'
+          + '<p>O que muda é o peso de Boltzmann que multiplica essa camada. Com '
+          + '\\(\\epsilon=p^2/2m\\) o corte é gaussiano, \\(e^{-p^2/2m\\kB T}\\), e morre '
+          + 'depressa. Com \\(\\epsilon=pc\\) o corte é uma exponencial simples, '
+          + '\\(e^{-pc/\\kB T}\\), que tem cauda muito mais longa. Mais partículas sobrevivem '
+          + 'com momento alto, e cada uma delas custa mais energia: é a composição dos dois '
+          + 'efeitos que dobra \\(U\\).</p>'
+        : '<p>Traduzida de momento para energia, a mesma camada vira a <b>densidade de '
+          + 'estados</b>. Com \\(\\epsilon=p^2/2m\\), \\(p\\propto\\sqrt\\epsilon\\) e '
+          + '\\(g(\\epsilon)\\propto\\sqrt\\epsilon\\); com \\(\\epsilon=pc\\), '
+          + '\\(p\\propto\\epsilon\\) e \\(g(\\epsilon)\\propto\\epsilon^2\\). A segunda '
+          + 'cresce muito mais rápido, e o pico da distribuição se desloca para a direita.</p>'
+          + '<p>As médias saem de \\(\\int u^{s}e^{-u}du=\\Gamma(s+1)\\) e são exatamente as '
+          + 'linhas tracejadas: \\(\\med{\\epsilon}=\\frac32\\kB T\\) num caso e '
+          + '\\(3\\kB T\\) no outro. É a mesma equipartição de sempre, contada direito: o '
+          + 'teorema dá \\(\\frac12\\kB T\\) por variável <em>quadrática</em>, e '
+          + '\\(\\kB T\\) por variável <em>linear</em>. São três componentes do momento nos '
+          + 'dois casos, e só muda a potência.</p>'
+          + '<p>Os cartões acima usam a relação exata, não os dois limites: deslize a '
+          + 'temperatura e veja \\(c/\\kB\\) subir continuamente de \\(3/2\\) para \\(3\\), '
+          + 'levando \\(\\gamma\\) de \\(5/3\\) para \\(4/3\\).</p>';
+      tipografar(nota);
+    }
+
+    registrarRedesenho(desenhar);
+    tipografar(corpo);
+  };
+
+  /* =================================================================
+     23. As três estatísticas de ocupação
+     Fermi, Bose e Maxwell-Boltzmann na mesma figura. A segunda vista
+     colapsa as três em curvas universais de (ε−μ)/kT, que é a única
+     escala do problema.
+     ================================================================= */
+  REGISTRO.estatisticas = function (raiz) {
+    var corpo = moldura(raiz, 'Fermi, Bose e Maxwell: a mesma conta, três resultados');
+
+    var kBeV = 8.617333262e-5;        // eV/K
+    var est = { mu: 5, T: 3000, vista: 'ev' };
+
+    var ctr0 = el('div', { class: 'controles' });
+    corpo.appendChild(ctr0);
+    opcoes(ctr0, [
+      { rot: 'Energia em elétron-volt', v: 'ev' },
+      { rot: 'Escala universal', v: 'uni' }
+    ], 0, function (v) { est.vista = v; desenhar(); });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'potencial químico μ', 0.5, 8, 0.1, 5,
+      function (v) { est.mu = v; desenhar(); },
+      function (v) { return F.fmt(v, 1) + ' eV'; });
+    deslizante(ctr, 'temperatura', 200, 30000, 100, 3000,
+      function (v) { est.T = v; desenhar(); },
+      function (v) { return v + ' K'; });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'k<sub>B</sub>T', k: 'kt' },
+      { rot: 'Fermi em ε = μ', k: 'nf' },
+      { rot: 'largura do degrau', k: 'w' },
+      { rot: 'ε − μ para 1% de erro', k: 'x1' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function desenhar() {
+      var kt = kBeV * est.T, mu = est.mu;
+
+      if (est.vista === 'ev') {
+        var ax = G.eixos(cv, {
+          xmin: 0, xmax: 10, ymin: 0, ymax: 3, altura: 300,
+          rotX: 'energia do estado individual ε (eV)',
+          rotY: 'ocupação média n̄(ε)',
+          marcasX: G.marcasLineares(0, 10, 10, 0),
+          formataY: function (v) { return F.fmt(v, 1); }
+        });
+        G.curva(ax, function (e) {
+          return e <= mu + 1e-9 ? NaN : 1 / (Math.exp((e - mu) / kt) - 1);
+        }, G.COR.vinho, 2.4);
+        G.curva(ax, function (e) { return Math.exp(-(e - mu) / kt); },
+                G.COR.ambar, 2, [6, 4]);
+        G.curva(ax, function (e) { return 1 / (Math.exp((e - mu) / kt) + 1); },
+                G.COR.azul, 2.8);
+        G.vertical(ax, mu, G.COR.tinta, 'μ', true);
+        G.legenda(ax, [
+          { cor: G.COR.azul, texto: 'Fermi-Dirac' },
+          { cor: G.COR.vinho, texto: 'Bose-Einstein' },
+          { cor: G.COR.ambar, texto: 'Maxwell-Boltzmann' }
+        ]);
+      } else {
+        var ax2 = G.eixos(cv, {
+          xmin: -5, xmax: 8, ymin: 0, ymax: 3, altura: 300,
+          rotX: '(ε − μ) / k\u2088T',
+          rotY: 'ocupação média n̄',
+          marcasX: G.marcasLineares(-5, 8, 13, 0),
+          formataY: function (v) { return F.fmt(v, 1); }
+        });
+        G.curva(ax2, function (x) {
+          return x <= 1e-9 ? NaN : 1 / (Math.exp(x) - 1);
+        }, G.COR.vinho, 2.4);
+        G.curva(ax2, function (x) { return Math.exp(-x); }, G.COR.ambar, 2, [6, 4]);
+        G.curva(ax2, function (x) { return 1 / (Math.exp(x) + 1); }, G.COR.azul, 2.8);
+        G.vertical(ax2, 4.605, G.COR.verde, 'erro de 1%', true);
+        G.legenda(ax2, [
+          { cor: G.COR.azul, texto: 'Fermi-Dirac' },
+          { cor: G.COR.vinho, texto: 'Bose-Einstein' },
+          { cor: G.COR.ambar, texto: 'Maxwell-Boltzmann' }
+        ]);
+      }
+
+      mostrar({
+        kt: F.fmt(kt, 4) + ' eV',
+        nf: '1/2',
+        w: '≈ ' + F.fmt(4 * kt, 3) + ' eV',
+        x1: F.fmt(4.605 * kt, 4) + ' eV'
+      });
+
+      nota.innerHTML = est.vista === 'ev'
+        ? '<p>As três curvas saem da mesma grande função de partição. A diferença está '
+          + 'apenas em quantos termos a soma \\(Y_j=\\sum_{n_j}e^{\\beta(\\mu-\\epsilon_j)n_j}\\) '
+          + 'admite: dois para férmions (\\(n_j=0,1\\)), infinitos para bósons, e o limite '
+          + 'diluído para Maxwell-Boltzmann.</p>'
+          + '<p>Mexa no potencial químico e repare que <b>μ é a energia onde a curva de Fermi '
+          + 'vale exatamente 1/2</b>, qualquer que seja a temperatura. A de Bose, ao '
+          + 'contrário, diverge quando \\(\\epsilon\\to\\mu^+\\) e não existe abaixo de μ: é '
+          + 'por isso que um gás de bósons é obrigado a manter \\(\\mu<\\epsilon_0\\), e é '
+          + 'desse aperto que nasce a condensação.</p>'
+        : '<p>Em função de \\((\\epsilon-\\mu)/\\kB T\\) as três curvas não têm mais nenhum '
+          + 'parâmetro: toda a temperatura e toda a densidade do problema estão escondidas '
+          + 'dentro do eixo. É a figura que vale para qualquer gás quântico.</p>'
+          + '<p>À direita da linha verde as três coincidem dentro de 1%, porque '
+          + '\\(e^{x}\\pm1\\approx e^{x}\\) quando \\(x\\gtrsim4{,}6\\). Essa é a resposta '
+          + 'quantitativa à pergunta do Módulo 6: a estatística quântica só se manifesta nos '
+          + 'estados cuja energia está a menos de uns poucos \\(\\kB T\\) do potencial '
+          + 'químico. Num gás diluído, \\(\\mu\\) é tão negativo que <em>nenhum</em> estado '
+          + 'satisfaz isso, e a contagem clássica volta a valer.</p>';
+      tipografar(nota);
+    }
+
+    registrarRedesenho(desenhar);
+    tipografar(corpo);
+  };
+
+  /* =================================================================
+     24. O gás de Fermi
+     O potencial químico é resolvido de verdade, impondo que a integral
+     de n̄(ε)g(ε) devolva N. A integral é partida em três trechos porque
+     a baixas temperaturas o integrando é um degrau de largura ~kT, e
+     uma varredura uniforme o atravessaria sem ver.
+     ================================================================= */
+  REGISTRO.gasfermi = function (raiz) {
+    var corpo = moldura(raiz, 'O gás de Fermi: mar preenchido, pressão no zero absoluto');
+
+    /* n em m^-3 (um elétron de condução por átomo, exceto o alumínio, com três),
+       gama medido em mJ/(mol·K²), theta de Debye em K */
+    var METAIS = [
+      { nome: 'Cu', rot: 'cobre', n: 8.47e28, gama: 0.695, thetaD: 343 },
+      { nome: 'Ag', rot: 'prata', n: 5.86e28, gama: 0.646, thetaD: 225 },
+      { nome: 'Au', rot: 'ouro', n: 5.90e28, gama: 0.729, thetaD: 165 },
+      { nome: 'Na', rot: 'sódio', n: 2.65e28, gama: 1.38, thetaD: 158 },
+      { nome: 'Li', rot: 'lítio', n: 4.70e28, gama: 1.63, thetaD: 344 },
+      { nome: 'Al', rot: 'alumínio', n: 18.1e28, gama: 1.35, thetaD: 428 }
+    ];
+
+    var est = { i: 0, logt: -2, vista: 'dist' };
+
+    var ctr0 = el('div', { class: 'controles' });
+    corpo.appendChild(ctr0);
+    opcoes(ctr0, [
+      { rot: 'Distribuição e potencial químico', v: 'dist' },
+      { rot: 'Metais reais', v: 'metais' }
+    ], 0, function (v) { est.vista = v; desenhar(); });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'temperatura T/T<sub>F</sub>', -3, 0.4, 0.02, -2,
+      function (v) { est.logt = v; desenhar(); },
+      function (v) { return F.fmt(Math.pow(10, v), 4); });
+    opcoes(ctr, METAIS.map(function (m) { return { rot: m.rot, v: m.nome }; }), 0,
+      function (v) {
+        METAIS.forEach(function (m, k) { if (m.nome === v) est.i = k; });
+        desenhar();
+      });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'ε<sub>F</sub>', k: 'ef' }, { rot: 'T<sub>F</sub>', k: 'tf' },
+      { rot: 'T equivalente', k: 'teq' }, { rot: 'μ/ε<sub>F</sub>', k: 'mu' },
+      { rot: 'pressão a T = 0', k: 'p' }, { rot: 'v<sub>F</sub>', k: 'vf' }
+    ]);
+    var tabela = el('div', { class: 'tabela-rolavel' });
+    corpo.appendChild(tabela);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function energiaFermi(n) {
+      return F.C.hbar * F.C.hbar / (2 * F.C.me)
+             * Math.pow(3 * Math.PI * Math.PI * n, 2 / 3);
+    }
+
+    /* Em unidades reduzidas x = ε/εF e t = T/TF, o número de partículas é
+       ∫₀^∞ √x n̄ dx = 2/3. Abaixo de μ−12t a ocupação é 1 a menos de e^-12,
+       e lá a integral de √x é analítica: é o trecho que se resolve de graça. */
+    function numeroReduzido(m, t) {
+      var f = function (x) {
+        if (x < 0) return 0;
+        var y = (x - m) / t;
+        return y > 700 ? 0 : Math.sqrt(x) / (Math.exp(y) + 1);
+      };
+      var a = Math.max(0, m - 12 * t);
+      var s = (2 / 3) * Math.pow(a, 1.5);
+      var b = Math.max(a + 1e-9, m + 14 * t);
+      s += F.simpson(f, a, b, 1200);
+      s += F.simpson(f, b, b + 60 * t, 400);
+      return s;
+    }
+
+    function energiaReduzida(m, t) {
+      var f = function (x) {
+        if (x < 0) return 0;
+        var y = (x - m) / t;
+        return y > 700 ? 0 : Math.pow(x, 1.5) / (Math.exp(y) + 1);
+      };
+      var a = Math.max(0, m - 12 * t);
+      var s = 0.4 * Math.pow(a, 2.5);
+      var b = Math.max(a + 1e-9, m + 14 * t);
+      s += F.simpson(f, a, b, 1200);
+      s += F.simpson(f, b, b + 60 * t, 400);
+      return 1.5 * s;                     // U/(N εF)
+    }
+
+    /* μ(t) por bisseção: o lado esquerdo cresce com m, de modo que há
+       exatamente uma raiz de numeroReduzido − 2/3. */
+    function muReduzido(t) {
+      var r = F.bissecao(function (m) { return numeroReduzido(m, t) - 2 / 3; },
+                         -60 * t - 1, 3, 1e-12);
+      return r === null ? 1 : r;
+    }
+
+    function desenhar() {
+      var M = METAIS[est.i];
+      var eF = energiaFermi(M.n), TF = eF / F.C.kB;
+      var t = Math.pow(10, est.logt), m = muReduzido(t);
+
+      if (est.vista === 'dist') {
+        var xmax = 2.6, ymax = 1.5 * Math.sqrt(xmax) * 1.05;
+        var ocup = function (x) {
+          if (x <= 0) return 0;
+          var y = (x - m) / t;
+          return 1.5 * Math.sqrt(x) / (y > 700 ? Infinity : Math.exp(y) + 1);
+        };
+        var ax = G.eixos(cv, {
+          xmin: 0, xmax: xmax, ymin: 0, ymax: ymax, altura: 310,
+          rotX: 'energia ε/ε\u2093  (ε\u2093 = energia de Fermi)',
+          rotY: 'elétrons por intervalo de energia',
+          marcasX: G.marcasLineares(0, xmax, 13, 1),
+          formataY: function () { return ''; }
+        });
+        G.area(ax, ocup, 0, xmax, 'rgba(44,95,141,.24)');
+        G.curva(ax, function (x) { return x <= 0 ? 0 : 1.5 * Math.sqrt(x); },
+                G.COR.suave, 1.6, [5, 4]);
+        G.curva(ax, ocup, G.COR.azul, 2.6);
+        G.vertical(ax, 1, G.COR.tinta, 'ε\u2093', true);
+        if (Math.abs(m - 1) > 0.02) G.vertical(ax, m, G.COR.vinho, 'μ', true);
+        G.legenda(ax, [
+          { cor: G.COR.suave, texto: 'densidade de estados g(ε) ∝ √ε' },
+          { cor: G.COR.azul, texto: 'n̄(ε) g(ε): o que está ocupado' }
+        ]);
+        tabela.innerHTML = '';
+      } else {
+        var ax2 = G.eixos(cv, {
+          xmin: 0, xmax: 20, ymin: 0, ymax: 14, altura: 300,
+          rotX: 'densidade de elétrons de condução (10²⁸ m⁻³)',
+          rotY: 'energia de Fermi (eV)',
+          marcasX: G.marcasLineares(0, 20, 10, 0),
+          formataY: function (v) { return F.fmt(v, 0); }
+        });
+        G.curva(ax2, function (x) {
+          return x <= 0 ? 0 : energiaFermi(x * 1e28) / F.C.e;
+        }, G.COR.azul, 2.4);
+        ax2.ct.save();
+        ax2.ct.font = '600 11px system-ui, sans-serif';
+        ax2.ct.textAlign = 'center';
+        ax2.ct.textBaseline = 'bottom';
+        METAIS.forEach(function (q, k) {
+          var x = ax2.X(q.n / 1e28), y = ax2.Y(energiaFermi(q.n) / F.C.e);
+          ax2.ct.fillStyle = k === est.i ? G.COR.vinho : G.COR.tinta;
+          ax2.ct.beginPath();
+          ax2.ct.arc(x, y, k === est.i ? 5 : 3.5, 0, 2 * Math.PI);
+          ax2.ct.fill();
+          ax2.ct.fillText(q.nome, x, y - 7);
+        });
+        ax2.ct.restore();
+
+        var linhas = METAIS.map(function (q) {
+          var E = energiaFermi(q.n);
+          var gt = Math.PI * Math.PI * F.C.R / (2 * E / F.C.kB) * 1000;
+          return '<tr><td><b>' + q.nome + '</b></td>'
+               + '<td>' + F.fmt(q.n / 1e28, 2) + '</td>'
+               + '<td>' + F.fmt(E / F.C.e, 2) + '</td>'
+               + '<td>' + F.fmt(E / F.C.kB / 1000, 1) + '</td>'
+               + '<td>' + F.fmt(0.4 * q.n * E / 1e9, 1) + '</td>'
+               + '<td>' + F.fmt(gt, 3) + '</td>'
+               + '<td>' + F.fmt(q.gama, 3) + '</td>'
+               + '<td>' + F.fmt(q.gama / gt, 2) + '</td></tr>';
+        }).join('');
+        tabela.innerHTML = '<table><thead><tr><th>Metal</th>'
+          + '<th>n (10²⁸ m⁻³)</th><th>ε<sub>F</sub> (eV)</th>'
+          + '<th>T<sub>F</sub> (10³ K)</th><th>P a T=0 (GPa)</th>'
+          + '<th>γ teórico</th><th>γ medido</th><th>m*/m</th></tr></thead><tbody>'
+          + linhas + '</tbody></table>'
+          + '<p class="legenda-tabela">γ em mJ/(mol·K²).</p>';
+      }
+
+      mostrar({
+        ef: F.fmt(eF / F.C.e, 3) + ' eV',
+        tf: F.fmt(TF, 0) + ' K',
+        teq: F.fmt(t * TF, 1) + ' K',
+        mu: F.fmt(m, 4),
+        p: F.fmt(0.4 * M.n * eF / 1e9, 1) + ' GPa',
+        vf: F.fmt(Math.sqrt(2 * eF / F.C.me) / 1e6, 3) + '×10⁶ m/s'
+      });
+
+      nota.innerHTML = est.vista === 'dist'
+        ? '<p>A curva tracejada é a densidade de estados, \\(g(\\epsilon)\\propto\\sqrt{\\epsilon}\\). '
+          + 'A área sombreada é o que está de fato ocupado, \\(\\bar n(\\epsilon)g(\\epsilon)\\), e '
+          + 'ela vale \\(N\\) seja qual for a temperatura: é essa condição que fixa \\(\\mu\\), e '
+          + 'o widget a resolve numericamente a cada passo, sem usar a expansão de '
+          + 'Sommerfeld.</p>'
+          + '<p>Deslize a temperatura e veja o que acontece. O degrau só amolece numa faixa de '
+          + 'largura \\(\\sim\\kB T\\) em volta de \\(\\mu\\), e \\(\\mu\\) mal se move enquanto '
+          + '\\(T\\ll T_F\\): a correção é \\(\\mu\\approx\\epsilon_F[1-\\frac{\\pi^2}{12}(T/T_F)^2]\\). '
+          + 'Para o ' + M.rot + ', \\(T_F=' + F.fmt(TF, 0).replace(/\u00a0/g, '')
+          + '\\,\\)K, de modo que à temperatura ambiente \\(T/T_F\\approx'
+          + F.fmt(300 / TF, 4) + '\\): o mar de Fermi está, para todos os efeitos, no zero '
+          + 'absoluto. Um metal a 300 K é um sistema <em>frio</em>.</p>'
+          + '<p>Repare também que a área não encosta no eixo na origem. Mesmo a \\(T=0\\) os '
+          + 'elétrons têm energia \\(\\frac35\\epsilon_F\\) por partícula e exercem pressão '
+          + '\\(P=\\frac25 n\\epsilon_F\\), aqui ' + F.fmt(0.4 * M.n * eF / 1e9, 1)
+          + ' GPa. Não é energia térmica: é o princípio de exclusão cobrando aluguel pelo '
+          + 'espaço de fase.</p>'
+        : '<p>A energia de Fermi depende só da densidade, como \\(n^{2/3}\\), e a curva é a '
+          + 'mesma para todos: os metais apenas ocupam pontos diferentes dela. Todos caem entre '
+          + '3 e 12 eV, isto é, entre 37 mil e 135 mil kelvin.</p>'
+          + '<p>As duas últimas colunas são o teste da teoria. O coeficiente '
+          + '\\(\\gamma=\\pi^2 R/2T_F\\) é previsto sem nenhum parâmetro ajustável, e para '
+          + 'prata e ouro acerta em poucos por cento. Onde erra, erra de forma informativa: a '
+          + 'razão \\(m^*/m\\) entre o medido e o previsto é a <b>massa efetiva</b>, e ela '
+          + 'mede o quanto a rede cristalina altera a inércia do elétron. No alumínio o fator '
+          + '4,5 avisa que tratá-lo como três elétrons livres por átomo é generoso demais.</p>';
+      tipografar(nota);
+    }
+
+    registrarRedesenho(desenhar);
+    tipografar(corpo);
+  };
+
+  /* =================================================================
+     25. Calor específico dos metais
+     A figura canônica do laboratório: c/T contra T². O intercepto é o
+     termo eletrônico, a inclinação é o de Debye.
+     ================================================================= */
+  REGISTRO.calormetal = function (raiz) {
+    var corpo = moldura(raiz, 'Calor específico: elétrons contra fônons');
+
+    var METAIS = [
+      { nome: 'Cu', rot: 'cobre', n: 8.47e28, gama: 0.695, thetaD: 343 },
+      { nome: 'Ag', rot: 'prata', n: 5.86e28, gama: 0.646, thetaD: 225 },
+      { nome: 'Au', rot: 'ouro', n: 5.90e28, gama: 0.729, thetaD: 165 },
+      { nome: 'Al', rot: 'alumínio', n: 18.1e28, gama: 1.35, thetaD: 428 }
+    ];
+
+    var est = { i: 0, vista: 'baixa' };
+
+    var ctr0 = el('div', { class: 'controles' });
+    corpo.appendChild(ctr0);
+    opcoes(ctr0, [
+      { rot: 'Baixas temperaturas: c/T contra T²', v: 'baixa' },
+      { rot: 'Escala completa até 400 K', v: 'cheia' }
+    ], 0, function (v) { est.vista = v; desenhar(); });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    opcoes(ctr, METAIS.map(function (m) { return { rot: m.rot, v: m.nome }; }), 0,
+      function (v) {
+        METAIS.forEach(function (m, k) { if (m.nome === v) est.i = k; });
+        desenhar();
+      });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'γ medido', k: 'g' }, { rot: 'γ de elétrons livres', k: 'gt' },
+      { rot: 'm*/m', k: 'me' }, { rot: 'θ<sub>D</sub>', k: 'td' },
+      { rot: 'onde os dois se igualam', k: 'tc' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function desenhar() {
+      var M = METAIS[est.i];
+      /* A em J/(mol·K⁴), do limite de Debye c = (12π⁴/5)R(T/θ)³ */
+      var A = 12 * Math.pow(Math.PI, 4) * F.C.R / (5 * Math.pow(M.thetaD, 3));
+      var Amj = A * 1000;
+      var g = M.gama;                                  // mJ/(mol·K²)
+      var eF = F.C.hbar * F.C.hbar / (2 * F.C.me)
+               * Math.pow(3 * Math.PI * Math.PI * M.n, 2 / 3);
+      var gt = Math.PI * Math.PI * F.C.R / (2 * eF / F.C.kB) * 1000;
+      var Tcruz = Math.sqrt(g / Amj);
+
+      if (est.vista === 'baixa') {
+        var x2 = 36;                                   // até T = 6 K
+        var ymax = (g + Amj * x2) * 1.1;
+        var ax = G.eixos(cv, {
+          xmin: 0, xmax: x2, ymin: 0, ymax: ymax, altura: 300,
+          rotX: 'T² (K²)', rotY: 'c/T  (mJ mol⁻¹ K⁻²)',
+          marcasX: G.marcasLineares(0, x2, 6, 0),
+          formataY: function (v) { return F.fmt(v, 1); }
+        });
+        G.curva(ax, function () { return g; }, G.COR.azul, 1.8, [6, 4]);
+        G.curva(ax, function (x) { return Amj * x; }, G.COR.ambar, 1.8, [6, 4]);
+        G.curva(ax, function (x) { return g + Amj * x; }, G.COR.vinho, 2.8);
+        G.vertical(ax, Tcruz * Tcruz, G.COR.verde,
+                   'T = ' + F.fmt(Tcruz, 2) + ' K', true);
+        G.legenda(ax, [
+          { cor: G.COR.vinho, texto: 'c/T = γ + A T²' },
+          { cor: G.COR.azul, texto: 'elétrons: γ' },
+          { cor: G.COR.ambar, texto: 'fônons: A T²' }
+        ]);
+      } else {
+        var ax2 = G.eixos(cv, {
+          xmin: 0, xmax: 400, ymin: 0, ymax: 28, altura: 300,
+          rotX: 'temperatura (K)', rotY: 'c (J mol⁻¹ K⁻¹)',
+          marcasX: G.marcasLineares(0, 400, 8, 0),
+          formataY: function (v) { return F.fmt(v, 0); }
+        });
+        G.curva(ax2, function () { return 3 * F.C.R; }, G.COR.suave, 1.4, [4, 4]);
+        G.curva(ax2, function (T) { return g * 1e-3 * T; }, G.COR.azul, 2);
+        G.curva(ax2, function (T) { return 3 * F.C.R * F.cDebye(T, M.thetaD); },
+                G.COR.ambar, 2, [6, 4]);
+        G.curva(ax2, function (T) {
+          return g * 1e-3 * T + 3 * F.C.R * F.cDebye(T, M.thetaD);
+        }, G.COR.vinho, 2.8);
+        G.legenda(ax2, [
+          { cor: G.COR.vinho, texto: 'total' },
+          { cor: G.COR.ambar, texto: 'fônons (Debye)' },
+          { cor: G.COR.azul, texto: 'elétrons' },
+          { cor: G.COR.suave, texto: '3R (Dulong-Petit)' }
+        ]);
+      }
+
+      mostrar({
+        g: F.fmt(g, 3), gt: F.fmt(gt, 3), me: F.fmt(g / gt, 2),
+        td: M.thetaD + ' K', tc: F.fmt(Tcruz, 2) + ' K'
+      });
+
+      nota.innerHTML = est.vista === 'baixa'
+        ? '<p>Esta é a figura que todo laboratório de baixas temperaturas desenha. Dividindo o '
+          + 'calor específico por \\(T\\) e traçando contra \\(T^2\\), as duas contribuições se '
+          + 'separam: o <b>intercepto</b> é o termo eletrônico \\(\\gamma\\), linear em '
+          + '\\(T\\), e a <b>inclinação</b> é o termo de Debye, cúbico. Medir γ é medir '
+          + '\\(g(\\epsilon_F)\\), a densidade de estados no nível de Fermi.</p>'
+          + '<p>No ' + M.rot + ' os dois termos se igualam a ' + F.fmt(Tcruz, 2)
+          + ' K. Acima disso os fônons dominam de longe, e é por isso que o calor específico '
+          + 'eletrônico ficou invisível por meio século: a 300 K ele responde por menos de 1% '
+          + 'do total. A teoria clássica, que daria \\(\\frac32\\kB\\) por elétron, erraria o '
+          + 'calor específico de um metal por um fator de cinquenta.</p>'
+        : '<p>Na escala completa o termo eletrônico (azul) é uma reta tão baixa que quase se '
+          + 'confunde com o eixo, enquanto a curva de Debye sobe e satura em \\(3R\\), o valor '
+          + 'de Dulong-Petit. O que se mede num calorímetro comum é essencialmente a rede.</p>'
+          + '<p>É uma lição sobre como a física estatística funciona. Dois subsistemas no mesmo '
+          + 'pedaço de cobre obedecem a estatísticas diferentes: os íons da rede são osciladores '
+          + 'tratados como bósons, e seu calor específico cai como \\(T^3\\); os elétrons são '
+          + 'férmions degenerados, e o deles cai como \\(T\\). Perto do zero absoluto a '
+          + 'potência mais baixa ganha, e o metal volta a mostrar seus elétrons.</p>';
+      tipografar(nota);
+    }
+
+    registrarRedesenho(desenhar);
+    tipografar(corpo);
+  };
+
+  /* =================================================================
+     26. Corpo negro
+     O espectro de Planck contra as duas aproximações que ele substitui.
+     A integral é feita de verdade e confere com σT⁴.
+     ================================================================= */
+  REGISTRO.corponegro = function (raiz) {
+    var corpo = moldura(raiz, 'Radiação de corpo negro: Planck, Wien e a catástrofe');
+
+    var FONTES = [
+      { rot: 'Fundo cósmico', T: 2.725 },
+      { rot: 'Terra', T: 288 },
+      { rot: 'Lâmpada', T: 2800 },
+      { rot: 'Sol', T: 5772 },
+      { rot: 'Rigel', T: 12100 }
+    ];
+
+    var est = { T: 5772, aprox: true };
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    var desT = deslizante(ctr, 'temperatura', 2, 15000, 1, 5772,
+      function (v) { est.T = v; desenhar(); },
+      function (v) { return F.fmt(v, 0) + ' K'; });
+    opcoes(ctr, FONTES.map(function (f) { return { rot: f.rot, v: f.T }; }), 3,
+      function (v) { desT.value = v; desT.dispatchEvent(new Event('input')); });
+    opcoes(ctr, [
+      { rot: 'Mostrar aproximações', v: true },
+      { rot: 'Só Planck', v: false }
+    ], 0, function (v) { est.aprox = v; desenhar(); });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'λ do máximo', k: 'lm' }, { rot: 'emitância σT⁴', k: 'fl' },
+      { rot: 'densidade de energia', k: 'ue' }, { rot: 'fótons por m³', k: 'nf' },
+      { rot: 'fração visível', k: 'vis' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    /* Rayleigh-Jeans: a mesma conta com kT por modo em vez de ħω/(e^x−1) */
+    function rj(lam, T) {
+      return 2 * Math.PI * F.C.c * F.C.kB * T / Math.pow(lam, 4);
+    }
+    /* Wien: o limite de altas frequências, sem o −1 no denominador */
+    function wienAprox(lam, T) {
+      var a = 2 * Math.PI * F.C.h * F.C.c * F.C.c / Math.pow(lam, 5);
+      var x = F.C.h * F.C.c / (lam * F.C.kB * T);
+      return x > 700 ? 0 : a * Math.exp(-x);
+    }
+
+    function desenhar() {
+      var T = est.T, lmax = F.wien(T);
+      var xmax = 4.2 * lmax;
+      var pico = F.planck(lmax, T);
+
+      var escala, unid, casas;
+      if (lmax > 1e-3) { escala = 1e3; unid = 'mm'; casas = 2; }
+      else if (lmax > 1e-6) { escala = 1e6; unid = 'μm'; casas = 1; }
+      else { escala = 1e9; unid = 'nm'; casas = 0; }
+
+      var ax = G.eixos(cv, {
+        xmin: 0, xmax: xmax * escala, ymin: 0, ymax: pico * 1.18, altura: 320,
+        rotX: 'comprimento de onda (' + unid + ')',
+        rotY: 'emitância espectral',
+        marcasX: G.marcasLineares(0, xmax * escala, 6, casas),
+        formataY: function () { return ''; }
+      });
+
+      /* faixa visível, quando ela cabe na figura */
+      if (400e-9 * escala < xmax * escala) {
+        var cores = ['#8b00ff', '#0040ff', '#00c000', '#ffd000', '#ff6000', '#e00000'];
+        var xa = ax.X(Math.max(400e-9, 0) * escala);
+        var xb = ax.X(Math.min(700e-9, xmax) * escala);
+        if (xb > xa) {
+          var gr = ax.ct.createLinearGradient(xa, 0, xb, 0);
+          cores.forEach(function (c, k) {
+            gr.addColorStop(k / (cores.length - 1), c);
+          });
+          ax.ct.save();
+          ax.ct.globalAlpha = 0.14;
+          ax.ct.fillStyle = gr;
+          ax.ct.fillRect(xa, ax.y0, xb - xa, ax.y1 - ax.y0);
+          ax.ct.restore();
+        }
+      }
+
+      if (est.aprox) {
+        G.curva(ax, function (l) { return rj(l / escala, T); }, G.COR.ambar, 2, [7, 4]);
+        G.curva(ax, function (l) { return wienAprox(l / escala, T); },
+                G.COR.verde, 2, [3, 3]);
+      }
+      G.area(ax, function (l) { return F.planck(l / escala, T); },
+             0, xmax * escala, 'rgba(140,47,57,.18)');
+      G.curva(ax, function (l) { return F.planck(l / escala, T); }, G.COR.vinho, 2.8);
+      G.vertical(ax, lmax * escala, G.COR.tinta,
+                 'λ_máx = ' + F.fmt(lmax * escala, casas + 1) + ' ' + unid, true);
+      if (est.aprox) {
+        G.legenda(ax, [
+          { cor: G.COR.vinho, texto: 'Planck' },
+          { cor: G.COR.ambar, texto: 'Rayleigh-Jeans (clássico)' },
+          { cor: G.COR.verde, texto: 'Wien (altas frequências)' }
+        ]);
+      }
+
+      /* fração no visível, integrando a própria lei de Planck */
+      var total = F.C.sigmaSB * Math.pow(T, 4);
+      var vis = F.simpson(function (l) { return F.planck(l, T); }, 400e-9, 700e-9, 400);
+      /* densidade de fótons: 2ζ(3)(kT/ħc)³/π² */
+      var nfot = 2 * 1.2020569 * Math.pow(F.C.kB * T / (F.C.hbar * F.C.c), 3)
+                 / (Math.PI * Math.PI);
+
+      mostrar({
+        lm: F.fmt(lmax * escala, casas + 1) + ' ' + unid,
+        fl: F.fmt(total, 3) + ' W/m²',
+        ue: F.fmt(4 * total / F.C.c, 3) + ' J/m³',
+        nf: F.fmt(nfot, 3),
+        vis: F.pct(vis / total, 2)
+      });
+
+      nota.innerHTML =
+        '<p>As duas curvas tracejadas são as leis que Planck precisou reconciliar. '
+        + 'Rayleigh-Jeans sai de dar \\(\\kB T\\) a cada modo, como manda a equipartição, e '
+        + 'acerta a cauda longa; mas cresce como \\(\\lambda^{-4}\\) e a energia total '
+        + 'diverge: é a <b>catástrofe do ultravioleta</b>. A lei de Wien acerta o lado curto '
+        + 'e erra o longo. A fórmula de Planck é a única que vale nos dois extremos, e o '
+        + 'preço foi quantizar a energia do oscilador.</p>'
+        + '<p>A diferença está num sinal. Planck dá '
+        + '\\(\\bar n=1/(e^{\\beta\\hbar\\omega}-1)\\), Wien dá \\(e^{-\\beta\\hbar\\omega}\\), '
+        + 'que é o mesmo sem o \\(-1\\), e Rayleigh-Jeans é o limite '
+        + '\\(\\beta\\hbar\\omega\\to0\\), onde \\(\\bar n\\hbar\\omega\\to\\kB T\\). Os fótons '
+        + 'são bósons com \\(\\mu=0\\), porque a parede da cavidade cria e destrói fótons '
+        + 'livremente: nada conserva o número deles.</p>'
+        + '<p>A área sob a curva é \\(\\sigma T^4\\), e os números abaixo da figura vêm de '
+        + 'integrá-la de fato: \\(\\sigma=2\\pi^5\\kB^4/15h^3c^2\\) não é um parâmetro '
+        + 'ajustado, é \\(\\pi^4/15\\) saindo de \\(\\int x^3dx/(e^x-1)\\). O deslocamento do '
+        + 'máximo, \\(\\lambda_{\\max}T=2{,}898\\times10^{-3}\\) m·K, é a lei de Wien, e vem de '
+        + 'resolver \\(5(1-e^{-x})=x\\), cuja raiz é 4,965.</p>';
+      tipografar(nota);
+    }
+
+    registrarRedesenho(desenhar);
+    tipografar(corpo);
+  };
+
+  /* =================================================================
+     27. Condensado de Bose-Einstein
+     A fração condensada e a distribuição de momento bimodal, que é a
+     assinatura experimental do condensado.
+     ================================================================= */
+  REGISTRO.condensado = function (raiz) {
+    var corpo = moldura(raiz, 'Condensação de Bose-Einstein');
+
+    var ZETA32 = 2.612375348685488;
+    var u = F.C.u;
+    var SISTEMAS = [
+      { rot: 'Rubídio 87 (JILA, 1995)', m: 86.909 * u, n: 2.5e19 },
+      { rot: 'Sódio 23 (MIT, 1995)', m: 22.990 * u, n: 1.5e20 },
+      { rot: 'Hélio 4 líquido', m: 4.0026 * u, n: 2.18e28 },
+      { rot: 'Elétrons no cobre', m: F.C.me, n: 8.47e28 }
+    ];
+
+    var est = { i: 0, r: 0.6, vista: 'fracao' };
+
+    var ctr0 = el('div', { class: 'controles' });
+    corpo.appendChild(ctr0);
+    opcoes(ctr0, [
+      { rot: 'Fração condensada', v: 'fracao' },
+      { rot: 'Distribuição de momento', v: 'momento' }
+    ], 0, function (v) { est.vista = v; desenhar(); });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'temperatura T/T<sub>c</sub>', 0, 1.6, 0.01, 0.6,
+      function (v) { est.r = v; desenhar(); },
+      function (v) { return F.fmt(v, 2); });
+    opcoes(ctr, SISTEMAS.map(function (s) { return { rot: s.rot, v: s.rot }; }), 0,
+      function (v) {
+        SISTEMAS.forEach(function (s, k) { if (s.rot === v) est.i = k; });
+        desenhar();
+      });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'T<sub>c</sub>', k: 'tc' }, { rot: 'T', k: 't' },
+      { rot: 'λ<sub>T</sub> em T<sub>c</sub>', k: 'lam' },
+      { rot: 'separação média', k: 'd' },
+      { rot: 'n λ³ em T', k: 'nl' }, { rot: 'n̄₀/N', k: 'f0' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function Tc(n, m) {
+      return 2 * Math.PI * F.C.hbar * F.C.hbar / (m * F.C.kB)
+             * Math.pow(n / ZETA32, 2 / 3);
+    }
+    function lambdaT(T, m) {
+      return F.C.h / Math.sqrt(2 * Math.PI * m * F.C.kB * T);
+    }
+    function fracao(r) { return r >= 1 ? 0 : 1 - Math.pow(r, 1.5); }
+
+    function desenhar() {
+      var S = SISTEMAS[est.i];
+      var tc = Tc(S.n, S.m), T = est.r * tc, f0 = fracao(est.r);
+
+      if (est.vista === 'fracao') {
+        var ax = G.eixos(cv, {
+          xmin: 0, xmax: 1.6, ymin: 0, ymax: 1.05, altura: 300,
+          rotX: 'T / T_c', rotY: 'fração de partículas',
+          marcasX: G.marcasLineares(0, 1.6, 8, 1),
+          formataY: function (v) { return F.fmt(v, 1); }
+        });
+        G.area(ax, fracao, 0, 1, 'rgba(44,95,141,.20)');
+        G.curva(ax, function (r) { return 1 - fracao(r); }, G.COR.ambar, 2, [6, 4]);
+        G.curva(ax, fracao, G.COR.azul, 2.8);
+        G.vertical(ax, 1, G.COR.tinta, 'T_c', true);
+        if (est.r > 0.01) {
+          G.vertical(ax, est.r, G.COR.vinho,
+                     'n̄₀/N = ' + F.fmt(f0, 3), true);
+        }
+        G.legenda(ax, [
+          { cor: G.COR.azul, texto: 'no estado p = 0' },
+          { cor: G.COR.ambar, texto: 'nos estados p > 0' }
+        ]);
+      } else {
+        /* A nuvem térmica é uma maxwelliana em p com área 1−f₀; o condensado
+           é um pico estreito em p = 0 com área f₀. A largura do pico aqui é
+           escolhida para ser visível, não medida: num experimento real ela é
+           fixada pelo tamanho da armadilha. */
+        var s = Math.max(0.08, Math.sqrt(Math.max(est.r, 0.02)));
+        var pmax = 3.2;
+        var termica = function (p) {
+          return (1 - f0) * 4 / Math.sqrt(Math.PI) * p * p
+                 * Math.exp(-p * p / (s * s)) / (s * s * s);
+        };
+        var sp = 0.075;
+        var cond = function (p) {
+          return f0 * 4 / Math.sqrt(Math.PI) * p * p
+                 * Math.exp(-p * p / (sp * sp)) / (sp * sp * sp);
+        };
+        var ymax = 0;
+        for (var k = 0; k <= 400; k++) {
+          var p = pmax * k / 400;
+          ymax = Math.max(ymax, termica(p) + cond(p));
+        }
+        var ax2 = G.eixos(cv, {
+          xmin: 0, xmax: pmax, ymin: 0, ymax: ymax * 1.1 || 1, altura: 300,
+          rotX: 'momento p (unidades de √(2mk\u2088T_c))',
+          rotY: 'átomos por intervalo de momento',
+          marcasX: G.marcasLineares(0, pmax, 8, 1),
+          formataY: function () { return ''; }
+        });
+        G.area(ax2, function (p) { return termica(p) + cond(p); }, 0, pmax,
+               'rgba(44,95,141,.18)');
+        G.curva(ax2, termica, G.COR.ambar, 2, [6, 4]);
+        G.curva(ax2, function (p) { return termica(p) + cond(p); }, G.COR.azul, 2.8);
+        G.legenda(ax2, [
+          { cor: G.COR.azul, texto: 'total' },
+          { cor: G.COR.ambar, texto: 'nuvem térmica' }
+        ]);
+      }
+
+      var lam = lambdaT(tc, S.m);
+      var lamT = T > 0 ? lambdaT(T, S.m) : Infinity;
+      mostrar({
+        tc: (tc < 1e-5 ? F.fmt(tc * 1e9, 1) + ' nK'
+             : tc < 1 ? F.fmt(tc * 1e3, 2) + ' mK' : F.fmt(tc, 3) + ' K'),
+        t: (T === 0 ? '0' : T < 1e-5 ? F.fmt(T * 1e9, 1) + ' nK'
+            : T < 1 ? F.fmt(T * 1e3, 2) + ' mK' : F.fmt(T, 3) + ' K'),
+        lam: F.fmt(lam * 1e9, 2) + ' nm',
+        d: F.fmt(Math.pow(S.n, -1 / 3) * 1e9, 2) + ' nm',
+        nl: (T === 0 ? '∞' : F.fmt(S.n * Math.pow(lamT, 3), 3)),
+        f0: F.fmt(f0, 3)
+      });
+
+      nota.innerHTML = est.vista === 'fracao'
+        ? '<p>Abaixo de \\(T_c\\) a fração no estado de momento nulo é '
+          + '\\(\\bar n_0/N=1-(T/T_c)^{3/2}\\), e ela não vem de nenhuma interação: vem de os '
+          + 'estados excitados não conseguirem mais acomodar todas as partículas. A integral '
+          + 'sobre \\(p>0\\) satura em \\(\\zeta(3/2)=2{,}612\\) em unidades de '
+          + '\\(V/\\lambda_T^3\\), e o que sobra é obrigado a cair no fundo.</p>'
+          + '<p>Compare os dois números do meio. A condensação começa exatamente quando o '
+          + 'comprimento de onda térmico fica da ordem da separação entre as partículas, '
+          + 'critério \\(n\\lambda_T^3\\geq2{,}612\\) que é o mesmo do Módulo 6. Aqui ele '
+          + 'aparece com os dois lados medidos em nanômetros.</p>'
+          + '<p>A última linha da lista é um lembrete: elétrons no cobre têm '
+          + '\\(n\\lambda_T^3\\) enorme à temperatura ambiente, isto é, são tão degenerados '
+          + 'quanto qualquer condensado. Mas são férmions, e o princípio de exclusão proíbe o '
+          + 'acúmulo no fundo. A mesma degenerescência produz um mar de Fermi num caso e um '
+          + 'condensado no outro, e o que decide é só a simetria da função de onda.</p>'
+        : '<p>É esta a assinatura experimental, e a figura que correu o mundo em 1995: a '
+          + 'distribuição de momento deixa de ser uma única maxwelliana e passa a ter '
+          + '<b>duas componentes</b>, uma nuvem térmica larga e um pico estreito no centro. '
+          + 'Abaixe a temperatura e veja o pico crescer às custas da nuvem.</p>'
+          + '<p>Na região de coexistência o gás é literalmente uma mistura de duas fases, uma '
+          + 'com \\(p=0\\) e outra com \\(p>0\\), e a fração de cada uma segue a curva da '
+          + 'primeira vista. A transição é de primeira ordem, mas a separação de fases não '
+          + 'acontece no espaço: acontece no espaço dos momentos.</p>'
+          + '<p>A largura do pico aqui foi escolhida para ser visível. Num experimento real ela '
+          + 'é fixada pela armadilha, pelo princípio de incerteza: um condensado confinado em '
+          + 'alguns micrômetros tem a menor dispersão de momento que a mecânica quântica '
+          + 'permite.</p>';
+      tipografar(nota);
+    }
+
+    registrarRedesenho(desenhar);
+    tipografar(corpo);
+  };
+
+  /* =================================================================
+     28. Bandas: metal, semicondutor e isolante
+     A mesma função de Fermi em três situações. O que muda é apenas
+     onde está o nível de Fermi em relação às bandas.
+     ================================================================= */
+  REGISTRO.bandas = function (raiz) {
+    var corpo = moldura(raiz, 'Bandas de energia: por que uns conduzem e outros não');
+
+    /* Eg em eV; ni é a densidade intrínseca de portadores a 300 K, em cm⁻³ */
+    var MAT = [
+      { nome: 'metal', rot: 'Metal (cobre)', Eg: 0, ni: null },
+      { nome: 'ge', rot: 'Germânio', Eg: 0.66, ni: 2.4e13 },
+      { nome: 'si', rot: 'Silício', Eg: 1.12, ni: 1.0e10 },
+      { nome: 'gaas', rot: 'Arseneto de gálio', Eg: 1.42, ni: 2.1e6 },
+      { nome: 'c', rot: 'Diamante', Eg: 5.47, ni: 1e-27 }
+    ];
+
+    var est = { i: 2, T: 300 };
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'temperatura', 100, 1200, 5, 300,
+      function (v) { est.T = v; desenhar(); },
+      function (v) { return v + ' K'; });
+    opcoes(ctr, MAT.map(function (m) { return { rot: m.rot, v: m.nome }; }), 2,
+      function (v) {
+        MAT.forEach(function (m, k) { if (m.nome === v) est.i = k; });
+        desenhar();
+      });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'separação E<sub>g</sub>', k: 'eg' },
+      { rot: 'k<sub>B</sub>T', k: 'kt' },
+      { rot: 'E<sub>g</sub>/k<sub>B</sub>T', k: 'raz' },
+      { rot: 'portadores (cm⁻³)', k: 'ni' },
+      { rot: 'contra 300 K', k: 'rel' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    /* n_i(T) ancorado no valor medido a 300 K:
+       n_i ∝ T^{3/2} e^{−Eg/2kT}, com Eg tratado como constante. */
+    function portadores(M, T) {
+      if (M.ni === null) return null;
+      var kv = 8.617333262e-5;
+      return M.ni * Math.pow(T / 300, 1.5)
+             * Math.exp(-M.Eg / (2 * kv) * (1 / T - 1 / 300));
+    }
+
+    function desenhar() {
+      var M = MAT[est.i], T = est.T;
+      var kt = 8.617333262e-5 * T;
+      var p = G.preparar(cv, 320);
+      var ct = p.ct, L = p.L, A = p.A;
+
+      /* eixo de energia: 0 no topo da banda de valência */
+      var emin = -2.2, emax = Math.max(2.2, M.Eg + 1.8);
+      var y0 = 20, y1 = A - 34;
+      var Y = function (e) { return y1 - (e - emin) / (emax - emin) * (y1 - y0); };
+      var xb0 = 56, xb1 = Math.min(L * 0.52, 300);
+      var xf0 = xb1 + 46, xf1 = L - 20;
+
+      var mu = M.Eg === 0 ? 0 : M.Eg / 2;      // no metal, meio da banda
+      var n = function (e) {
+        var x = (e - mu) / kt;
+        return x > 700 ? 0 : x < -700 ? 1 : 1 / (Math.exp(x) + 1);
+      };
+
+      ct.font = '11px system-ui, sans-serif';
+
+      /* bandas: valência de emin a 0, condução de Eg a emax.
+         No metal a banda é uma só, de emin a emax, com μ no meio. */
+      function pintarBanda(ea, eb) {
+        var ya = Y(eb), yb = Y(ea), passos = 90;
+        for (var k = 0; k < passos; k++) {
+          var yy = ya + (yb - ya) * k / passos;
+          var ee = emin + (y1 - yy) / (y1 - y0) * (emax - emin);
+          var oc = n(ee);
+          ct.fillStyle = 'rgba(44,95,141,' + (0.08 + 0.78 * oc).toFixed(3) + ')';
+          ct.fillRect(xb0, yy, xb1 - xb0, (yb - ya) / passos + 0.8);
+        }
+        ct.strokeStyle = G.COR.suave;
+        ct.lineWidth = 1.2;
+        ct.strokeRect(xb0 + 0.5, ya + 0.5, xb1 - xb0 - 1, yb - ya - 1);
+      }
+
+      if (M.Eg === 0) {
+        pintarBanda(emin, emax);
+      } else {
+        pintarBanda(emin, 0);
+        pintarBanda(M.Eg, emax);
+        /* a separação, hachurada */
+        ct.save();
+        ct.fillStyle = 'rgba(180,186,195,.16)';
+        ct.fillRect(xb0, Y(M.Eg), xb1 - xb0, Y(0) - Y(M.Eg));
+        ct.restore();
+      }
+
+      /* nível de Fermi */
+      ct.save();
+      ct.strokeStyle = G.COR.vinho;
+      ct.lineWidth = 1.6;
+      ct.setLineDash([6, 4]);
+      ct.beginPath();
+      ct.moveTo(xb0 - 10, Y(mu)); ct.lineTo(xf1, Y(mu)); ct.stroke();
+      ct.restore();
+      ct.fillStyle = G.COR.vinho;
+      ct.font = '600 11px system-ui, sans-serif';
+      ct.textAlign = 'left'; ct.textBaseline = 'bottom';
+      ct.fillText('nível de Fermi', xb0 + 6, Y(mu) - 3);
+
+      /* rótulos das bandas */
+      ct.fillStyle = G.COR.tinta;
+      ct.font = '600 11px system-ui, sans-serif';
+      ct.textAlign = 'center'; ct.textBaseline = 'middle';
+      if (M.Eg === 0) {
+        ct.fillText('banda semipreenchida', (xb0 + xb1) / 2, Y(emax) + 16);
+      } else {
+        ct.fillText('banda de condução', (xb0 + xb1) / 2, Y((M.Eg + emax) / 2));
+        ct.fillStyle = '#ffffff';
+        ct.fillText('banda de valência', (xb0 + xb1) / 2, Y(emin / 2));
+        ct.fillStyle = G.COR.suave;
+        ct.fillText('E_g = ' + F.fmt(M.Eg, 2) + ' eV', (xb0 + xb1) / 2, Y(M.Eg / 2));
+      }
+
+      /* eixo de energia à esquerda */
+      ct.strokeStyle = G.COR.suave; ct.lineWidth = 1.2;
+      ct.beginPath(); ct.moveTo(xb0 - 14, y0); ct.lineTo(xb0 - 14, y1); ct.stroke();
+      ct.save();
+      ct.translate(16, (y0 + y1) / 2); ct.rotate(-Math.PI / 2);
+      ct.fillStyle = G.COR.suave;
+      ct.font = '600 11px system-ui, sans-serif';
+      ct.textAlign = 'center'; ct.textBaseline = 'top';
+      ct.fillText('energia do elétron', 0, 0);
+      ct.restore();
+
+      /* função de Fermi ao lado, com a energia no eixo vertical */
+      ct.strokeStyle = G.COR.grade; ct.lineWidth = 1;
+      [0, 0.5, 1].forEach(function (v) {
+        var x = xf0 + v * (xf1 - xf0);
+        ct.beginPath(); ct.moveTo(x, y0); ct.lineTo(x, y1); ct.stroke();
+      });
+      ct.strokeStyle = G.COR.azul; ct.lineWidth = 2.4;
+      ct.beginPath();
+      for (var k = 0; k <= 300; k++) {
+        var ee = emin + (emax - emin) * k / 300;
+        var xx = xf0 + n(ee) * (xf1 - xf0), yy = Y(ee);
+        if (k === 0) ct.moveTo(xx, yy); else ct.lineTo(xx, yy);
+      }
+      ct.stroke();
+      ct.fillStyle = G.COR.suave;
+      ct.font = '11px system-ui, sans-serif';
+      ct.textAlign = 'center'; ct.textBaseline = 'top';
+      ct.fillText('n̄(ε) a ' + T + ' K', (xf0 + xf1) / 2, y1 + 6);
+      ct.fillText('0', xf0, y1 + 6);
+      ct.fillText('1', xf1, y1 + 6);
+
+      var ni = portadores(M, T), ni300 = portadores(M, 300);
+      mostrar({
+        eg: M.Eg === 0 ? 'sem separação' : F.fmt(M.Eg, 2) + ' eV',
+        kt: F.fmt(kt, 4) + ' eV',
+        raz: M.Eg === 0 ? '—' : F.fmt(M.Eg / kt, 1),
+        ni: ni === null ? '~10²²' : (ni < 1e-3 || ni > 1e6
+            ? ni.toExponential(2).replace('.', ',').replace('e', '×10^')
+            : F.fmt(ni, 2)),
+        rel: ni === null ? 'não muda' : '×' + F.fmt(ni / ni300, 3)
+      });
+
+      nota.innerHTML =
+        '<p>A mesma função de Fermi, três destinos. O que muda não é a estatística: é '
+        + '<b>onde o nível de Fermi cai</b>. No metal ele fica no meio de uma banda, e há '
+        + 'estados vazios a uma distância infinitesimal dos ocupados: basta um campo elétrico '
+        + 'ínfimo para redistribuir elétrons e aparecer corrente. Num semicondutor ou isolante '
+        + 'ele cai dentro de uma <b>separação</b> onde não existe nenhum estado, e conduzir '
+        + 'exige promover um elétron por cima de \\(E_g\\).</p>'
+        + '<p>Esse custo entra exponencialmente. A probabilidade de ocupação no fundo da banda '
+        + 'de condução é da ordem de \\(e^{-E_g/2\\kB T}\\), e a razão \\(E_g/\\kB T\\) é o '
+        + 'número que decide tudo. '
+        + (M.Eg === 0
+            ? 'No cobre não há separação alguma, e é por isso que a condutividade de um metal '
+              + '<em>cai</em> com a temperatura em vez de subir: o número de portadores não '
+              + 'muda, só o espalhamento pelos fônons aumenta.'
+            : 'Para o ' + M.rot.toLowerCase() + ' a ' + T + ' K temos \\(E_g/\\kB T='
+              + F.fmt(M.Eg / kt, 1) + '\\).')
+        + '</p>'
+        + '<p>Nada separa qualitativamente um semicondutor de um isolante: é a mesma física com '
+        + 'um número diferente. Entre o germânio e o diamante o \\(E_g\\) cresce por um fator '
+        + 'oito, e os portadores a 300 K caem por quarenta ordens de grandeza. Aqueça o '
+        + 'silício de 300 para 400 K e os portadores aumentam umas trezentas vezes: é por isso '
+        + 'que um transistor esquenta e muda de comportamento, e é também por isso que o '
+        + 'diamante, que tem a mesma estrutura cristalina do silício, é um isolante '
+        + 'excelente.</p>';
+      tipografar(nota);
+    }
+
+    registrarRedesenho(desenhar);
+    tipografar(corpo);
+  };
+
   /* ---------- inicialização ---------- */
   document.addEventListener('DOMContentLoaded', function () {
     Array.prototype.forEach.call(document.querySelectorAll('[data-widget]'), function (n) {
