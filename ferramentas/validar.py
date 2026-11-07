@@ -58,7 +58,13 @@ for p in paginas:
         if '—' in linha and not re.search(r'<t[dh][^>]*>\s*—\s*</t[dh]>', linha):
             erros.append('%s: travessão em "%s"' % (p, linha.strip()[:60]))
 
-    # 8. tags equilibradas nos contêineres principais
+    # 8. nenhum caractere de controle: eles aparecem quando \f ou \b do LaTeX
+    #    passam por uma string Python não crua e viram formfeed e backspace
+    for ch in set(c for c in t if ord(c) < 32 and c not in '\t\n'):
+        erros.append('%s: caractere de controle 0x%02x no arquivo '
+                     '(provável \\f ou \\b do LaTeX corrompido)' % (p, ord(ch)))
+
+    # 9. tags equilibradas nos contêineres principais
     for tag in ('div', 'main', 'section', 'details', 'table'):
         a = len(re.findall(r'<%s[\s>]' % tag, t))
         b = len(re.findall(r'</%s>' % tag, t))

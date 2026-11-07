@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Módulo 1: Revisão de termodinâmica | Física Estatística</title>
 <link rel="icon" type="image/png" href="assets/img/favicon.png">
-<link rel="stylesheet" href="assets/css/estilo.css?v=202611071700">
-<script src="assets/js/comum.js?v=202611071700"></script>
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611071709">
+<script src="assets/js/comum.js?v=202611071709"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
 <body>
@@ -196,6 +196,51 @@
   temperatura, e não sobre o gás. Definindo \(T = t + 273{,}15\), a reta passa a ser
   simplesmente \(P\propto T\), e a extrapolação vira a origem de uma escala
   <strong>absoluta</strong>.</p>
+
+  <h3>Misturas e a lei de Dalton</h3>
+
+  <p>Uma das curvas do gráfico acima é o <strong>ar</strong>, que não é uma substância: é
+  cerca de 78% de nitrogênio, 21% de oxigênio, 0,9% de argônio e o resto em gás carbônico e
+  vapor d'água. Ainda assim ele dá uma reta como as outras e aponta para o mesmo zero. Por
+  quê?</p>
+
+  <p>Porque, num gás diluído, cada componente ignora os demais. Nenhuma molécula de
+  nitrogênio sabe que há oxigênio na sala: as interações são desprezíveis e o que cada
+  espécie faz é bater nas paredes por conta própria. John Dalton percebeu isso em 1801 e
+  enunciou o que hoje se chama <strong>lei das pressões parciais</strong>.</p>
+
+  <div class="bloco def">
+    <span class="rotulo">Lei de Dalton</span>
+    <p>Defina a <em>pressão parcial</em> \(P_i\) de cada componente como a pressão que ele
+    exerceria se ocupasse sozinho todo o volume \(V\) à temperatura \(T\):</p>
+    <p>\[P_i=\frac{N_i\kB T}{V}.\]</p>
+    <p>A pressão total é a soma das parciais:</p>
+    <p>\[\boxed{\;P=\sum_i P_i=\frac{\kB T}{V}\sum_i N_i=\frac{N\kB T}{V}\;}\]</p>
+    <p>Em termos da <em>fração molar</em> \(x_i=N_i/N\), isso se escreve simplesmente
+    \(P_i=x_i P\): a pressão parcial de um componente é a sua fração na mistura vezes a
+    pressão total.</p>
+  </div>
+
+  <p>O resultado é mais forte do que parece. Ele diz que a equação de estado de uma mistura
+  é a mesma do gás puro, com \(N\) sendo apenas a contagem total de moléculas,
+  <strong>independentemente de quais sejam</strong>. O ar se comporta como um gás ideal com
+  \(N\) moléculas, e não importa que haja cinco espécies ali dentro com massas diferentes.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Por que a massa não entra</span>
+    <p>À primeira vista é estranho: moléculas de oxigênio pesam 32 unidades e as de hidrogênio
+    pesam 2, e ainda assim contribuem igualmente para a pressão. A razão aparece na seção 12,
+    quando deduzirmos \(PV=\frac{1}{3}Nm\overline{v^2}\) dos choques.</p>
+    <p>O que entra na pressão é o produto \(m\overline{v^2}\), e a equipartição garante que
+    \(\frac{1}{2}m\overline{v^2}=\frac{3}{2}\kB T\) para toda espécie na mesma temperatura.
+    As moléculas leves se movem mais depressa exatamente na proporção que compensa a sua
+    massa menor. <strong>O produto é o mesmo, e por isso a contribuição à pressão é a
+    mesma.</strong> O widget da seção 12 permite verificar isso com duas espécies de massas
+    diferentes na mesma caixa.</p>
+    <p>É também de onde vem a lei de Graham: a velocidade típica vai com \(1/\sqrt{m}\), e é
+    por isso que o hidrogênio escapa de um balão mais depressa que o hélio, e que o
+    urânio-235 pôde ser separado do 238 por difusão gasosa.</p>
+  </div>
 
   <div class="bloco alerta">
     <span class="rotulo">Nenhum gás chega lá</span>
@@ -781,6 +826,6 @@
   Laboratório de Física Computacional Aplicada (LFCA) · Universidade Regional do Cariri</p>
 </footer>
 
-<script src="assets/js/widgets.js?v=202611071700"></script>
+<script src="assets/js/widgets.js?v=202611071709"></script>
 </body>
 </html>

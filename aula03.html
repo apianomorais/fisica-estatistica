@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Módulo 3: Caminhante aleatório e estados microscópicos | Física Estatística</title>
 <link rel="icon" type="image/png" href="assets/img/favicon.png">
-<link rel="stylesheet" href="assets/css/estilo.css?v=202611071700">
-<script src="assets/js/comum.js?v=202611071700"></script>
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611071709">
+<script src="assets/js/comum.js?v=202611071709"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
 <body>
@@ -239,9 +239,23 @@
 
   <p>em qualquer dimensão. A raiz de \(N\) não é um acidente unidimensional: é consequência
   apenas da independência dos passos. O que muda com a dimensão é outra coisa, e bastante
-  dramática: em uma e duas dimensões o caminhante volta à origem com probabilidade 1, e em
-  três dimensões a probabilidade de retorno cai para cerca de 34%. Como disse Kakutani, um
-  bêbado sempre acha o caminho de casa, mas um passarinho bêbado pode se perder para sempre.</p>
+  dramática.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">O teorema de Pólya</span>
+    <p>Em 1921, <strong>George Pólya</strong> demonstrou que o caminhante aleatório simétrico
+    retorna à origem com probabilidade <strong>1</strong> em uma e em duas dimensões, mas
+    apenas com probabilidade \(0{,}3405\dots\) em três. Esse número ficou conhecido como
+    constante de Pólya. Em uma e duas dimensões o passeio é <em>recorrente</em>; de três em
+    diante é <em>transiente</em>, e o caminhante pode nunca mais voltar.</p>
+    <p>A formulação que ficou famosa é de <strong>Shizuo Kakutani</strong>, atribuída a uma
+    palestra na UCLA em 1976: um bêbado sempre acha o caminho de casa, mas um passarinho
+    bêbado pode se perder para sempre.</p>
+    <p>Note que isso não contradiz \(\overline{R^2}=NL^2\), que vale em qualquer dimensão.
+    As duas afirmações convivem: o caminhante se afasta tipicamente \(\sqrt N\,L\) em
+    qualquer \(d\), mas <em>quantas vezes ele passa pela origem no caminho</em> depende de
+    quanto espaço existe para se perder.</p>
+  </div>
 
   <!-- ================================================== -->
   <h2 id="s6">6. A aproximação de Stirling</h2>
@@ -860,6 +874,6 @@
   Laboratório de Física Computacional Aplicada (LFCA) · Universidade Regional do Cariri</p>
 </footer>
 
-<script src="assets/js/widgets.js?v=202611071700"></script>
+<script src="assets/js/widgets.js?v=202611071709"></script>
 </body>
 </html>

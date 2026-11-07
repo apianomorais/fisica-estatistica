@@ -521,25 +521,34 @@
      Unidades reduzidas: m = 1, kB = 1, caixa 1x1.
      ================================================================= */
   REGISTRO.cinetica = function (raiz) {
-    var corpo = moldura(raiz, 'De onde vem a pressão: impulso nas paredes');
+    var corpo = moldura(raiz, 'De onde vem a pressão, e por que as parciais se somam');
 
-    var est = { N: 120, T: 1, rodando: true };
-    var part = [], impulso = 0, tempo = 0, NB = 22, hist = new Array(NB).fill(0);
+    /* Duas espécies no mesmo recipiente, massas 1 e 4, em unidades
+       reduzidas: kB = 1, caixa de lado 1, área 1. A previsão para cada
+       espécie é P_i = N_i T / A, sem nenhuma referência à massa. */
+    var MASSA = [1, 4];
+    var COR = ['#2c5f8d', '#8c2f39'];
+
+    var est = { N: 300, fraca: 0.5, T: 1, rodando: true, mistura: true };
+    var part = [], imp = [0, 0], tempo = 0, NB = 14;
 
     var cv = el('canvas');
     corpo.appendChild(cv);
     var ctr = el('div', { class: 'controles' });
     corpo.appendChild(ctr);
 
-    deslizante(ctr, 'número de partículas \\(N\\)', 20, 400, 10, 120,
+    deslizante(ctr, 'total de partículas \\(N\\)', 40, 800, 20, 300,
       function (v) { est.N = v; reiniciar(); });
+    deslizante(ctr, 'fração da espécie leve', 0, 1, 0.05, 0.5,
+      function (v) { est.fraca = v; reiniciar(); },
+      function (v) { return F.pct(v, 0); });
     deslizante(ctr, 'temperatura \\(T\\) (unidades de \\(\\kB\\))', 0.2, 3, 0.1, 1,
       function (v) { est.T = v; reiniciar(); },
       function (v) { return v.toFixed(1).replace('.', ','); });
 
     var bot = el('div', { class: 'botoes' });
     var bPausa = el('button', { type: 'button', texto: 'pausar' });
-    var bZerar = el('button', { type: 'button', texto: 'reiniciar' });
+    var bZerar = el('button', { type: 'button', class: 'sec', texto: 'reiniciar' });
     bPausa.addEventListener('click', function () {
       est.rodando = !est.rodando;
       bPausa.textContent = est.rodando ? 'pausar' : 'continuar';
@@ -549,35 +558,62 @@
     ctr.appendChild(bot);
 
     var mostrar = cartoes(corpo, [
-      { rot: 'P medida', k: 'pm' },
-      { rot: 'Nm⟨v<sub>x</sub>²⟩/A desta amostra', k: 'pa' },
+      { rot: 'P<sub>leve</sub> medida', k: 'p1' },
+      { rot: 'P<sub>pesada</sub> medida', k: 'p2' },
+      { rot: 'soma das parciais', k: 'ps' },
       { rot: 'Nk<sub>B</sub>T/A no limite N→∞', k: 'pt' },
-      { rot: 'diferença para o limite', k: 'err' }
+      { rot: '⟨½mv²⟩ leve / pesada', k: 'ek' }
     ]);
-    var nota = el('div', { class: 'saida', html:
-      '<p>A parede direita registra cada choque. Num choque elástico a partícula devolve '
-      + 'momento \\(2m|v_x|\\); somando esses impulsos e dividindo pelo tempo e pelo '
-      + 'comprimento da parede obtém-se a pressão. Ela converge para \\(N\\kB T/A\\) '
-      + 'sem que nada disso tenha sido imposto: a lei dos gases ideais é consequência '
-      + 'dos choques, não um postulado.</p><p>Repare que a pressão medida acompanha de perto '
-      + '\\(Nm\\med{v_x^2}/A\\) desta amostra, e não exatamente \\(N\\kB T/A\\). A diferença é '
-      + 'a flutuação estatística de uma amostra com poucas centenas de partículas: ela cai '
-      + 'como \\(1/\\sqrt{N}\\). Aumente \\(N\\) e veja encolher. Num gás real, com '
-      + '\\(N\\sim 10^{23}\\), essa flutuação é de uma parte em \\(10^{11}\\), e é por isso '
-      + 'que a termodinâmica pode tratar a pressão como um número exato.' });
+    var nota = el('div', { class: 'saida' });
     corpo.appendChild(nota);
+
+    function nLeve() { return Math.round(est.N * est.fraca); }
 
     function reiniciar() {
       part = [];
+      var nl = nLeve();
       for (var i = 0; i < est.N; i++) {
+        var esp = i < nl ? 0 : 1;
+        var sig = Math.sqrt(est.T / MASSA[esp]);
         part.push({
           x: Math.random() * 0.96 + 0.02,
           y: Math.random() * 0.96 + 0.02,
-          vx: F.normalAleatoria() * Math.sqrt(est.T),
-          vy: F.normalAleatoria() * Math.sqrt(est.T)
+          vx: F.normalAleatoria() * sig,
+          vy: F.normalAleatoria() * sig,
+          e: esp
         });
       }
-      impulso = 0; tempo = 0; hist = new Array(NB).fill(0);
+      /* Cada espécie é preparada exatamente na temperatura pedida: tira-se o
+         momento total e reescalam-se as velocidades para que a energia
+         cinética média seja kB.T por grau de liberdade. Sem isso, o sorteio
+         daria a uma espécie uma amostra fria e à outra uma quente, e as
+         pressões parciais sairiam diferentes por um motivo que nada tem a ver
+         com Dalton. A flutuação que resta é a da contagem de choques. */
+      [0, 1].forEach(function (e) {
+        var g = part.filter(function (q) { return q.e === e; });
+        if (!g.length) return;
+        var sx = 0, sy = 0;
+        g.forEach(function (q) { sx += q.vx; sy += q.vy; });
+        sx /= g.length; sy /= g.length;
+        var ex = 0, ey = 0;
+        g.forEach(function (q) {
+          q.vx -= sx; q.vy -= sy;
+          ex += q.vx * q.vx; ey += q.vy * q.vy;
+        });
+        ex /= g.length; ey /= g.length;
+        /* Reescala cada eixo separadamente. Aqui as partículas não colidem
+           entre si, e um choque na parede troca o sinal de vx sem tocar em
+           vy: nada reparte energia entre as direções, de modo que o
+           desequilíbrio do sorteio inicial ficaria congelado para sempre.
+           Num gás real as colisões fazem esse trabalho. Impondo
+           <vx²> = <vy²> = kB.T/m no instante zero, a equipartição vale
+           dali em diante. */
+        var fx = ex > 0 ? Math.sqrt(est.T / MASSA[e] / ex) : 1;
+        var fy = ey > 0 ? Math.sqrt(est.T / MASSA[e] / ey) : 1;
+        g.forEach(function (q) { q.vx *= fx; q.vy *= fy; });
+      });
+
+      imp = [0, 0]; tempo = 0;
     }
 
     function passo(dt) {
@@ -585,91 +621,162 @@
         var p = part[i];
         p.x += p.vx * dt; p.y += p.vy * dt;
         if (p.x < 0) { p.x = -p.x; p.vx = -p.vx; }
-        if (p.x > 1) { impulso += 2 * Math.abs(p.vx); p.x = 2 - p.x; p.vx = -p.vx; }
+        if (p.x > 1) {
+          imp[p.e] += 2 * MASSA[p.e] * Math.abs(p.vx);   // impulso = 2m|vx|
+          p.x = 2 - p.x; p.vx = -p.vx;
+        }
         if (p.y < 0) { p.y = -p.y; p.vy = -p.vy; }
         if (p.y > 1) { p.y = 2 - p.y; p.vy = -p.vy; }
       }
       tempo += dt;
-      var vmax = 3.6 * Math.sqrt(est.T);
-      for (i = 0; i < part.length; i++) {
-        var b = Math.floor(Math.hypot(part[i].vx, part[i].vy) / vmax * NB);
-        if (b >= 0 && b < NB) hist[b]++;
-      }
     }
 
     function desenhar() {
-      var p = G.preparar(cv, 300);
+      var p = G.preparar(cv, 320);
       var ct = p.ct;
-      var lado = Math.min(p.L * 0.46, p.A - 34);
+      var lado = Math.min(p.L * 0.42, p.A - 42);
       var x0 = 12, y0 = 8;
 
       ct.save();
       ct.strokeStyle = G.COR.tinta; ct.lineWidth = 1.2;
       ct.strokeRect(x0, y0, lado, lado);
-      ct.strokeStyle = G.COR.vinho; ct.lineWidth = 3;
+      ct.strokeStyle = G.COR.ambar; ct.lineWidth = 3;
       ct.beginPath(); ct.moveTo(x0 + lado, y0); ct.lineTo(x0 + lado, y0 + lado); ct.stroke();
-      ct.fillStyle = G.COR.azul;
       part.forEach(function (q) {
+        ct.fillStyle = COR[q.e];
         ct.beginPath();
-        ct.arc(x0 + q.x * lado, y0 + (1 - q.y) * lado, 1.9, 0, 2 * Math.PI);
+        ct.arc(x0 + q.x * lado, y0 + (1 - q.y) * lado, q.e ? 2.8 : 1.8, 0, 2 * Math.PI);
         ct.fill();
       });
       ct.restore();
 
-      // histograma das velocidades contra a Maxwell bidimensional
-      var gx = x0 + lado + 34, gl = p.L - gx - 14, ga = lado;
-      if (gl > 90) {
-        var vmax = 3.6 * Math.sqrt(est.T), nb = NB;
-        var h = hist, soma = 0, k;
-        for (k = 0; k < nb; k++) soma += h[k];
-        var hmax = 0;
-        var hn = h.map(function (c) {
-          var y = soma ? c / soma * est.N : 0;
-          if (y > hmax) hmax = y;
-          return y;
+      ct.save();
+      ct.font = '11px system-ui, sans-serif';
+      ct.textAlign = 'left';
+      ct.fillStyle = G.COR.ambar;
+      ct.fillText('parede medida', x0 + lado - 86, y0 + lado + 14);
+      ct.fillStyle = COR[0];
+      ct.fillText('leve (m = 1)', x0, y0 + lado + 14);
+      ct.fillStyle = COR[1];
+      ct.fillText('pesada (m = 4)', x0, y0 + lado + 28);
+      ct.restore();
+
+      /* Histogramas das duas espécies, no mesmo eixo de velocidade.
+         Normalizados por ÁREA, e não pelo pico: assim a comparação com a
+         Maxwell teórica é quantitativa e o ruído de um bin isolado não
+         estica a curva inteira. As duas têm área 1, logo a mais estreita
+         é também a mais alta. */
+      var gx = x0 + lado + 34, gl = p.L - gx - 14, ga = lado - 18;
+      if (gl > 110) {
+        var vmax = 3.9 * Math.sqrt(est.T / MASSA[0]);
+        // pico teórico mais alto, que fixa a escala vertical
+        var pico = 0, e, i;
+        for (e = 0; e < 2; e++) {
+          pico = Math.max(pico, Math.sqrt(MASSA[e] / est.T) * Math.exp(-0.5));
+        }
+        var dens = function (v, mm) {
+          return (mm * v / est.T) * Math.exp(-mm * v * v / (2 * est.T));
+        };
+        /* O histograma é do instante, não acumulado: sem colisões entre
+           partículas os módulos das velocidades nunca mudam, de modo que
+           somar quadros apenas reamostraria as mesmas N moléculas. O que
+           se vê é uma amostra finita, e é por isso que ela serrilha. */
+        var conta = [new Array(NB).fill(0), new Array(NB).fill(0)];
+        part.forEach(function (q) {
+          var esc2 = 3.6 * Math.sqrt(est.T / MASSA[q.e]);
+          var bb = Math.floor(Math.hypot(q.vx, q.vy) / esc2 * NB);
+          if (bb >= 0 && bb < NB) conta[q.e][bb]++;
         });
-        hmax = hmax || 1;
-        // Maxwell em 2D: f(v) = (m v /kT) exp(-m v²/2kT)
-        var teo = [], tmax = 0, i;
-        for (i = 0; i < nb; i++) {
-          var v0 = (i + 0.5) / nb * vmax;
-          var ft = (v0 / est.T) * Math.exp(-v0 * v0 / (2 * est.T)) * (vmax / nb) * est.N;
-          teo.push(ft); if (ft > tmax) tmax = ft;
-        }
-        var esc = Math.max(hmax, tmax);
         ct.save();
-        ct.fillStyle = G.COR.azulClaro;
-        for (i = 0; i < nb; i++) {
-          var altura = hn[i] / esc * ga;
-          ct.fillRect(gx + i * gl / nb, y0 + ga - altura, gl / nb - 1, altura);
+        for (e = 0; e < 2; e++) {
+          var soma = 0;
+          for (i = 0; i < NB; i++) soma += conta[e][i];
+          var escalaV = 3.6 * Math.sqrt(est.T / MASSA[e]);
+          var larguraBin = escalaV / NB;
+
+          if (soma) {
+            ct.strokeStyle = COR[e];
+            ct.lineWidth = 2;
+            ct.beginPath();
+            for (i = 0; i < NB; i++) {
+              var v = (i + 0.5) * larguraBin;
+              var d = conta[e][i] / soma / larguraBin;
+              var X = gx + Math.min(1, v / vmax) * gl;
+              var Y = y0 + ga - (d / pico) * ga * 0.9;
+              if (i) ct.lineTo(X, Y); else ct.moveTo(X, Y);
+            }
+            ct.stroke();
+          }
+
+          ct.strokeStyle = COR[e];
+          ct.setLineDash([4, 3]);
+          ct.lineWidth = 1.3;
+          ct.beginPath();
+          for (i = 0; i <= 140; i++) {
+            var vv = vmax * i / 140;
+            var XX = gx + vv / vmax * gl;
+            var YY = y0 + ga - (dens(vv, MASSA[e]) / pico) * ga * 0.9;
+            if (i) ct.lineTo(XX, YY); else ct.moveTo(XX, YY);
+          }
+          ct.stroke();
+          ct.setLineDash([]);
         }
-        ct.strokeStyle = G.COR.vinho; ct.lineWidth = 2;
-        ct.beginPath();
-        for (i = 0; i < nb; i++) {
-          var X = gx + (i + 0.5) * gl / nb, Y = y0 + ga - teo[i] / esc * ga;
-          if (i) ct.lineTo(X, Y); else ct.moveTo(X, Y);
-        }
-        ct.stroke();
         ct.fillStyle = G.COR.suave;
         ct.font = '11px system-ui, sans-serif';
         ct.textAlign = 'center';
         ct.fillText('módulo da velocidade', gx + gl / 2, y0 + ga + 16);
+        ct.textAlign = 'right';
+        ct.fillText('tracejado: Maxwell 2D', gx + gl, y0 + ga + 30);
         ct.textAlign = 'left';
-        ct.fillStyle = G.COR.vinho;
-        ct.fillText('Maxwell 2D', gx + 4, y0 + 12);
+        ct.fillStyle = G.COR.tinta;
+        ct.fillText('a pesada é mais lenta, na razão 1/\u221am', gx, y0 + ga + 30);
         ct.restore();
       }
 
-      var vx2 = 0;
-      part.forEach(function (q) { vx2 += q.vx * q.vx; });
-      vx2 /= (part.length || 1);
-      var pm = tempo > 0 ? impulso / tempo : 0;   // parede de comprimento 1
-      var pa = est.N * vx2;                        // previsão para ESTA amostra
-      var pt = est.N * est.T;                      // limite termodinâmico, área 1
-      mostrar({
-        pm: F.fmt(pm, 2), pa: F.fmt(pa, 2), pt: F.fmt(pt, 2),
-        err: tempo > 0 ? F.pct((pm - pt) / pt, 1) : '·'
+      var nl = nLeve(), np = est.N - nl;
+      var P1 = tempo > 0 ? imp[0] / tempo : 0;
+      var P2 = tempo > 0 ? imp[1] / tempo : 0;
+      var Pt = est.N * est.T;
+      var ek = [0, 0], cnt = [0, 0];
+      part.forEach(function (q) {
+        ek[q.e] += 0.5 * MASSA[q.e] * (q.vx * q.vx + q.vy * q.vy);
+        cnt[q.e]++;
       });
+      mostrar({
+        p1: F.fmt(P1, 2) + ' <small>(N=' + nl + ')</small>',
+        p2: F.fmt(P2, 2) + ' <small>(N=' + np + ')</small>',
+        ps: F.fmt(P1 + P2, 2),
+        pt: F.fmt(Pt, 2),
+        ek: (cnt[0] ? F.fmt(ek[0] / cnt[0], 2) : '·') + ' / '
+          + (cnt[1] ? F.fmt(ek[1] / cnt[1], 2) : '·')
+      });
+    }
+
+    function texto() {
+      nota.innerHTML =
+        '<p>A parede da direita registra cada choque. Num choque elástico a partícula devolve '
+        + 'momento \\(2m|v_x|\\); somando esses impulsos e dividindo pelo tempo e pelo '
+        + 'comprimento da parede obtém-se a pressão. Ela converge para \\(N\\kB T/A\\) sem '
+        + 'que nada disso tenha sido imposto: a lei dos gases ideais é consequência dos '
+        + 'choques, não um postulado.</p>'
+        + '<p><b>E aqui está a lei de Dalton acontecendo.</b> As duas espécies têm massas '
+        + 'diferentes por um fator 4, e as velocidades diferem por um fator 2, como mostram '
+        + 'os dois histogramas. Ainda assim cada espécie contribui com \\(N_i\\kB T/A\\), '
+        + 'proporcional apenas ao seu <b>número</b> de partículas. Mova a fração da espécie '
+        + 'leve de 0 a 100% e veja as duas parciais trocarem de valor enquanto a soma não '
+        + 'se mexe.</p>'
+        + '<p>A razão está no último cartão: a energia cinética média é a mesma para as duas '
+        + 'espécies, \\(\\med{\\tfrac12 mv^2}=\\kB T\\) em duas dimensões, porque é isso que '
+        + 'a equipartição exige. A espécie pesada bate com mais força e menos frequência; a '
+        + 'leve, com menos força e mais frequência. O produto \\(m\\med{v_x^2}\\), que é o '
+        + 'que entra na pressão, é idêntico.</p>'
+        + '<p>Qualquer resíduo entre a soma medida e \\(N\\kB T/A\\) é a flutuação da '
+        + 'contagem de choques, que cai como o inverso da raiz do número de choques já '
+        + 'registrados: deixe rodar e veja encolher. As partículas aqui não colidem entre '
+        + 'si, apenas com as paredes, e por isso a equipartição entre as direções \\(x\\) '
+        + 'e \\(y\\) precisa ser imposta no instante inicial; num gás real são as '
+        + 'colisões mútuas que a estabelecem.</p>';
+      tipografar(nota);
     }
 
     var ultimo = 0;
@@ -682,11 +789,11 @@
     }
 
     reiniciar();
+    texto();
     requestAnimationFrame(quadro);
     window.addEventListener('resize', desenhar);
     tipografar(corpo);
   };
-
 
   /* =================================================================
      5. Dois dados: a frequência vira densidade de probabilidade
@@ -1136,7 +1243,8 @@
       { nome: 'hidrogênio', P0: 96, tmin: -252.9, cor: '#1f6f54' },
       { nome: 'nitrogênio', P0: 74, tmin: -195.8, cor: '#b5831f' },
       { nome: 'oxigênio', P0: 52, tmin: -183.0, cor: '#8c2f39' },
-      { nome: 'gás carbônico', P0: 31, tmin: -78.5, cor: '#7a5ea8' }
+      { nome: 'gás carbônico', P0: 31, tmin: -78.5, cor: '#7a5ea8' },
+      { nome: 'ar (mistura)', P0: 62, tmin: -194.0, cor: '#1b7f9e', mistura: true }
     ];
 
     var est = { P0: 140, zoom: false };
@@ -1267,7 +1375,11 @@
           + 'ao gás carbônico em -78,5 °C. Dali para a esquerda tudo é extrapolação '
           + 'tracejada, e é justamente por isso que o resultado impressiona: cinco '
           + 'substâncias quimicamente distintas, que nem sequer chegam juntas até lá, '
-          + 'apontam todas para o mesmo lugar.';
+          + 'apontam todas para o mesmo lugar. Repare que o <b>ar</b> está na lista: é uma '
+          + 'mistura de nitrogênio, oxigênio, argônio e vapor d\'água, e mesmo assim se '
+          + 'comporta como um gás só. Pela lei de Dalton, cada componente contribui com sua '
+          + 'pressão parcial segundo a mesma reta, e somar retas que cruzam no mesmo ponto '
+          + 'dá outra reta que cruza ali também.';
       tipografar(nota);
     }
 
