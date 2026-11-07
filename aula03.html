@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Módulo 3: Caminhante aleatório e estados microscópicos | Física Estatística</title>
 <link rel="icon" type="image/png" href="assets/img/favicon.png">
-<link rel="stylesheet" href="assets/css/estilo.css?v=202611071709">
-<script src="assets/js/comum.js?v=202611071709"></script>
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611071721">
+<script src="assets/js/comum.js?v=202611071721"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
 <body>
@@ -21,6 +21,7 @@
       <a href="aula02.html" class="num" title="Módulo 2: Métodos estatísticos">2</a>
       <span class="grupo">Microestados</span>
       <a href="aula03.html" class="num ativo" title="Módulo 3: Caminhante aleatório e estados microscópicos">3</a>
+      <a href="aula04.html" class="num" title="Módulo 4: Movimento browniano">4</a>
     </nav>
   </div>
 </header>
@@ -384,6 +385,12 @@
   resultado clássico, \(2\pi\delta E/\omega = h\cdot\delta E/\hbar\omega\): mais uma vez,
   <strong>um estado por célula de área \(h\)</strong>.</p>
 
+  <p>Os dois casos ficam mais claros desenhados. No widget abaixo, a região sombreada é a
+  casca de energia entre \(E\) e \(E+\delta E\), e a malha por cima dela é a grade de
+  células de área \(h\). Contar estados é contar células.</p>
+
+  <div data-widget="contarestados"></div>
+
   <!-- ================================================== -->
   <h2 id="s10">10. O ensemble microcanônico</h2>
 
@@ -417,6 +424,14 @@
 
   <p>O roteiro, daqui em diante, é sempre o mesmo, e vale decorá-lo porque os três próximos
   sistemas são apenas aplicações dele:</p>
+
+  <p>Antes de aplicar o roteiro, vale ver a contagem acontecer. O widget abaixo desenha
+  <strong>todos</strong> os microestados de um macroestado escolhido, quando eles são poucos
+  o bastante para caber na tela, e mostra ao lado como \(\Omega\) se distribui pelos
+  valores possíveis da energia. Os três sistemas das próximas seções estão ali, e a surpresa
+  é que a combinatória é a mesma nos três.</p>
+
+  <div data-widget="multiplicidade"></div>
 
   <div class="bloco def">
     <span class="rotulo">O roteiro microcanônico</span>
@@ -509,18 +524,171 @@
     fenômeno vive em sistemas de spin, e não em gases.</p>
   </div>
 
-  <p><strong>E o laser?</strong> Um laser precisa de inversão de população, isto é, mais
-  átomos no estado excitado do que no fundamental, para que a emissão estimulada supere a
-  absorção. Mas acabamos de ver que inversão de população é \(u>\epsilon/2\), ou seja,
-  temperatura negativa, que é impossível <em>em equilíbrio térmico</em>.</p>
+  <h3>Por que um sistema de dois níveis não pode ser um laser</h3>
 
-  <p>A conclusão é um resultado forte: <strong>um sistema de dois níveis não pode funcionar
-  como laser</strong>. Com bombeamento óptico, no melhor dos casos as populações se igualam e
-  o meio fica transparente, nunca amplificador. Por isso todo laser real tem três ou quatro
-  níveis: o truque é bombear para um nível alto de vida curta, que decai rapidamente para um
-  estado metaestável, e fazer a transição laser a partir dele para um nível <em>que se
-  esvazia depressa</em>. A inversão é mantida fora do equilíbrio, por um fluxo contínuo de
-  energia, e não apesar da termodinâmica, mas por nunca deixá-la se estabelecer.</p>
+  <p>Um laser amplifica luz por <strong>emissão estimulada</strong>: um fóton que passa por
+  um átomo excitado o faz decair, produzindo um segundo fóton idêntico em energia, fase,
+  polarização e direção. É daí que vêm a coerência e a monocromaticidade do feixe.</p>
+
+  <p>O problema é que o mesmo fóton, ao passar por um átomo no estado fundamental, pode ser
+  <em>absorvido</em>. Einstein mostrou em 1917 que os coeficientes dos dois processos são
+  iguais, \(B_{12}=B_{21}\). O ganho líquido do meio é então proporcional a</p>
+
+  <p>\[n_2-n_1,\]</p>
+
+  <p>e o meio só amplifica se houver <strong>inversão de população</strong>, \(n_2>n_1\).</p>
+
+  <p>Mas \(n_2>n_1\) é exatamente \(u>\epsilon/2\) na linguagem da seção anterior, isto é,
+  temperatura negativa. Em equilíbrio térmico a distribuição de Boltzmann garante
+  \(n_2/n_1=e^{-\epsilon/\kB T}<1\) para qualquer \(T>0\): o nível de cima está
+  <em>sempre</em> menos povoado.</p>
+
+  <div class="bloco alerta">
+    <span class="rotulo">O resultado, enunciado com precisão</span>
+    <p>Com apenas dois níveis e bombeamento óptico na própria transição laser, a inversão é
+    <strong>impossível</strong>, não importa quão forte seja o bombeamento. A razão é que o
+    bombeamento que leva átomos de 1 para 2 estimula, com a mesma taxa \(B\), o caminho de
+    volta de 2 para 1.</p>
+    <p>Escrevendo a equação de taxas no regime estacionário, com \(W\) a taxa de bombeamento
+    e \(A\) a de emissão espontânea,</p>
+    <p>\[\frac{n_2}{n_1}=\frac{W}{W+A}<1\quad\text{sempre}.\]</p>
+    <p>No limite de bombeamento infinito, \(n_2/n_1\to 1\): as populações se igualam e o meio
+    fica <b>transparente</b>, nunca amplificador. Esse regime tem nome, <em>saturação</em>,
+    e é por isso que nenhum laser de dois níveis jamais foi construído.</p>
+  </div>
+
+  <h3>A solução: três níveis e bombeamento</h3>
+
+  <p>A saída é separar o nível que recebe o bombeamento do nível que emite o laser, de modo
+  que o bombeamento não possa desfazer a inversão que ele mesmo cria.</p>
+
+  <div class="diagrama-niveis">
+  <svg viewBox="0 0 660 260" role="img"
+       aria-label="Esquemas de dois, três e quatro níveis para um laser">
+    <style>
+      .nv{stroke:#1b1f24;stroke-width:2.4}
+      .rot{font:11px system-ui,sans-serif;fill:#4a5560}
+      .tit{font:600 12px system-ui,sans-serif;fill:#16304f}
+      .bomb{stroke:#b5831f;stroke-width:2;marker-end:url(#pta)}
+      .las{stroke:#8c2f39;stroke-width:2.6;marker-end:url(#ptv)}
+      .rap{stroke:#4a5560;stroke-width:1.4;stroke-dasharray:4 3;marker-end:url(#ptc)}
+      .nao{font:600 11px system-ui,sans-serif;fill:#8c2f39}
+      .sim{font:600 11px system-ui,sans-serif;fill:#1f6f54}
+    </style>
+    <defs>
+      <marker id="pta" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+        <path d="M0,0 L7,3.5 L0,7 z" fill="#b5831f"/></marker>
+      <marker id="ptv" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+        <path d="M0,0 L7,3.5 L0,7 z" fill="#8c2f39"/></marker>
+      <marker id="ptc" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+        <path d="M0,0 L7,3.5 L0,7 z" fill="#4a5560"/></marker>
+    </defs>
+
+    <!-- dois níveis -->
+    <text class="tit" x="20" y="18">Dois níveis</text>
+    <line class="nv" x1="20" y1="210" x2="140" y2="210"/>
+    <line class="nv" x1="20" y1="80"  x2="140" y2="80"/>
+    <text class="rot" x="146" y="214">1</text>
+    <text class="rot" x="146" y="84">2</text>
+    <line class="bomb" x1="50" y1="206" x2="50" y2="88"/>
+    <line class="las"  x1="105" y1="84" x2="105" y2="202"/>
+    <text class="nao" x="20" y="240">não inverte: satura em n₂ = n₁</text>
+
+    <!-- três níveis -->
+    <text class="tit" x="240" y="18">Três níveis</text>
+    <line class="nv" x1="240" y1="210" x2="360" y2="210"/>
+    <line class="nv" x1="240" y1="110" x2="360" y2="110"/>
+    <line class="nv" x1="240" y1="52"  x2="360" y2="52"/>
+    <text class="rot" x="366" y="214">1 fundamental</text>
+    <text class="rot" x="366" y="114">2 metaestável</text>
+    <text class="rot" x="366" y="56">3 bombeio</text>
+    <line class="bomb" x1="262" y1="206" x2="262" y2="60"/>
+    <line class="rap"  x1="300" y1="56"  x2="300" y2="106"/>
+    <line class="las"  x1="335" y1="114" x2="335" y2="202"/>
+    <text class="sim" x="240" y="240">inverte, mas exige bombeio forte</text>
+
+    <!-- quatro níveis -->
+    <text class="tit" x="470" y="18">Quatro níveis</text>
+    <line class="nv" x1="470" y1="222" x2="590" y2="222"/>
+    <line class="nv" x1="470" y1="176" x2="590" y2="176"/>
+    <line class="nv" x1="470" y1="110" x2="590" y2="110"/>
+    <line class="nv" x1="470" y1="52"  x2="590" y2="52"/>
+    <text class="rot" x="596" y="226">0</text>
+    <text class="rot" x="596" y="180">1 esvazia</text>
+    <text class="rot" x="596" y="114">2</text>
+    <text class="rot" x="596" y="56">3</text>
+    <line class="bomb" x1="488" y1="218" x2="488" y2="60"/>
+    <line class="rap"  x1="520" y1="56"  x2="520" y2="106"/>
+    <line class="las"  x1="552" y1="114" x2="552" y2="168"/>
+    <line class="rap"  x1="575" y1="180" x2="575" y2="216"/>
+    <text class="sim" x="470" y="246">inverte com bombeio fraco</text>
+  </svg>
+  <p class="legenda">Em âmbar, o bombeamento. Em vinho, a transição laser. Tracejado,
+  decaimentos rápidos não radiativos.</p>
+  </div>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th></th><th>Dois níveis</th><th>Três níveis</th><th>Quatro níveis</th></tr></thead>
+    <tbody>
+      <tr><th>Nível inferior da transição laser</th><td>o fundamental</td><td>o fundamental</td>
+          <td>um nível excitado que se esvazia sozinho</td></tr>
+      <tr><th>Inversão exige</th><td>impossível</td>
+          <td>bombear <b>mais da metade</b> de todos os átomos</td>
+          <td>bombear uns poucos átomos</td></tr>
+      <tr><th>Limiar de bombeamento</th><td>infinito</td><td>alto</td><td>baixo</td></tr>
+      <tr><th>Exemplo</th><td>nenhum</td><td>rubi (Maiman, 1960)</td>
+          <td>Nd:YAG, hélio-neônio, diodos</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>No esquema de <strong>três níveis</strong>, o bombeamento leva os átomos do fundamental
+  (1) para um nível alto (3) de vida curta, que decai muito depressa, sem emitir luz, para um
+  nível <strong>metaestável</strong> (2) de vida longa. Como 3 se esvazia rápido, o
+  bombeamento nunca encontra população lá para estimular de volta, e a armadilha do caso de
+  dois níveis é evitada. A inversão é entre 2 e 1.</p>
+
+  <p>O preço é alto: como o nível inferior da transição laser é o próprio fundamental, onde
+  estão todos os átomos no início, é preciso bombear <strong>mais da metade</strong> da
+  população inteira antes de haver qualquer ganho. O rubi de Maiman, o primeiro laser, é de
+  três níveis, e por isso só funcionava em pulsos, com lâmpadas de flash fotográfico.</p>
+
+  <p>No esquema de <strong>quatro níveis</strong>, a transição laser termina num nível
+  excitado (1) que se esvazia sozinho e rapidamente para o fundamental (0). Como ele está
+  praticamente vazio o tempo todo, <em>qualquer</em> átomo colocado em 2 já constitui
+  inversão. O limiar cai enormemente, e é por isso que quase todo laser contínuo, do
+  ponteiro ao industrial, é de quatro níveis.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">A inversão é um estado fora do equilíbrio</span>
+    <p>Nada disso contradiz a termodinâmica. Em nenhum momento o meio ativo está em
+    equilíbrio térmico: ele é atravessado por um fluxo contínuo de energia, que entra pelo
+    bombeamento e sai pelo feixe e pelo calor. A inversão é <strong>mantida</strong> por esse
+    fluxo, e desaparece em microssegundos se ele for cortado.</p>
+    <p>Atribuir uma temperatura negativa ao par de níveis invertidos é legítimo e útil, desde
+    que se entenda que ela descreve apenas aqueles dois níveis, e não o material inteiro, que
+    continua à temperatura ambiente.</p>
+  </div>
+
+  <div class="bloco def">
+    <span class="rotulo">Para ir além</span>
+    <ul>
+      <li>E. M. Purcell e R. V. Pound, <em>A Nuclear Spin System at Negative Temperature</em>,
+      Phys. Rev. <b>81</b>, 279 (1951). A primeira realização experimental de \(T<0\), em
+      spins nucleares de fluoreto de lítio.</li>
+      <li>N. F. Ramsey, <em>Thermodynamics and Statistical Mechanics at Negative Absolute
+      Temperatures</em>, Phys. Rev. <b>103</b>, 20 (1956). O tratamento termodinâmico
+      cuidadoso, incluindo por que \(T<0\) é mais quente que \(T>0\).</li>
+      <li>A. L. Schawlow e C. H. Townes, <em>Infrared and Optical Masers</em>, Phys. Rev.
+      <b>112</b>, 1940 (1958). O artigo que propôs o laser.</li>
+      <li>T. H. Maiman, <em>Stimulated Optical Radiation in Ruby</em>, Nature <b>187</b>, 493
+      (1960). O primeiro laser, de três níveis.</li>
+      <li>S. Braun <em>et al.</em>, <em>Negative Absolute Temperature for Motional Degrees of
+      Freedom</em>, Science <b>339</b>, 52 (2013). Temperatura negativa em graus de liberdade
+      de movimento, num gás de átomos ultrafrios.</li>
+    </ul>
+  </div>
 
   <!-- ================================================== -->
   <h2 id="s13">13. O sólido de Einstein</h2>
@@ -862,7 +1030,7 @@
 
   <nav class="nav-aulas">
     <a href="aula02.html"><small>Módulo anterior</small>← 2. Métodos estatísticos</a>
-    <span class="em-breve"><small>Em preparação</small>4. Movimento browniano</span>
+    <a class="prox" href="aula04.html"><small>Próximo módulo</small>4. Movimento browniano →</a>
   </nav>
 
 </main>
@@ -874,6 +1042,6 @@
   Laboratório de Física Computacional Aplicada (LFCA) · Universidade Regional do Cariri</p>
 </footer>
 
-<script src="assets/js/widgets.js?v=202611071709"></script>
+<script src="assets/js/widgets.js?v=202611071721"></script>
 </body>
 </html>

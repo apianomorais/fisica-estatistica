@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Módulo 4: Movimento browniano | Física Estatística</title>
+<link rel="icon" type="image/png" href="assets/img/favicon.png">
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611071721">
+<script src="assets/js/comum.js?v=202611071721"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+
+<header class="topo">
+  <div class="topo-interno">
+    <a class="marca" href="index.html">Física Estatística <span>· LFCA/URCA</span></a>
+    <nav class="menu">
+      <a href="index.html">Início</a>
+      <span class="grupo">Fundamentos</span>
+      <a href="aula01.html" class="num" title="Módulo 1: Revisão de termodinâmica">1</a>
+      <a href="aula02.html" class="num" title="Módulo 2: Métodos estatísticos">2</a>
+      <span class="grupo">Microestados</span>
+      <a href="aula03.html" class="num" title="Módulo 3: Caminhante aleatório e estados microscópicos">3</a>
+      <a href="aula04.html" class="num ativo" title="Módulo 4: Movimento browniano">4</a>
+    </nav>
+  </div>
+</header>
+
+<div class="envoltorio">
+
+<aside class="lateral">
+  <h4>Neste módulo</h4>
+  <ol>
+    <li><a href="#s1">1. O que Brown viu</a></li>
+    <li><a href="#s2">2. A equação de Langevin</a></li>
+    <li><a href="#s3">3. O truque de multiplicar por x</a></li>
+    <li><a href="#s4">4. O coeficiente de difusão</a></li>
+    <li><a href="#s5">5. Com um campo externo: mobilidade</a></li>
+    <li><a href="#s6">6. As leis de Fick</a></li>
+    <li><a href="#s7">7. A solução gaussiana</a></li>
+    <li><a href="#s8">8. A relação de Stokes e Einstein</a></li>
+    <li><a href="#s9">9. Perrin e a pesagem do átomo</a></li>
+    <li><a href="#s10">10. O teorema H</a></li>
+    <li><a href="#s11">11. Loschmidt, Zermelo e a recorrência</a></li>
+    <li><a href="#s12">12. Exercícios resolvidos</a></li>
+    <li><a href="#s13">13. Exercícios propostos</a></li>
+  </ol>
+</aside>
+
+<main class="conteudo">
+
+  <p class="chapeu">Módulo 4 · Estados microscópicos e entropia</p>
+  <h1>Movimento browniano</h1>
+  <p class="subtitulo">O caminhante aleatório do módulo anterior era um modelo. Aqui ele vira
+  um objeto visível ao microscópio, e a conta que o descreve permite pesar um átomo usando
+  nada além de uma lente, um cronômetro e a temperatura ambiente. Foi assim que a existência
+  das moléculas deixou de ser hipótese.</p>
+
+  <div class="bloco def">
+    <span class="rotulo">Objetivos</span>
+    <ul>
+      <li>Escrever a equação de Langevin e identificar o papel de cada termo;</li>
+      <li>Obter \(\med{x^2}=2Dt\) sem resolver a equação estocástica;</li>
+      <li>Deduzir a relação de Einstein entre difusão e mobilidade;</li>
+      <li>Passar das leis de Fick à solução gaussiana que se espalha como \(\sqrt t\);</li>
+      <li>Obter \(D=\kB T/6\pi\eta a\) e, dela, o número de Avogadro;</li>
+      <li>Definir \(H=\sum f\ln f\) e discutir por que ele cai mesmo com dinâmica reversível.</li>
+    </ul>
+  </div>
+
+  <hr class="linha">
+
+  <!-- ================================================== -->
+  <h2 id="s1">1. O que Brown viu</h2>
+
+  <p>Em 1827, o botânico escocês <strong>Robert Brown</strong> observava ao microscópio grãos
+  de pólen suspensos em água e notou que as partículas minúsculas liberadas por eles se
+  moviam incessantemente, em ziguezague, sem nunca parar. A primeira suspeita foi de que
+  aquilo era vida. Brown, cuidadoso, repetiu com pó de vidro, com fuligem e com um fragmento
+  da Esfinge: o movimento continuou. Não era vida.</p>
+
+  <p>Por quase oitenta anos ninguém soube explicar. A dificuldade é séria: o grão tem talvez
+  um micrômetro e pesa um bilhão de vezes mais que uma molécula de água. Como pode ser
+  sacudido por elas?</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">A resposta é estatística, não mecânica</span>
+    <p>O grão é bombardeado por algo como \(10^{20}\) moléculas por segundo, vindas de todas
+    as direções. Se os impactos se cancelassem exatamente, nada aconteceria. Mas eles são
+    <em>aleatórios</em>, e a soma de \(n\) contribuições aleatórias não é zero: é da ordem de
+    \(\sqrt{n}\).</p>
+    <p>É o mesmo \(\sqrt{N}\) do Módulo 3. O desequilíbrio instantâneo de forças é uma parte
+    em \(10^{10}\) do bombardeio total, e ainda assim basta para deslocar o grão o suficiente
+    para ser visto. O movimento browniano é a flutuação estatística tornada visível a olho
+    nu.</p>
+  </div>
+
+  <p>Em 1905, Einstein publicou a teoria quantitativa. Em 1908, Perrin a verificou e mediu o
+  número de Avogadro. Em 1926, recebeu o Nobel por isso. É essa a história deste módulo.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s2">2. A equação de Langevin</h2>
+
+  <p>Paul Langevin, em 1908, propôs tratar o problema separando a força que a água exerce
+  sobre o grão em duas partes: uma parte sistemática, que é o arrasto viscoso, e uma parte
+  flutuante, que é o bombardeio molecular. A segunda lei de Newton fica</p>
+
+  <div class="destaque">
+    <span class="anuncio">Equação de Langevin</span>
+    \[\frac{dv}{dt}=-\beta' v + A(t),\qquad \beta'=\frac{b}{m}\]
+  </div>
+
+  <p>O primeiro termo é a força de Stokes dividida pela massa, que freia o grão. O segundo é
+  uma aceleração aleatória, da qual só exigiremos uma coisa:</p>
+
+  <p>\[\overline{A(t)}=0.\]</p>
+
+  <p>A média temporal do empurrão é nula, porque não há direção privilegiada. Note que isso
+  é notavelmente pouco: não precisaremos saber a forma de \(A(t)\), nem sua estatística
+  detalhada.</p>
+
+  <p>Sem o termo aleatório, a equação se resolve de imediato:</p>
+
+  <p>\[\frac{dv}{dt}=-\beta' v \;\Longrightarrow\; v=v_0e^{-\beta' t},\]</p>
+
+  <p>e o grão simplesmente para, com tempo característico \(1/\beta'\). Para um grão de
+  1 µm em água esse tempo é da ordem de \(10^{-7}\) s: muito menor que qualquer observação.
+  É por isso que nunca vemos o grão "em movimento"; vemos apenas o resultado acumulado de
+  milhões de partidas e paradas.</p>
+
+  <div class="bloco alerta">
+    <span class="rotulo">Uma equação de tipo novo</span>
+    <p>A equação de Langevin é uma <strong>equação diferencial estocástica</strong>: um de
+    seus termos é uma função aleatória. Ela não tem "a" solução, e sim um conjunto de
+    soluções, uma por realização do ruído. O que se calcula são médias sobre esse conjunto.</p>
+    <p>Foi a primeira equação desse tipo na física, e abriu um ramo inteiro. Hoje a mesma
+    estrutura descreve ruído em circuitos, dinâmica de populações e precificação de ativos
+    financeiros.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s3">3. O truque de multiplicar por x</h2>
+
+  <p>Queremos \(\med{x^2}\), e não \(x(t)\). Há um caminho engenhoso que evita resolver a
+  equação estocástica: multiplicar tudo por \(x\) e reconhecer derivadas.</p>
+
+  <p>\[x\frac{dv}{dt}=-\beta' x v + xA(t).\]</p>
+
+  <p>Observe agora que, com \(v=dx/dt\),</p>
+
+  <p>\[\frac{d}{dt}\left(x^2\right)=2xv,\qquad
+  \frac{d^2}{dt^2}\left(x^2\right)=2v^2+2x\frac{dv}{dt}.\]</p>
+
+  <p>Isolando \(x\,dv/dt\) da segunda e substituindo na primeira equação:</p>
+
+  <p>\[\frac{d^2}{dt^2}\left(x^2\right)-2v^2
+  =-\beta'\frac{d}{dt}\left(x^2\right)+2xA(t).\]</p>
+
+  <p>Agora tomamos a média temporal. O termo \(\overline{xA}\) se anula, porque a posição do
+  grão não sabe o que as moléculas vão fazer no instante seguinte: a força aleatória não está
+  correlacionada com a posição. Definindo \(\overline{\alpha}=d\overline{x^2}/dt\),</p>
+
+  <p>\[\frac{d\overline{\alpha}}{dt}-2\overline{v^2}+\beta'\overline{\alpha}=0.\]</p>
+
+  <p>Falta apenas \(\overline{v^2}\), e aqui entra a termodinâmica. O grão está em equilíbrio
+  térmico com o líquido, logo vale a <strong>equipartição</strong>:</p>
+
+  <p>\[\tfrac{1}{2}m\overline{v^2}=\tfrac{1}{2}\kB T
+  \quad\Longrightarrow\quad \overline{v^2}=\frac{\kB T}{m}.\]</p>
+
+  <p>Note o que acabou de acontecer: o grão, que é um objeto macroscópico visível ao
+  microscópio, foi tratado como mais uma partícula do gás. Essa é a jogada central de
+  Einstein.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s4">4. O coeficiente de difusão</h2>
+
+  <p>A equação para \(\overline\alpha\) vira</p>
+
+  <p>\[\frac{d\overline{\alpha}}{dt}=\frac{2\kB T}{m}-\beta'\overline{\alpha},\]</p>
+
+  <p>cuja solução é imediata:</p>
+
+  <p>\[\overline{\alpha}=\frac{2\kB T}{\beta' m}+Ce^{-\beta' t}.\]</p>
+
+  <p>O último termo é transiente e morre em \(10^{-7}\) s. Sobrando apenas o primeiro, e
+  lembrando que \(\overline\alpha=d\overline{x^2}/dt\):</p>
+
+  <p>\[\frac{d\overline{x^2}}{dt}=\frac{2\kB T}{\beta' m}
+  \quad\Longrightarrow\quad
+  \boxed{\;\overline{x^2}=2Dt,\qquad D=\frac{\kB T}{\beta' m}=\frac{\kB T}{b}\;}\]</p>
+
+  <p>Chegamos ao mesmo \(\sqrt t\) do caminhante aleatório, agora com o coeficiente escrito em
+  termos de grandezas mensuráveis. O deslocamento típico é</p>
+
+  <p>\[\sqrt{\overline{x^2}}=\sqrt{2Dt}.\]</p>
+
+  <div class="bloco alerta">
+    <span class="rotulo">Uma armadilha de nomenclatura</span>
+    <p>Em uma dimensão, \(\med{x^2}=2Dt\). Em duas, \(\med{r^2}=\med{x^2}+\med{y^2}=4Dt\);
+    em três, \(\med{r^2}=6Dt\). O coeficiente \(D\) é o mesmo; o que muda é quantas direções
+    somam. Sempre verifique qual convenção um texto está usando antes de comparar números.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s5">5. Com um campo externo: mobilidade</h2>
+
+  <p>Suponha agora que o grão tenha carga \(q\) e haja um campo elétrico constante \(E\). A
+  equação de Langevin ganha um termo:</p>
+
+  <p>\[\frac{dv}{dt}=\frac{qE}{m}-\beta' v+A(t).\]</p>
+
+  <p>Tomando a média, o termo aleatório some e sobra uma equação ordinária:</p>
+
+  <p>\[\frac{d\overline{v}}{dt}=\frac{qE}{m}-\beta'\overline{v}
+  \;\Longrightarrow\;
+  \overline{v}=v_0e^{-\beta' t}+\frac{qE}{m\beta'}\left(1-e^{-\beta' t}\right).\]</p>
+
+  <p>Para tempos longos, o grão atinge uma velocidade terminal:</p>
+
+  <p>\[\overline{v}_\infty=\frac{qE}{\beta' m}=\mu\,qE,\qquad
+  \mu\equiv\frac{1}{\beta' m}=\frac{1}{b},\]</p>
+
+  <p>onde \(\mu\) é a <strong>mobilidade</strong>. Comparando com \(D=\kB T/(\beta'm)\),
+  chega-se a uma identidade de alcance enorme:</p>
+
+  <div class="destaque">
+    <span class="anuncio">Relação de Einstein</span>
+    \[\frac{D}{\mu}=\kB T\]
+  </div>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Por que isto é surpreendente</span>
+    <p>\(D\) descreve como o grão se <em>espalha</em> sozinho, sem força nenhuma. \(\mu\)
+    descreve como ele <em>responde</em> a uma força aplicada. São experimentos distintos, um
+    em equilíbrio e outro fora dele, e a relação diz que seu quociente é apenas \(\kB T\).</p>
+    <p>A razão é que os dois fenômenos têm a mesma origem: os choques moleculares que
+    empurram o grão ao acaso são os mesmos que o freiam quando ele se move. Flutuação e
+    dissipação são dois lados do mesmo processo. Essa ideia, generalizada, é o
+    <strong>teorema da flutuação e dissipação</strong>, um dos resultados mais fundos da
+    física estatística fora do equilíbrio.</p>
+    <p>Uma consequência prática: a condutividade de um eletrólito e a difusão dos seus íons
+    não são medidas independentes. Medindo uma, sabe-se a outra.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s6">6. As leis de Fick</h2>
+
+  <p>Mudemos de ponto de vista: em vez de um grão, uma nuvem deles, descrita pela densidade
+  numérica \(\rho_N(\vec r,t)\). Como grãos não são criados nem destruídos, vale a equação da
+  continuidade:</p>
+
+  <p>\[\frac{\partial \rho_N}{\partial t}=-\nabla\cdot\vec J,\]</p>
+
+  <p>com \(\vec J\) a corrente de partículas. Falta uma relação entre \(\vec J\) e
+  \(\rho_N\), e a observação experimental, de Adolf Fick em 1855, é que as partículas fluem
+  do mais concentrado para o menos concentrado, na proporção do gradiente:</p>
+
+  <p>\[\boxed{\;\vec J=-D\,\nabla\rho_N\;}\qquad\text{(primeira lei de Fick)}\]</p>
+
+  <p>Substituindo na continuidade, e supondo \(D\) uniforme:</p>
+
+  <p>\[\boxed{\;\frac{\partial\rho_N}{\partial t}=D\,\nabla^{2}\rho_N\;}
+  \qquad\text{(segunda lei de Fick)}\]</p>
+
+  <p>É a equação do calor, e não por acaso: calor e matéria se espalham pela mesma matemática.
+  Note que ela <strong>não é simétrica no tempo</strong>: trocando \(t\) por \(-t\) ela muda.
+  Uma gota de tinta se dissolve na água; água tingida não reconcentra a tinta
+  espontaneamente. Guarde essa assimetria, porque a seção 10 vai perguntar de onde ela veio,
+  já que as equações de Newton por baixo são reversíveis.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s7">7. A solução gaussiana</h2>
+
+  <p>Suponha que no instante inicial todos os grãos estejam concentrados num ponto:</p>
+
+  <p>\[\rho_N(x,0)=\rho_0\,\delta(x).\]</p>
+
+  <p>A solução da segunda lei de Fick com essa condição é uma gaussiana que se alarga:</p>
+
+  <p>\[\rho_N(x,t)=\frac{\rho_0}{\sqrt{4\pi Dt}}\;e^{-x^2/4Dt}.\]</p>
+
+  <p>Comparando com a forma padrão \(e^{-x^2/2\sigma^2}/\sqrt{2\pi\sigma^2}\), lê-se
+  imediatamente \(\sigma^2=2Dt\), ou seja</p>
+
+  <p>\[\overline{x^2}=\int_{-\infty}^{\infty}x^2\,\rho_N(x,t)\,dx=2Dt,\]</p>
+
+  <p>em acordo com o que a equação de Langevin já havia dado. Os dois caminhos, o da
+  partícula individual e o da nuvem, levam ao mesmo lugar.</p>
+
+  <p>O widget abaixo faz as três coisas ao mesmo tempo: mostra as trajetórias como nos
+  desenhos de Perrin, acompanha \(\med{x^2}\) crescendo linearmente e exibe o perfil de
+  difusão se abrindo sobre a gaussiana prevista.</p>
+
+  <div data-widget="browniano"></div>
+
+  <!-- ================================================== -->
+  <h2 id="s8">8. A relação de Stokes e Einstein</h2>
+
+  <p>Falta dar nome ao coeficiente de arrasto. Para uma esfera de raio \(a\) movendo-se
+  lentamente num fluido de viscosidade \(\eta\), a lei de Stokes dá \(b=6\pi\eta a\), logo
+  \(\beta'=6\pi\eta a/m\), e</p>
+
+  <div class="destaque">
+    <span class="anuncio">Relação de Stokes e Einstein</span>
+    \[D=\frac{\kB T}{6\pi\eta a}\]
+  </div>
+
+  <p>Tudo do lado direito é mensurável com instrumentos de bancada: a temperatura com um
+  termômetro, a viscosidade com um viscosímetro, o raio do grão com o próprio microscópio.
+  E do lado esquerdo está uma grandeza que se obtém cronometrando o ziguezague.</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>Partícula</th><th>Raio</th><th>\(D\) em água a 20 °C</th>
+    <th>Tempo para percorrer 1 mm</th></tr></thead>
+    <tbody>
+      <tr><td>molécula de água</td><td>0,14 nm</td><td>\(2{,}3\times 10^{3}\) µm²/s</td><td>3,6 min</td></tr>
+      <tr><td>proteína pequena</td><td>2 nm</td><td>\(1{,}1\times 10^{2}\) µm²/s</td><td>1,3 h</td></tr>
+      <tr><td>grão de Perrin</td><td>0,5 µm</td><td>0,43 µm²/s</td><td>13 dias</td></tr>
+      <tr><td>bactéria</td><td>1 µm</td><td>0,21 µm²/s</td><td>27 dias</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>A última coluna explica por que bactérias nadam em vez de esperar a difusão, e por que
+  as células são pequenas: acima de alguns micrômetros, difundir nutrientes deixa de
+  funcionar.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s9">9. Perrin e a pesagem do átomo</h2>
+
+  <p>Agora o passo que mudou a história da física. A constante de Boltzmann não é independente:
+  ela é a constante dos gases por partícula,</p>
+
+  <p>\[\kB=\frac{R}{N_A},\]</p>
+
+  <p>e \(R=8{,}314\) J/(mol·K) era conhecida desde o século XIX, medida em gases. Substituindo
+  na relação de Stokes e Einstein e isolando:</p>
+
+  <div class="destaque">
+    <span class="anuncio">O número de Avogadro, medido com um microscópio</span>
+    \[N_A=\frac{R\,T}{6\pi\eta a\,D}\]
+  </div>
+
+  <p>Em 1908, <strong>Jean Perrin</strong> e seus alunos fizeram exatamente isso. Prepararam
+  emulsões de guta-percha com grãos de raio conhecido, acompanharam ao microscópio a posição
+  de centenas deles em intervalos de 30 segundos, anotaram milhares de deslocamentos e
+  calcularam \(\med{x^2}\). O resultado foi \(N_A\approx 7\times 10^{23}\).</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Por que esse número ganhou a discussão</span>
+    <p>O valor de Perrin erra uns 15% em relação ao atual, \(6{,}022\times 10^{23}\). Para a
+    época, isso era excelente. Mas não foi a precisão que convenceu: foi a
+    <strong>convergência</strong>.</p>
+    <p>Perrin reuniu no livro <em>Les Atomes</em> (1913) treze determinações independentes de
+    \(N_A\), vindas de fenômenos sem nenhuma relação entre si: movimento browniano,
+    radioatividade, opalescência crítica, azul do céu, espectro do corpo negro, carga do
+    elétron. Todas deram a mesma ordem de grandeza. Como ele argumentou, era inacreditável
+    que treze rotas distintas conspirassem para produzir o mesmo número se não houvesse
+    realmente átomos lá.</p>
+    <p>Wilhelm Ostwald, o mais influente dos céticos, desistiu publicamente da oposição em
+    1909. Ernst Mach nunca aceitou.</p>
+  </div>
+
+  <p>No widget da seção 7, o cartão \(N_A\) refaz essa medida a cada instante. Reduza o número
+  de grãos observados e veja o erro crescer: é precisamente a dificuldade que Perrin enfrentou
+  ao olho nu, contando grão por grão.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s10">10. O teorema H</h2>
+
+  <p>Resta a pergunta deixada em aberto na seção 6: de onde vem a irreversibilidade, se as
+  equações de Newton não a têm?</p>
+
+  <p>Boltzmann atacou o problema em 1872. Seja \(f\) a densidade de probabilidade das
+  partículas no espaço de fase \(\Gamma\), de modo que o número esperado de partículas num
+  elemento \(\delta v_\mu\) é \(\delta n = f\,\delta v_\mu\). Defina a quantidade</p>
+
+  <div class="destaque">
+    <span class="anuncio">O funcional H de Boltzmann</span>
+    \[H=\sum_i f_i\ln f_i\,\delta v_\mu
+    \;\xrightarrow[\;\delta v_\mu\to 0\;]{}\;
+    \int f\ln f\,d\Gamma\]
+  </div>
+
+  <p>Escrito em termos do número de moléculas em cada célula, \(H=\sum_i n_i\ln n_i + C\). E
+  aqui vem a conexão com o módulo anterior. No ensemble microcanônico, a probabilidade de uma
+  dada repartição \(\{n_i\}\) satisfaz</p>
+
+  <p>\[\ln\wp\approx N\ln N-\sum_i n_i\ln n_i + C',\]</p>
+
+  <p>que é exatamente o cálculo de multiplicidade que fizemos para o sistema de dois níveis.
+  Portanto</p>
+
+  <p>\[H=-\ln\wp+C''=-\ln\Gamma+C',\]</p>
+
+  <p>com \(\Gamma\) o número de microestados compatíveis com a condição observada. Comparando
+  com \(S=\kB\ln\Omega\):</p>
+
+  <div class="destaque">
+    <span class="anuncio">H é a entropia de cabeça para baixo</span>
+    \[H=-\frac{S}{\kB}+\text{constante}\]
+  </div>
+
+  <p>O <strong>teorema H</strong> afirma que \(dH/dt\le 0\), com igualdade apenas no
+  equilíbrio. Dizer que \(H\) cai é dizer que \(S\) sobe: é a segunda lei, deduzida da
+  dinâmica das colisões.</p>
+
+  <p>Derivando \(H\) no tempo, e lembrando que o número total de partículas é fixo, de modo
+  que \(\int(\partial f/\partial t)\,d\Gamma=0\):</p>
+
+  <p>\[\frac{dH}{dt}=\int \frac{\partial f}{\partial t}\ln f\;d\Gamma.\]</p>
+
+  <p>Substituindo \(\partial f/\partial t\) pela equação de transporte de Boltzmann, que
+  descreve como as colisões redistribuem as velocidades, demonstra-se que essa integral nunca
+  é positiva.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s11">11. Loschmidt, Zermelo e a recorrência</h2>
+
+  <p>A demonstração provocou duas objeções que são, até hoje, o melhor caminho para entender
+  o que a segunda lei realmente afirma.</p>
+
+  <div class="cartoes">
+    <div class="cartao">
+      <h3>Paradoxo de Loschmidt (1876)</h3>
+      <p>As leis de Newton são simétricas no tempo. Se existe uma evolução em que \(H\) cai,
+      então, invertendo todas as velocidades, existe outra igualmente legítima em que \(H\)
+      sobe. Como um teorema pode produzir uma conclusão assimétrica a partir de premissas
+      simétricas?</p>
+    </div>
+    <div class="cartao">
+      <h3>Paradoxo de Zermelo (1896)</h3>
+      <p>O teorema de recorrência de Poincaré garante que um sistema mecânico limitado volta
+      arbitrariamente perto de qualquer estado inicial, se esperarmos o suficiente. Logo
+      \(H\) terá de subir de volta. Nenhum decaimento pode ser permanente.</p>
+    </div>
+  </div>
+
+  <p>As duas objeções são <strong>logicamente corretas</strong>, e Boltzmann acabou por
+  aceitá-las, reformulando a sua afirmação. O teorema H não diz que \(H\) cai sempre; diz que
+  \(H\) cai <em>quase sempre</em>, e que as exceções são tão improváveis que não ocorrem em
+  nenhum tempo observável.</p>
+
+  <p>O modelo abaixo, proposto por Paul e Tatiana Ehrenfest em 1907, deixa isso visível. A
+  regra é reversível e simples a ponto de caber em uma linha, e ainda assim \(H\) despenca.</p>
+
+  <div data-widget="ehrenfest"></div>
+
+  <div class="bloco alerta">
+    <span class="rotulo">A hipótese escondida</span>
+    <p>Onde exatamente entra a assimetria temporal na demonstração de Boltzmann? Na
+    <strong>hipótese do caos molecular</strong>: supõe-se que as velocidades de duas
+    partículas são descorrelacionadas <em>antes</em> de colidirem.</p>
+    <p>Depois da colisão elas estão correlacionadas, necessariamente. Ao aplicar a hipótese
+    sempre antes e nunca depois, introduz-se uma seta do tempo que a mecânica não tinha. Não
+    é uma trapaça: é uma afirmação razoável sobre as condições iniciais de um sistema real,
+    preparado num passado de baixa entropia. Mas é uma hipótese <em>sobre o estado</em>, e não
+    um teorema sobre a dinâmica.</p>
+    <p>É por isso que a origem última da seta do tempo é hoje discutida em cosmologia, e não
+    em termodinâmica: ela remete às condições iniciais do universo.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s12">12. Exercícios resolvidos</h2>
+
+  <div class="bloco ex">
+    <span class="rotulo">Exercício resolvido 4.1: refazendo a medida de Perrin</span>
+    <p><b>Grãos esféricos de raio \(a=0{,}50\) µm difundem em água a 20 °C
+    (\(\eta=1{,}0\times10^{-3}\) Pa·s). Observa-se \(\med{x^2}=0{,}43\) µm² após 0,50 s de
+    observação, em média sobre muitos grãos. Determine \(D\), \(\kB\) e \(N_A\).</b></p>
+    <details class="solucao"><summary>Ver solução</summary>
+    <div class="corpo-solucao">
+    <p><b>Coeficiente de difusão.</b> De \(\med{x^2}=2Dt\),</p>
+    <p>\[D=\frac{\med{x^2}}{2t}=\frac{0{,}43\times 10^{-12}}{2\times 0{,}50}
+    =4{,}3\times 10^{-13}\ \mathrm{m^2/s}=0{,}43\ \mathrm{\mu m^2/s}.\]</p>
+
+    <p><b>Constante de Boltzmann.</b> De \(D=\kB T/6\pi\eta a\), com \(T=293\) K:</p>
+    <p>\[\kB=\frac{6\pi\eta a D}{T}
+    =\frac{6\pi\times 10^{-3}\times 0{,}50\times 10^{-6}\times 4{,}3\times 10^{-13}}{293}.\]</p>
+    <p>O numerador é \(6\pi\times 10^{-3}\times 5{,}0\times 10^{-7}\times 4{,}3\times 10^{-13}
+    = 4{,}05\times 10^{-21}\), logo</p>
+    <p>\[\kB=\frac{4{,}05\times 10^{-21}}{293}=1{,}38\times 10^{-23}\ \mathrm{J/K}.\]</p>
+
+    <p><b>Número de Avogadro.</b></p>
+    <p>\[N_A=\frac{R}{\kB}=\frac{8{,}314}{1{,}38\times 10^{-23}}
+    =6{,}02\times 10^{23}\ \mathrm{mol^{-1}}.\]</p>
+
+    <p><b>O que foi usado.</b> Um microscópio, um cronômetro, um termômetro, uma tabela de
+    viscosidade e o valor de \(R\) vindo de experimentos com gases. Nada de química, nada de
+    espectroscopia, nada de acelerador. Confira cada passo no widget da seção 7, com a
+    temperatura em 293 K, raio 0,5 µm e viscosidade 1,0 mPa·s.</p>
+    </div></details>
+  </div>
+
+  <div class="bloco ex">
+    <span class="rotulo">Exercício resolvido 4.2: por que as células são pequenas</span>
+    <p><b>Uma molécula de oxigênio tem \(D\approx 2{,}0\times 10^{3}\) µm²/s em água. Estime o
+    tempo de difusão por uma célula de 10 µm, por um tecido de 1 mm e por um corpo de 1 m, e
+    comente.</b></p>
+    <details class="solucao"><summary>Ver solução</summary>
+    <div class="corpo-solucao">
+    <p>Em três dimensões \(\med{r^2}=6Dt\), de onde \(t=L^2/6D\). Com
+    \(D=2{,}0\times 10^{3}\ \mathrm{\mu m^2/s}\):</p>
+    <div class="tabela-rolavel">
+    <table>
+      <thead><tr><th>Distância</th><th>\(t=L^2/6D\)</th><th>Em unidades humanas</th></tr></thead>
+      <tbody>
+        <tr><td>10 µm (uma célula)</td><td>\(8{,}3\times 10^{-3}\) s</td><td>8 milissegundos</td></tr>
+        <tr><td>1 mm (um tecido)</td><td>83 s</td><td>1,4 minuto</td></tr>
+        <tr><td>1 m (um corpo)</td><td>\(8{,}3\times 10^{7}\) s</td><td>2,6 <b>anos</b></td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p><b>Leitura.</b> O tempo vai com o <em>quadrado</em> da distância, de modo que multiplicar
+    o tamanho por 100 multiplica o tempo por 10 mil. A difusão é excelente na escala celular e
+    catastrófica acima de um milímetro.</p>
+    <p>É por isso que organismos maiores que alguns milímetros precisaram inventar
+    <strong>transporte convectivo</strong>: sangue, traqueias, seiva. A circulação não existe
+    por elegância, existe porque a difusão não escala. E é por isso que neurônios, que podem
+    ter um metro de comprimento, transportam material por motores moleculares ao longo de
+    microtúbulos, e não por difusão.</p>
+    </div></details>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s13">13. Exercícios propostos</h2>
+
+  <div class="bloco def">
+    <span class="rotulo">Para resolver</span>
+    <ol>
+      <li><b>4.1</b> Mostre que o tempo característico \(1/\beta'\) de um grão esférico de
+      raio 1 µm e densidade 1 g/cm³ em água vale cerca de \(2\times 10^{-7}\) s. Compare com
+      o intervalo de 30 s entre as observações de Perrin e justifique o uso do regime
+      superamortecido.</li>
+
+      <li><b>4.2</b> Partindo de \(\rho_N(x,t)=\rho_0(4\pi Dt)^{-1/2}e^{-x^2/4Dt}\), verifique
+      por substituição direta que ela satisfaz \(\partial_t\rho_N=D\,\partial_x^2\rho_N\), e
+      calcule \(\med{x^2}\) pela integral.</li>
+
+      <li><b>4.3</b> Deduza a relação de Einstein \(D/\mu=\kB T\) por um segundo caminho:
+      considere partículas carregadas em equilíbrio num campo externo, iguale a corrente de
+      arrasto à corrente de difusão e use a distribuição de Boltzmann
+      \(\rho_N\propto e^{-qEx/\kB T}\).</li>
+
+      <li><b>4.4</b> Um eletrólito tem íons de mobilidade \(\mu=5\times10^{-8}\) m²/(V·s) a
+      25 °C. Estime o coeficiente de difusão desses íons e compare com o valor típico de
+      \(10^{-9}\) m²/s para íons pequenos em água.</li>
+
+      <li><b>4.5</b> No widget da seção 7, fixe tudo e varie apenas o raio do grão de 0,1 a
+      3 µm. Verifique que \(D\) escala como \(1/a\) e explique por que grãos maiores são mais
+      fáceis de acompanhar ao microscópio mas dão medidas mais lentas.</li>
+
+      <li><b>4.6</b> No modelo de Ehrenfest com \(N\) bolas, mostre que o número médio na
+      urna A obedece a \(\med{n_A}(t+1)-N/2=\left(1-2/N\right)\left[\med{n_A}(t)-N/2\right]\).
+      Conclua que o equilíbrio é atingido exponencialmente com tempo característico \(N/2\)
+      passos, e confirme no widget da seção 11.</li>
+
+      <li><b>4.7</b> Ainda no modelo de Ehrenfest, estime o tempo de recorrência ao estado
+      inicial para \(N=10\), \(N=100\) e \(N=10^{23}\), supondo um passo por nanossegundo.
+      Compare o último com a idade do universo, \(4\times 10^{17}\) s.</li>
+
+      <li><b>4.8</b> Discuta em meia página: o teorema H prova a segunda lei? Em que sentido
+      sim e em que sentido não? Use os paradoxos de Loschmidt e Zermelo e a hipótese do caos
+      molecular.</li>
+    </ol>
+  </div>
+
+  <nav class="nav-aulas">
+    <a href="aula03.html"><small>Módulo anterior</small>← 3. Caminhante aleatório</a>
+    <span class="em-breve"><small>Em preparação</small>5. Canônico e grã-canônico</span>
+  </nav>
+
+</main>
+</div>
+
+<footer class="rodape">
+  <img class="logo-rodape" src="assets/img/logo-lfca.png" alt="LFCA | URCA">
+  <p><strong>Prof. Apiano Morais</strong> · <a href="mailto:apiano.morais@urca.br">apiano.morais@urca.br</a><br>
+  Laboratório de Física Computacional Aplicada (LFCA) · Universidade Regional do Cariri</p>
+</footer>
+
+<script src="assets/js/widgets.js?v=202611071721"></script>
+</body>
+</html>

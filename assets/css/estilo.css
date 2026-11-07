@@ -500,3 +500,41 @@ h3.unidade:first-of-type{margin-top:1.2rem}
   cursor:pointer;white-space:nowrap;
 }
 .controles .caixa input{width:auto;margin:0;accent-color:var(--azul-claro)}
+
+/* Diagramas em SVG dentro do texto */
+.diagrama-niveis{margin:1.4rem 0;text-align:center}
+.diagrama-niveis svg{width:100%;max-width:660px;height:auto}
+.diagrama-niveis .legenda{
+  font-family:var(--sans);font-size:.8rem;color:var(--tinta-suave);
+  margin:.3rem auto 0;max-width:620px;
+}
+
+/* ===================================================================
+   Enumeração de microestados (módulo 3)
+   =================================================================== */
+.microestados{margin:.9rem 0 .2rem}
+.microestados .legenda{
+  font-family:var(--sans);font-size:.82rem;color:var(--tinta-suave);margin:0 0 .5rem;
+}
+.grade-micro{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,max-content));
+  gap:.45rem;justify-content:start;
+}
+.micro{
+  display:flex;align-items:flex-end;gap:2px;padding:.3rem .4rem;
+  border:1px solid var(--borda);border-radius:6px;background:var(--papel-alt);
+}
+.micro .cx{
+  width:12px;height:12px;border:1.4px solid var(--azul-claro);border-radius:3px;
+  background:#fff;display:inline-block;
+}
+.micro .cx.cheio{background:var(--azul);border-color:var(--azul)}
+.micro .spin{
+  font:700 13px/1 system-ui,sans-serif;color:var(--azul);width:11px;text-align:center;
+}
+.micro .spin.baixo{color:var(--vinho)}
+.micro .osc{
+  display:inline-flex;flex-direction:column-reverse;gap:2px;
+  width:11px;min-height:12px;border-bottom:1.6px solid var(--tinta-suave);
+}
+.micro .osc i{width:7px;height:7px;border-radius:50%;background:var(--azul);margin:0 auto}

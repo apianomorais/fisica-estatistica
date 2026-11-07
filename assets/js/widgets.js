@@ -2161,6 +2161,922 @@
     tipografar(corpo);
   };
 
+
+  /* =================================================================
+     13. Movimento browniano e a pesagem do átomo
+     Integra a equação de Langevin superamortecida em unidades reais,
+     mede o deslocamento quadrático médio e, de posse dele, refaz a
+     medida de Perrin do número de Avogadro.
+     ================================================================= */
+  REGISTRO.browniano = function (raiz) {
+    var corpo = moldura(raiz, 'Movimento browniano: medindo o número de Avogadro');
+
+    var est = { T: 293, a: 0.5, eta: 1.0, n: 200, vista: 'traj', rodando: true };
+    var part = [], tempo = 0, serie = [];
+    var ESCALA = 40e-6;        // meio campo de visão, em metros
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+
+    opcoes(ctr, [
+      { rot: 'Trajetórias', v: 'traj' },
+      { rot: '⟨x²⟩ contra o tempo', v: 'msd' },
+      { rot: 'Perfil de difusão', v: 'perfil' }
+    ], 0, function (v) { est.vista = v; });
+
+    deslizante(ctr, 'temperatura', 273, 350, 1, 293,
+      function (v) { est.T = v; reiniciar(); },
+      function (v) { return v + ' K'; });
+    deslizante(ctr, 'raio do grão \\(a\\)', 0.1, 3, 0.1, 0.5,
+      function (v) { est.a = v; reiniciar(); },
+      function (v) { return v.toFixed(1).replace('.', ',') + ' µm'; });
+    deslizante(ctr, 'viscosidade \\(\\eta\\)', 0.3, 5, 0.1, 1.0,
+      function (v) { est.eta = v; reiniciar(); },
+      function (v) { return v.toFixed(1).replace('.', ',') + ' mPa·s'; });
+    deslizante(ctr, 'grãos observados', 20, 800, 20, 200,
+      function (v) { est.n = v; reiniciar(); });
+
+    var bP = el('button', { type: 'button', texto: 'pausar' });
+    var bR = el('button', { type: 'button', class: 'sec', texto: 'reiniciar' });
+    bP.addEventListener('click', function () {
+      est.rodando = !est.rodando;
+      bP.textContent = est.rodando ? 'pausar' : 'continuar';
+    });
+    bR.addEventListener('click', reiniciar);
+    ctr.appendChild(el('div', { class: 'botoes' }, [bP, bR]));
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'D previsto, k<sub>B</sub>T/6πηa', k: 'dt' },
+      { rot: 'D medido do ajuste', k: 'dm' },
+      { rot: 'tempo decorrido', k: 't' },
+      { rot: 'N<sub>A</sub> obtido', k: 'na' },
+      { rot: 'erro em N<sub>A</sub>', k: 'er' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function Dteorico() {
+      // a em micrômetros, eta em mPa.s
+      return F.C.kB * est.T / (6 * Math.PI * (est.eta * 1e-3) * (est.a * 1e-6));
+    }
+
+    function reiniciar() {
+      part = [];
+      for (var i = 0; i < est.n; i++) part.push({ x: 0, y: 0, hx: [0], hy: [0] });
+      tempo = 0; serie = [];
+    }
+
+    function passo(dt) {
+      var D = Dteorico();
+      var s = Math.sqrt(2 * D * dt);
+      for (var i = 0; i < part.length; i++) {
+        var p = part[i];
+        p.x += s * F.normalAleatoria();
+        p.y += s * F.normalAleatoria();
+        if (i < 9 && p.hx.length < 4000) { p.hx.push(p.x); p.hy.push(p.y); }
+      }
+      tempo += dt;
+      var m2 = 0;
+      part.forEach(function (q) { m2 += q.x * q.x; });
+      serie.push([tempo, m2 / part.length]);
+      if (serie.length > 3000) serie.shift();
+    }
+
+    /* Ajuste de reta pela origem: <x²> = 2Dt, logo D = soma(t.y)/(2.soma(t²)) */
+    function ajuste() {
+      var sty = 0, stt = 0;
+      serie.forEach(function (s) { sty += s[0] * s[1]; stt += s[0] * s[0]; });
+      return stt > 0 ? sty / (2 * stt) : 0;
+    }
+
+    function desenhar() {
+      var D = Dteorico(), Dm = ajuste();
+
+      if (est.vista === 'traj') {
+        var p = G.preparar(cv, 330);
+        var ct = p.ct;
+        var lado = Math.min(p.L - 24, p.A - 24);
+        var ox = (p.L - lado) / 2, oy = (p.A - lado) / 2;
+        function X(v) { return ox + (v / ESCALA + 1) / 2 * lado; }
+        function Y(v) { return oy + (1 - (v / ESCALA + 1) / 2) * lado; }
+
+        ct.save();
+        ct.strokeStyle = G.COR.grade;
+        ct.strokeRect(ox, oy, lado, lado);
+        // barra de escala de 10 micrômetros
+        var bl = lado * (10e-6 / (2 * ESCALA));
+        ct.strokeStyle = G.COR.tinta;
+        ct.lineWidth = 2;
+        ct.beginPath();
+        ct.moveTo(ox + 12, oy + lado - 14); ct.lineTo(ox + 12 + bl, oy + lado - 14);
+        ct.stroke();
+        ct.fillStyle = G.COR.tinta;
+        ct.font = '11px system-ui, sans-serif';
+        ct.fillText('10 µm', ox + 12, oy + lado - 20);
+
+        // nuvem de grãos
+        ct.fillStyle = 'rgba(44,95,141,.55)';
+        part.forEach(function (q) {
+          ct.beginPath();
+          ct.arc(X(q.x), Y(q.y), 1.6, 0, 2 * Math.PI);
+          ct.fill();
+        });
+        // algumas trajetórias, como nos desenhos de Perrin
+        ct.strokeStyle = G.COR.vinho;
+        ct.lineWidth = 1;
+        part.slice(0, 9).forEach(function (q) {
+          ct.beginPath();
+          for (var k = 0; k < q.hx.length; k += 3) {
+            if (k) ct.lineTo(X(q.hx[k]), Y(q.hy[k]));
+            else ct.moveTo(X(q.hx[k]), Y(q.hy[k]));
+          }
+          ct.stroke();
+        });
+        ct.restore();
+
+      } else if (est.vista === 'msd') {
+        var tmax = Math.max(1, tempo) * 1.05;
+        var ymax = Math.max(1e-14, 2 * D * tmax * 1.4);
+        var ax = G.eixos(cv, {
+          xmin: 0, xmax: tmax, ymin: 0, ymax: ymax, altura: 320,
+          rotX: 'tempo (s)', rotY: '⟨x²⟩ (m²)',
+          marcasX: G.marcasLineares(0, tmax, 5, 1),
+          formataY: function (v) { return v === 0 ? '0' : (v * 1e12).toFixed(1).replace('.', ',') + 'µm²'; }
+        });
+        ax.ct.save();
+        ax.ct.strokeStyle = G.COR.azul;
+        ax.ct.lineWidth = 2;
+        ax.ct.beginPath();
+        serie.forEach(function (s, i) {
+          if (i) ax.ct.lineTo(ax.X(s[0]), ax.Y(s[1]));
+          else ax.ct.moveTo(ax.X(s[0]), ax.Y(s[1]));
+        });
+        ax.ct.stroke();
+        ax.ct.restore();
+        G.curva(ax, function (t) { return 2 * D * t; }, G.COR.vinho, 1.8, [6, 4]);
+        G.legenda(ax, [
+          { cor: G.COR.azul, texto: 'medido sobre ' + est.n + ' grãos' },
+          { cor: G.COR.vinho, texto: '2Dt previsto' }
+        ]);
+
+      } else {
+        var lim = Math.max(1e-7, 3.2 * Math.sqrt(2 * D * Math.max(tempo, 0.01)));
+        var nb = 30, h = new Array(nb).fill(0);
+        part.forEach(function (q) {
+          var b = Math.floor((q.x + lim) / (2 * lim) * nb);
+          if (b >= 0 && b < nb) h[b]++;
+        });
+        var larg = 2 * lim / nb;
+        var dmax = 0, dens = h.map(function (c) {
+          var d = c / part.length / larg;
+          if (d > dmax) dmax = d;
+          return d;
+        });
+        var teo = function (x) {
+          var s2 = 2 * D * Math.max(tempo, 1e-6);
+          return Math.exp(-x * x / (2 * s2)) / Math.sqrt(2 * Math.PI * s2);
+        };
+        dmax = Math.max(dmax, teo(0)) * 1.2;
+        var ax2 = G.eixos(cv, {
+          xmin: -lim, xmax: lim, ymin: 0, ymax: dmax, altura: 320,
+          rotX: 'posição x (µm)', rotY: 'densidade de grãos',
+          marcasX: G.marcasLineares(-lim, lim, 4, 0).map(function (m) {
+            return { v: m.v, r: (m.v * 1e6).toFixed(0) };
+          }),
+          formataY: function () { return ''; }
+        });
+        var barras = [];
+        for (var i = 0; i < nb; i++) {
+          barras.push({ x: -lim + (i + 0.5) * larg, y: dens[i] });
+        }
+        G.barras(ax2, barras, G.COR.azulClaro, 0.9);
+        G.curva(ax2, teo, G.COR.vinho, 2.2);
+        G.legenda(ax2, [
+          { cor: G.COR.azulClaro, texto: 'grãos' },
+          { cor: G.COR.vinho, texto: 'solução de Fick, σ² = 2Dt' }
+        ]);
+      }
+
+      /* Perrin: de D medido tira-se NA, porque kB = R/NA */
+      var NA = Dm > 0
+        ? F.C.R * est.T / (6 * Math.PI * (est.eta * 1e-3) * (est.a * 1e-6) * Dm)
+        : 0;
+      mostrar({
+        dt: F.fmt(D * 1e12, 3) + ' µm²/s',
+        dm: Dm > 0 ? F.fmt(Dm * 1e12, 3) + ' µm²/s' : '·',
+        t: F.fmt(tempo, 2) + ' s',
+        na: NA > 0 ? F.fmt(NA, 3) : '·',
+        er: NA > 0 ? F.pct(Math.abs(NA - F.C.NA) / F.C.NA, 1) : '·'
+      });
+    }
+
+    function texto() {
+      nota.innerHTML =
+        '<p>Cada grão segue a equação de Langevin no regime superamortecido, em que a '
+        + 'inércia já foi esquecida e sobra o balanço entre o arrasto de Stokes e o '
+        + 'bombardeio molecular. O deslocamento quadrático médio cresce linearmente no '
+        + 'tempo, \\(\\med{x^2}=2Dt\\), com '
+        + '\\[D=\\frac{\\kB T}{6\\pi\\eta a}.\\]</p>'
+        + '<p><b>E aqui está a medida de Perrin.</b> A constante dos gases \\(R\\) era '
+        + 'conhecida desde o século XIX, e \\(\\kB=R/N_A\\). Logo, medir \\(D\\) com um '
+        + 'microscópio e um cronômetro dá</p>'
+        + '\\[N_A=\\frac{RT}{6\\pi\\eta a D},\\]'
+        + '<p>que é o número de Avogadro obtido sem nenhuma química. Jean Perrin fez '
+        + 'exatamente isso em 1908, com grãos de resina de guta-percha, e publicou '
+        + '\\(N_A\\approx 7\\times 10^{23}\\): errado por uns 15%, mas <b>da ordem certa</b> '
+        + 'e em acordo com os valores vindos de experimentos completamente diferentes. Foi o '
+        + 'argumento que convenceu os últimos céticos de que átomos existem, e rendeu a '
+        + 'Perrin o Nobel de 1926. Einstein havia previsto a fórmula em 1905, num dos quatro '
+        + 'artigos daquele ano.</p>'
+        + '<p>Note o que o widget mostra: o \\(N_A\\) obtido aqui é exato até a flutuação '
+        + 'estatística, porque a simulação <em>usa</em> \\(\\kB\\) para gerar os passos. O '
+        + 'que se está testando não é a física, e sim quanta precisão a medida permite com '
+        + '\\(n\\) grãos e um dado tempo de observação. Reduza o número de grãos para ver o '
+        + 'erro crescer, que é exatamente a dificuldade que Perrin enfrentou no microscópio.</p>';
+      tipografar(nota);
+    }
+
+    var ultimo = 0;
+    function quadro(ts) {
+      var dt = Math.min(0.05, (ts - ultimo) / 1000) || 0.016;
+      ultimo = ts;
+      if (est.rodando) passo(dt);
+      desenhar();
+      requestAnimationFrame(quadro);
+    }
+
+    reiniciar();
+    texto();
+    requestAnimationFrame(quadro);
+    window.addEventListener('resize', desenhar);
+    tipografar(corpo);
+  };
+
+  /* =================================================================
+     14. O modelo das urnas de Ehrenfest e o teorema H
+     N bolas em duas urnas; a cada instante uma bola sorteada troca de
+     lado. A dinâmica é perfeitamente reversível e ainda assim H cai.
+     Mostra também a recorrência de Poincaré, que leva 2^N passos.
+     ================================================================= */
+  REGISTRO.ehrenfest = function (raiz) {
+    var corpo = moldura(raiz, 'Urnas de Ehrenfest: como uma dinâmica reversível produz H decrescente');
+
+    var est = { N: 100, vel: 60, rodando: true };
+    var nA = 0, passos = 0, serieN = [], serieH = [], minimoVisto = 0;
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+
+    deslizante(ctr, 'número de bolas \\(N\\)', 10, 400, 10, 100,
+      function (v) { est.N = v; reiniciar(); });
+    deslizante(ctr, 'passos por quadro', 1, 400, 1, 60,
+      function (v) { est.vel = v; });
+
+    var bP = el('button', { type: 'button', texto: 'pausar' });
+    var bR = el('button', { type: 'button', class: 'sec', texto: 'reiniciar' });
+    bP.addEventListener('click', function () {
+      est.rodando = !est.rodando;
+      bP.textContent = est.rodando ? 'pausar' : 'continuar';
+    });
+    bR.addEventListener('click', reiniciar);
+    ctr.appendChild(el('div', { class: 'botoes' }, [bP, bR]));
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'bolas na urna A', k: 'na' },
+      { rot: 'passos dados', k: 'ps' },
+      { rot: 'H atual', k: 'h' },
+      { rot: 'mínimo de H já visto', k: 'hm' },
+      { rot: 'tempo de recorrência ≈ 2ᴺ', k: 'rec' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function H(k) {
+      var N = est.N, p1 = k / N, p2 = 1 - p1;
+      var h = 0;
+      if (p1 > 0) h += p1 * Math.log(p1);
+      if (p2 > 0) h += p2 * Math.log(p2);
+      return h;                                   // H = soma f ln f, negativo
+    }
+
+    function reiniciar() {
+      nA = est.N; passos = 0;                     // começa com tudo numa urna
+      serieN = [[0, nA]]; serieH = [[0, H(nA)]];
+      minimoVisto = H(nA);
+      texto();
+    }
+
+    function passo() {
+      // sorteia uma bola entre as N e a passa para a outra urna
+      if (Math.random() < nA / est.N) nA--; else nA++;
+      passos++;
+      var h = H(nA);
+      if (h < minimoVisto) minimoVisto = h;
+      serieN.push([passos, nA]);
+      serieH.push([passos, h]);
+      if (serieN.length > 1800) { serieN.shift(); serieH.shift(); }
+    }
+
+    function desenhar() {
+      var p = G.preparar(cv, 330);
+      var ct = p.ct;
+
+      /* ---- urnas ---- */
+      var uw = Math.min(p.L * 0.17, 130), uh = 120, uy = 14;
+      [0, 1].forEach(function (u) {
+        var ux = 14 + u * (uw + 18);
+        var qtd = u === 0 ? nA : est.N - nA;
+        ct.save();
+        ct.strokeStyle = G.COR.tinta; ct.lineWidth = 1.4;
+        ct.strokeRect(ux, uy, uw, uh);
+        ct.fillStyle = u === 0 ? 'rgba(44,95,141,.75)' : 'rgba(140,47,57,.75)';
+        var cols = Math.ceil(Math.sqrt(est.N * uw / uh));
+        var r = Math.max(1.2, Math.min(uw / cols / 2.4, 4));
+        for (var i = 0; i < qtd; i++) {
+          var cxp = ux + 4 + (i % cols) * (uw - 8) / cols + r;
+          var cyp = uy + uh - 5 - Math.floor(i / cols) * (r * 2.3) - r;
+          if (cyp < uy + 3) break;
+          ct.beginPath(); ct.arc(cxp, cyp, r, 0, 2 * Math.PI); ct.fill();
+        }
+        ct.fillStyle = G.COR.tinta;
+        ct.font = '600 12px system-ui, sans-serif';
+        ct.textAlign = 'center';
+        ct.fillText((u === 0 ? 'A: ' : 'B: ') + qtd, ux + uw / 2, uy + uh + 16);
+        ct.restore();
+      });
+
+      /* ---- gráficos ---- */
+      var gx = 14 + 2 * uw + 46, gl = p.L - gx - 16;
+      if (gl < 140) return;
+      var p0 = passos > 1800 ? passos - 1800 : 0;
+      var pmax = Math.max(60, passos);
+
+      // ocupação da urna A
+      var ga = 112, gy = 14;
+      function px(v) { return gx + (v - p0) / (pmax - p0 || 1) * gl; }
+      function pyN(v) { return gy + ga - v / est.N * ga; }
+      ct.save();
+      ct.strokeStyle = G.COR.grade;
+      ct.strokeRect(gx, gy, gl, ga);
+      ct.setLineDash([4, 3]);
+      ct.beginPath();
+      ct.moveTo(gx, pyN(est.N / 2)); ct.lineTo(gx + gl, pyN(est.N / 2));
+      ct.stroke();
+      ct.setLineDash([]);
+      ct.strokeStyle = G.COR.azul; ct.lineWidth = 1.4;
+      ct.beginPath();
+      serieN.forEach(function (s, i) {
+        if (i) ct.lineTo(px(s[0]), pyN(s[1])); else ct.moveTo(px(s[0]), pyN(s[1]));
+      });
+      ct.stroke();
+      ct.fillStyle = G.COR.suave;
+      ct.font = '11px system-ui, sans-serif';
+      ct.textAlign = 'left';
+      ct.fillText('bolas na urna A (tracejado: N/2)', gx + 4, gy + 12);
+      ct.restore();
+
+      // H
+      var gy2 = gy + ga + 30, ga2 = 112;
+      var hmin = -Math.log(2) * 1.08, hmax = 0.06;
+      function pyH(v) { return gy2 + ga2 - (v - hmin) / (hmax - hmin) * ga2; }
+      ct.save();
+      ct.strokeStyle = G.COR.grade;
+      ct.strokeRect(gx, gy2, gl, ga2);
+      ct.setLineDash([4, 3]);
+      ct.beginPath();
+      ct.moveTo(gx, pyH(-Math.log(2))); ct.lineTo(gx + gl, pyH(-Math.log(2)));
+      ct.stroke();
+      ct.setLineDash([]);
+      ct.strokeStyle = G.COR.vinho; ct.lineWidth = 1.6;
+      ct.beginPath();
+      serieH.forEach(function (s, i) {
+        if (i) ct.lineTo(px(s[0]), pyH(s[1])); else ct.moveTo(px(s[0]), pyH(s[1]));
+      });
+      ct.stroke();
+      ct.fillStyle = G.COR.suave;
+      ct.font = '11px system-ui, sans-serif';
+      ct.fillText('H = Σ f ln f  (tracejado: o mínimo, −ln 2)', gx + 4, gy2 + 12);
+      ct.textAlign = 'center';
+      ct.fillText('passos', gx + gl / 2, gy2 + ga2 + 18);
+      ct.restore();
+
+      var rec = est.N * Math.LN2 / Math.LN10;
+      mostrar({
+        na: String(nA), ps: String(passos),
+        h: F.fmt(H(nA), 4), hm: F.fmt(minimoVisto, 4),
+        rec: '10' + '<sup>' + rec.toFixed(0) + '</sup> passos'
+      });
+    }
+
+    function texto() {
+      var rec = est.N * Math.LN2 / Math.LN10;
+      nota.innerHTML =
+        '<p>Duas urnas e \\(N\\) bolas numeradas. A cada passo, sorteia-se um número de 1 a '
+        + '\\(N\\) e a bola correspondente <b>troca de urna</b>. Nada mais. A regra é '
+        + 'simétrica no tempo: aplicada ao contrário, é exatamente a mesma regra.</p>'
+        + '<p>Começamos com todas as bolas na urna A, e a quantidade \\(H=\\sum_i f_i\\ln f_i\\) '
+        + 'despenca até o mínimo \\(-\\ln 2\\), onde as urnas estão equilibradas, e ali fica '
+        + 'flutuando. Isso é o <b>teorema H</b> de Boltzmann acontecendo num modelo que cabe '
+        + 'em cinco linhas de código. Note que \\(H=-S/\\kB N\\): H caindo é entropia '
+        + 'subindo.</p>'
+        + '<p><b>O paradoxo e sua dissolução.</b> Loschmidt objetou a Boltzmann que, se as '
+        + 'leis da mecânica são reversíveis, nenhuma consequência delas pode ser '
+        + 'irreversível. Ele estava certo quanto à premissa. A resposta está na tela: a '
+        + 'dinâmica aqui é reversível e o estado inicial <em>pode</em> voltar. Só que o '
+        + 'tempo típico para isso é da ordem de \\(2^{N}\\) passos, hoje cerca de '
+        + '\\(10^{' + rec.toFixed(0) + '}\\). Com \\(N=20\\) a volta acontece enquanto o '
+        + 'senhor observa; com \\(N=400\\), nunca.</p>'
+        + '<p>Reduza \\(N\\) até 10 ou 20 e veja H subir de volta com frequência. Aumente '
+        + 'para 400 e as flutuações somem. Não há nenhuma lei nova entre os dois casos: só '
+        + 'há \\(1/\\sqrt N\\).</p>';
+      tipografar(nota);
+    }
+
+    var ultimo = 0;
+    function quadro() {
+      if (est.rodando) {
+        for (var k = 0; k < est.vel; k++) passo();
+      }
+      desenhar();
+      requestAnimationFrame(quadro);
+    }
+
+    reiniciar();
+    requestAnimationFrame(quadro);
+    window.addEventListener('resize', desenhar);
+    tipografar(corpo);
+  };
+
+
+  /* =================================================================
+     15. Contar estados no espaço de fase
+     A casca entre E e E+dE, com a malha de células de área h desenhada
+     por cima. A contagem clássica é a área dividida por h; a quântica é
+     o número de níveis na faixa. As duas coincidem, e é isso que
+     justifica dividir toda integral de fase por h.
+     Unidades reduzidas: m = 1, hbar = 1, logo h = 2*pi.
+     ================================================================= */
+  REGISTRO.contarestados = function (raiz) {
+    var corpo = moldura(raiz, 'Contar estados: a casca de energia e as células de área h');
+
+    var H = 2 * Math.PI;      // h, com hbar = 1
+    var est = { sis: 'caixa', E: 2.0, dE: 1.0, L: 20, w: 1.0 };
+
+    var ctr0 = el('div', { class: 'controles' });
+    corpo.appendChild(ctr0);
+    opcoes(ctr0, [
+      { rot: 'Partícula na caixa', v: 'caixa' },
+      { rot: 'Oscilador harmônico', v: 'osc' }
+    ], 0, function (v) {
+      est.sis = v;
+      campoL.parentNode.style.display = v === 'caixa' ? '' : 'none';
+      campoW.parentNode.style.display = v === 'osc' ? '' : 'none';
+      desenhar();
+    });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'energia \\(E\\)', 0.3, 8, 0.1, 2.0,
+      function (v) { est.E = v; desenhar(); },
+      function (v) { return v.toFixed(1).replace('.', ','); });
+    deslizante(ctr, 'largura da faixa \\(\\delta E\\)', 0.05, 2, 0.05, 1.0,
+      function (v) { est.dE = v; desenhar(); },
+      function (v) { return v.toFixed(2).replace('.', ','); });
+    var campoL = deslizante(ctr, 'lado da caixa \\(L\\)', 4, 30, 1, 20,
+      function (v) { est.L = v; desenhar(); },
+      function (v) { return v.toFixed(1).replace('.', ','); });
+    var campoW = deslizante(ctr, 'frequência \\(\\omega\\)', 0.3, 3, 0.1, 1.0,
+      function (v) { est.w = v; desenhar(); },
+      function (v) { return v.toFixed(1).replace('.', ','); });
+    campoW.parentNode.style.display = 'none';
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'área da casca', k: 'a' },
+      { rot: 'área / h', k: 'oc' },
+      { rot: 'níveis quânticos na faixa', k: 'oq' },
+      { rot: 'diferença', k: 'df' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function pDe(E) { return Math.sqrt(2 * E); }        // m = 1
+
+    /* Área da casca e contagem quântica, para cada sistema */
+    function conta() {
+      if (est.sis === 'caixa') {
+        var area = 2 * est.L * (pDe(est.E + est.dE) - pDe(est.E));
+        // E_n = pi^2 n^2 / (2 L^2), com n = 1, 2, 3...
+        var k = Math.PI * Math.PI / (2 * est.L * est.L);
+        var n1 = Math.ceil(Math.sqrt(est.E / k) - 1e-12);
+        var n2 = Math.floor(Math.sqrt((est.E + est.dE) / k) + 1e-12);
+        return { area: area, oc: area / H, oq: Math.max(0, n2 - n1 + 1) };
+      }
+      var a2 = 2 * Math.PI * est.dE / est.w;
+      // E_n = (n + 1/2) omega, com n = 0, 1, 2...
+      var m1 = Math.ceil(est.E / est.w - 0.5 - 1e-12);
+      var m2 = Math.floor((est.E + est.dE) / est.w - 0.5 + 1e-12);
+      return { area: a2, oc: a2 / H, oq: Math.max(0, m2 - m1 + 1) };
+    }
+
+    function desenhar() {
+      var c = conta();
+      var pmax = pDe(8 + 2) * 1.08;
+      var qmax = est.sis === 'caixa' ? est.L * 1.18
+               : Math.sqrt(2 * 10) / est.w * 1.15;
+
+      var ax = G.eixos(cv, {
+        xmin: est.sis === 'caixa' ? -0.1 * est.L : -qmax,
+        xmax: qmax,
+        ymin: -pmax, ymax: pmax, altura: 340,
+        rotX: 'coordenada q', rotY: 'momento p',
+        marcasX: G.marcasLineares(est.sis === 'caixa' ? 0 : -qmax, qmax, 4, 1),
+        formataY: function (v) { return v.toFixed(1).replace('.', ','); }
+      });
+      var ct = ax.ct;
+
+      /* ---- a casca acessível ---- */
+      ct.save();
+      ct.fillStyle = 'rgba(44,95,141,.26)';
+      if (est.sis === 'caixa') {
+        var pa = pDe(est.E), pb = pDe(est.E + est.dE);
+        [1, -1].forEach(function (s) {
+          ct.fillRect(ax.X(0), ax.Y(s > 0 ? pb : -pa),
+                      ax.X(est.L) - ax.X(0),
+                      Math.abs(ax.Y(pa) - ax.Y(pb)));
+        });
+      } else {
+        // anel entre duas elipses: p = +-sqrt(2(E - w^2 q^2 / 2))
+        function elipse(E, sentido) {
+          var qm = Math.sqrt(2 * E) / est.w;
+          ct.beginPath();
+          for (var i = 0; i <= 160; i++) {
+            var q = -qm + 2 * qm * i / 160;
+            var v = 2 * (E - 0.5 * est.w * est.w * q * q);
+            var pp = sentido * Math.sqrt(Math.max(0, v));
+            if (i) ct.lineTo(ax.X(q), ax.Y(pp)); else ct.moveTo(ax.X(q), ax.Y(pp));
+          }
+          for (var j = 160; j >= 0; j--) {
+            var q2 = -qm + 2 * qm * j / 160;
+            var v2 = 2 * (E - 0.5 * est.w * est.w * q2 * q2);
+            ct.lineTo(ax.X(q2), ax.Y(-sentido * Math.sqrt(Math.max(0, v2))));
+          }
+          ct.closePath();
+        }
+        ct.beginPath();
+        elipse(est.E + est.dE, 1);
+        ct.fill();
+        ct.save();
+        ct.globalCompositeOperation = 'destination-out';
+        elipse(est.E, 1);
+        ct.fill();
+        ct.restore();
+      }
+      ct.restore();
+
+      /* ---- contorno das curvas de energia ---- */
+      ct.save();
+      ct.strokeStyle = G.COR.azul;
+      ct.lineWidth = 1.8;
+      if (est.sis === 'caixa') {
+        [pDe(est.E), -pDe(est.E), pDe(est.E + est.dE), -pDe(est.E + est.dE)]
+          .forEach(function (pp) {
+            ct.beginPath();
+            ct.moveTo(ax.X(0), ax.Y(pp)); ct.lineTo(ax.X(est.L), ax.Y(pp));
+            ct.stroke();
+          });
+        ct.strokeStyle = G.COR.tinta;
+        ct.lineWidth = 2.2;
+        [0, est.L].forEach(function (q) {
+          ct.beginPath();
+          ct.moveTo(ax.X(q), ax.Y(-pmax)); ct.lineTo(ax.X(q), ax.Y(pmax));
+          ct.stroke();
+        });
+      } else {
+        [est.E, est.E + est.dE].forEach(function (EE) {
+          var qm = Math.sqrt(2 * EE) / est.w;
+          [1, -1].forEach(function (s) {
+            ct.beginPath();
+            for (var i = 0; i <= 200; i++) {
+              var q = -qm + 2 * qm * i / 200;
+              var vv = 2 * (EE - 0.5 * est.w * est.w * q * q);
+              var pp = s * Math.sqrt(Math.max(0, vv));
+              if (i) ct.lineTo(ax.X(q), ax.Y(pp)); else ct.moveTo(ax.X(q), ax.Y(pp));
+            }
+            ct.stroke();
+          });
+        });
+      }
+      ct.restore();
+
+      /* ---- malha de células de área h ---- */
+      /* A célula tem área h fixa; escolhe-se o formato para que ela fique
+         com proporção parecida com a do gráfico, e não um risco fino. */
+      var faixaQ = qmax - ax.xmin, faixaP = 2 * pmax;
+      var dq = Math.sqrt(H * faixaQ / faixaP);
+      var dp = H / dq;
+      ct.save();
+      ct.strokeStyle = 'rgba(140,47,57,.45)';
+      ct.lineWidth = 1;
+      var q0 = est.sis === 'caixa' ? 0 : -Math.ceil(qmax / dq) * dq;
+      for (var q = q0; q <= qmax + 1e-9; q += dq) {
+        ct.beginPath();
+        ct.moveTo(ax.X(q), ax.Y(-pmax)); ct.lineTo(ax.X(q), ax.Y(pmax));
+        ct.stroke();
+      }
+      for (var pp2 = 0; pp2 <= pmax; pp2 += dp) {
+        [pp2, -pp2].forEach(function (y) {
+          ct.beginPath();
+          ct.moveTo(ax.X(ax.xmin), ax.Y(y)); ct.lineTo(ax.X(qmax), ax.Y(y));
+          ct.stroke();
+        });
+      }
+      // uma célula destacada, para dar a escala
+      ct.fillStyle = 'rgba(181,131,31,.45)';
+      ct.strokeStyle = G.COR.ambar;
+      ct.lineWidth = 1.6;
+      var nf = Math.max(1, Math.floor(pmax / dp));
+      var cxq = q0, cyp = -nf * dp;
+      ct.fillRect(ax.X(cxq), ax.Y(cyp + dp), ax.X(cxq + dq) - ax.X(cxq),
+                  ax.Y(cyp) - ax.Y(cyp + dp));
+      ct.strokeRect(ax.X(cxq), ax.Y(cyp + dp), ax.X(cxq + dq) - ax.X(cxq),
+                    ax.Y(cyp) - ax.Y(cyp + dp));
+      ct.fillStyle = G.COR.ambar;
+      ct.font = '600 11px system-ui, sans-serif';
+      ct.textAlign = 'left';
+      ct.fillText('uma célula tem área h', ax.X(cxq) + 4, ax.Y(cyp + dp) - 6);
+      ct.restore();
+
+      G.legenda(ax, [
+        { cor: G.COR.azul, texto: 'curvas E e E + δE' },
+        { cor: 'rgba(44,95,141,.6)', texto: 'casca acessível' }
+      ]);
+
+      mostrar({
+        a: F.fmt(c.area, 3),
+        oc: F.fmt(c.oc, 3),
+        oq: String(c.oq),
+        df: c.oq > 0 ? F.pct(Math.abs(c.oc - c.oq) / c.oq, 1)
+                     : (c.oc < 1 ? 'faixa vazia' : '·')
+      });
+
+      var txt;
+      if (est.sis === 'caixa') {
+        txt = 'A região acessível são duas faixas, uma para cada sentido do momento, de '
+            + 'comprimento \\(L\\) e altura \\(\\delta p\\). A área é '
+            + '\\(\\Omega_{\\text{área}} = 2L\\,\\delta p = L\\sqrt{2m/E}\\,\\delta E\\), e '
+            + 'dividindo por \\(h\\) obtém-se um número que o cartão compara com a contagem '
+            + 'quântica exata dos níveis \\(E_n=\\hbar^2\\pi^2n^2/2mL^2\\) dentro da faixa. '
+            + 'Para \\(\\delta E\\) pequeno a contagem quântica pula de um em um e a '
+            + 'clássica varia continuamente: aumente \\(\\delta E\\) e veja as duas se '
+            + 'aproximarem.';
+      } else {
+        txt = 'Aqui a casca é o anel entre duas elipses, de área '
+            + '\\(2\\pi\\,\\delta E/\\omega\\), que não depende de \\(E\\): a densidade de '
+            + 'estados do oscilador é constante. Dividindo por \\(h=2\\pi\\hbar\\) sobra '
+            + '\\(\\delta E/\\hbar\\omega\\), que é <b>exatamente</b> o número de níveis '
+            + '\\(E_n=(n+\\tfrac12)\\hbar\\omega\\) na faixa. O acordo aqui não é '
+            + 'aproximado: é identidade.';
+      }
+      nota.innerHTML = '<p>' + txt + '</p>'
+        + '<p>A moral é a mesma nos dois casos. A mecânica clássica fornece <b>áreas</b> no '
+        + 'espaço de fase, que têm dimensão de ação e não são números puros. Para contar '
+        + 'estados é preciso dividir por uma unidade de ação, e a natureza fornece uma: '
+        + '\\(h\\). Cada estado quântico ocupa uma célula de área \\(h\\) por grau de '
+        + 'liberdade, de modo que em \\(f\\) graus a divisão é por \\(h^f\\). Sem esse '
+        + 'fator, a entropia ficaria indeterminada por uma constante aditiva, que é '
+        + 'justamente o \\(K\\) que ficou pendente no fim do Módulo 1.</p>';
+      tipografar(nota);
+    }
+
+    registrarRedesenho(desenhar);
+    tipografar(corpo);
+  };
+
+
+  /* =================================================================
+     16. A contagem, vista de perto
+     Para N pequeno os microestados são desenhados um a um; para N
+     grande resta o gráfico de Omega contra U, que é onde o pico
+     aparece. O mesmo widget serve aos três sistemas do módulo.
+     ================================================================= */
+  REGISTRO.multiplicidade = function (raiz) {
+    var corpo = moldura(raiz, 'A contagem de microestados, desenhada');
+
+    var MOD = {
+      dois: {
+        rot: 'Dois níveis',
+        /* k = número de partículas excitadas; U = k.epsilon */
+        kmax: function (N) { return N; },
+        lnOmega: function (k, N) { return F.lnBinom(N, k); },
+        rotU: 'energia U / \u03b5',
+        valU: function (k) { return k; },
+        legenda: 'cada quadradinho é uma partícula: vazio no nível 0, cheio no nível \u03b5',
+        /* devolve as configurações como vetores de 0 e 1 */
+        enumera: function (k, N, limite) {
+          var saida = [];
+          (function rec(i, resta, atual) {
+            if (saida.length >= limite) return;
+            if (i === N) { if (resta === 0) saida.push(atual.slice()); return; }
+            atual.push(0); rec(i + 1, resta, atual); atual.pop();
+            if (resta > 0) { atual.push(1); rec(i + 1, resta - 1, atual); atual.pop(); }
+          })(0, k, []);
+          return saida;
+        }
+      },
+      para: {
+        rot: 'Paramagneto ideal',
+        kmax: function (N) { return N; },
+        lnOmega: function (k, N) { return F.lnBinom(N, k); },
+        rotU: 'spins contra o campo',
+        valU: function (k) { return k; },
+        legenda: 'cada seta é um spin: para cima alinhado ao campo, para baixo contra ele',
+        enumera: null          // usa o mesmo enumerador do caso de dois níveis
+      },
+      einstein: {
+        rot: 'Sólido de Einstein',
+        /* k = número de quanta distribuídos entre N osciladores */
+        kmax: function () { return null; },
+        lnOmega: function (k, N) { return F.lnBinom(k + N - 1, k); },
+        rotU: 'quanta de energia q',
+        valU: function (k) { return k; },
+        legenda: 'cada coluna é um oscilador, e cada bolinha um quantum nele',
+        enumera: function (k, N, limite) {
+          var saida = [];
+          (function rec(i, resta, atual) {
+            if (saida.length >= limite) return;
+            if (i === N - 1) { atual.push(resta); saida.push(atual.slice()); atual.pop(); return; }
+            for (var v = resta; v >= 0; v--) {
+              if (saida.length >= limite) return;
+              atual.push(v); rec(i + 1, resta - v, atual); atual.pop();
+            }
+          })(0, k, []);
+          return saida;
+        }
+      }
+    };
+
+    var est = { mod: 'dois', N: 6, k: 3, Q: 6 };
+
+    var ctr0 = el('div', { class: 'controles' });
+    corpo.appendChild(ctr0);
+    opcoes(ctr0, Object.keys(MOD).map(function (m) {
+      return { rot: MOD[m].rot, v: m };
+    }), 0, function (v) {
+      est.mod = v;
+      campoQ.parentNode.style.display = (v === 'einstein') ? '' : 'none';
+      if (v === 'einstein' && est.N > 5) {
+        est.N = 4; campoN.value = 4; campoN.dispatchEvent(new Event('input'));
+      }
+      ajustar(); desenhar();
+    });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    var campoN = deslizante(ctr, 'partículas \\(N\\)', 2, 200, 1, 6,
+      function (v) { est.N = v; ajustar(); desenhar(); });
+    var campoQ = deslizante(ctr, 'quanta totais disponíveis', 2, 60, 1, 6,
+      function (v) { est.Q = v; ajustar(); desenhar(); });
+    campoQ.parentNode.style.display = 'none';
+    var campoK = deslizante(ctr, 'macroestado em destaque', 0, 6, 1, 3,
+      function (v) { est.k = v; desenhar(); });
+
+    var mostrar = cartoes(corpo, [
+      { rot: '\u03a9 do macroestado', k: 'om' },
+      { rot: '\u03a9 total (todos os U)', k: 'ot' },
+      { rot: 'fração dos microestados', k: 'fr' },
+      { rot: 'S/k<sub>B</sub> = ln \u03a9', k: 's' }
+    ]);
+    var painel = el('div', { class: 'microestados' });
+    corpo.appendChild(painel);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function faixaK() {
+      return est.mod === 'einstein' ? est.Q : est.N;
+    }
+
+    function ajustar() {
+      var fk = faixaK();
+      campoK.max = fk;
+      if (est.k > fk) { est.k = Math.round(fk / 2); }
+      campoK.value = est.k;
+      campoK.dispatchEvent(new Event('input'));
+    }
+
+    function desenhar() {
+      var M = MOD[est.mod], fk = faixaK(), i;
+      var lns = [], maior = -Infinity;
+      for (i = 0; i <= fk; i++) {
+        var L = M.lnOmega(i, est.N);
+        lns.push(L);
+        if (L > maior) maior = L;
+      }
+      var om = [], total = 0;
+      for (i = 0; i <= fk; i++) { om.push(Math.exp(lns[i] - maior)); total += om[i]; }
+
+      var ax = G.eixos(cv, {
+        xmin: -0.6, xmax: fk + 0.6, ymin: 0, ymax: 1.15, altura: 250,
+        rotX: M.rotU, rotY: '\u03a9 (em unidades do máximo)',
+        marcasX: G.marcasInteiras(0, fk, 12),
+        formataY: function (v) { return v.toFixed(1).replace('.', ','); }
+      });
+      var dados = [];
+      for (i = 0; i <= fk; i++) dados.push({ x: i, y: om[i] });
+      G.barras(ax, dados, G.COR.azulClaro, 0.76);
+      // destaque
+      ax.ct.save();
+      ax.ct.fillStyle = G.COR.vinho;
+      var passo = (ax.x1 - ax.x0) / (ax.xmax - ax.xmin);
+      var larg = Math.max(2, passo * 0.76);
+      ax.ct.fillRect(ax.X(est.k) - larg / 2, ax.Y(om[est.k]), larg,
+                     ax.y1 - ax.Y(om[est.k]));
+      ax.ct.restore();
+
+      var lnTotal = maior + Math.log(total);
+      var lnEste = lns[est.k];
+      mostrar({
+        om: lnEste > 30 ? 'e<sup>' + F.fmt(lnEste, 1) + '</sup>'
+                        : F.fmt(Math.exp(lnEste), 0),
+        ot: lnTotal > 30 ? 'e<sup>' + F.fmt(lnTotal, 1) + '</sup>'
+                         : F.fmt(Math.exp(lnTotal), 0),
+        fr: F.pct(Math.exp(lnEste - lnTotal), 2),
+        s: F.fmt(lnEste, 3)
+      });
+
+      /* ---- os microestados, um a um, quando couberem ---- */
+      var LIM = 56;
+      var qtd = Math.exp(lnEste);
+      if (est.N <= 10 && qtd <= LIM && (est.mod !== 'einstein' || est.N <= 6)) {
+        var enumera = M.enumera || MOD.dois.enumera;
+        var confs = enumera(est.k, est.N, LIM);
+        var html = '<p class="legenda">' + M.legenda + '. Aqui estão <b>todos</b> os '
+                 + confs.length + ' microestados deste macroestado.</p><div class="grade-micro">';
+        confs.forEach(function (c) {
+          html += '<div class="micro">';
+          c.forEach(function (v) {
+            if (est.mod === 'para') {
+              html += '<span class="spin' + (v ? ' baixo' : '') + '">'
+                    + (v ? '\u2193' : '\u2191') + '</span>';
+            } else if (est.mod === 'dois') {
+              html += '<span class="cx' + (v ? ' cheio' : '') + '"></span>';
+            } else {
+              html += '<span class="osc">';
+              for (var z = 0; z < v; z++) html += '<i></i>';
+              html += '</span>';
+            }
+          });
+          html += '</div>';
+        });
+        html += '</div>';
+        painel.innerHTML = html;
+      } else {
+        painel.innerHTML = '<p class="legenda">Este macroestado tem microestados demais para '
+          + 'desenhar um a um. Reduza \\(N\\) para dez ou menos, e escolha um macroestado '
+          + 'perto das pontas, onde \\(\\Omega\\) é pequeno.</p>';
+        tipografar(painel);
+      }
+
+      var txt;
+      if (est.mod === 'einstein') {
+        txt = 'Com \\(N\\) osciladores e \\(q\\) quanta, o número de maneiras de repartir é '
+            + '\\(\\Omega=\\binom{q+N-1}{q}\\), o problema das barras e estrelas. Note que '
+            + '\\(\\Omega\\) <b>cresce</b> com a energia sem limite: um sólido não tem teto '
+            + 'de energia, e por isso nunca tem temperatura negativa.';
+      } else if (est.mod === 'para') {
+        txt = 'Com \\(k\\) spins apontando contra o campo, \\(\\Omega=\\binom{N}{k}\\) e a '
+            + 'energia é \\(U=(2k-N)\\mu_0B\\). O máximo está em \\(k=N/2\\), a '
+            + 'magnetização nula, que é o estado mais desordenado. Os extremos \\(k=0\\) e '
+            + '\\(k=N\\) têm um único microestado cada, e portanto entropia zero.';
+      } else {
+        txt = 'Com \\(k\\) partículas excitadas, \\(\\Omega=\\binom{N}{k}\\) e \\(U=k\\epsilon\\). '
+            + 'É literalmente a mesma conta do caminhante aleatório do início do módulo, com '
+            + '"excitada" no lugar de "passo à direita". Daí a lição: três sistemas físicos '
+            + 'diferentes, uma única combinatória.';
+      }
+      nota.innerHTML = '<p>' + txt + '</p>'
+        + '<p>Aumente \\(N\\) e observe o que acontece com o gráfico: o pico <b>estreita</b>. '
+        + 'Com \\(N=6\\) os macroestados das pontas ainda são visíveis; com \\(N=200\\) '
+        + 'praticamente toda a probabilidade está concentrada numa vizinhança estreitíssima '
+        + 'do máximo. Essa concentração é o que torna a termodinâmica possível: o valor mais '
+        + 'provável vira o único valor observável.</p>';
+      tipografar(nota);
+    }
+
+    ajustar();
+    registrarRedesenho(desenhar);
+    tipografar(corpo);
+  };
+
   /* ---------- inicialização ---------- */
   document.addEventListener('DOMContentLoaded', function () {
     Array.prototype.forEach.call(document.querySelectorAll('[data-widget]'), function (n) {
