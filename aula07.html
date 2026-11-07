@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Módulo 7: Gases clássicos | Física Estatística</title>
+<link rel="icon" type="image/png" href="assets/img/favicon.png">
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611071747">
+<script src="assets/js/comum.js?v=202611071747"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+
+<header class="topo">
+  <div class="topo-interno">
+    <a class="marca" href="index.html">Física Estatística <span>· LFCA/URCA</span></a>
+    <nav class="menu">
+      <a href="index.html">Início</a>
+      <span class="grupo">Fundamentos</span>
+      <a href="aula01.html" class="num" title="Módulo 1: Revisão de termodinâmica">1</a>
+      <a href="aula02.html" class="num" title="Módulo 2: Métodos estatísticos">2</a>
+      <span class="grupo">Microestados</span>
+      <a href="aula03.html" class="num" title="Módulo 3: Caminhante aleatório e estados microscópicos">3</a>
+      <a href="aula04.html" class="num" title="Módulo 4: Movimento browniano">4</a>
+      <span class="grupo">Ensembles</span>
+      <a href="aula05.html" class="num" title="Módulo 5: Ensembles canônico e grã-canônico">5</a>
+      <span class="grupo">Gases</span>
+      <a href="aula06.html" class="num" title="Módulo 6: Gás ideal">6</a>
+      <a href="aula07.html" class="num ativo" title="Módulo 7: Gases clássicos">7</a>
+    </nav>
+  </div>
+</header>
+
+<div class="envoltorio">
+
+<aside class="lateral">
+  <h4>Neste módulo</h4>
+  <ol>
+    <li><a href="#s1">1. Onde o gás ideal falha</a></li>
+    <li><a href="#s2">2. A integral configuracional</a></li>
+    <li><a href="#s3">3. A função de Mayer</a></li>
+    <li><a href="#s4">4. A expansão em aglomerados</a></li>
+    <li><a href="#s5">5. O segundo coeficiente do virial</a></li>
+    <li><a href="#s6">6. Caroço duro mais atração</a></li>
+    <li><a href="#s7">7. A equação de van der Waals</a></li>
+    <li><a href="#s8">8. O ponto crítico</a></li>
+    <li><a href="#s9">9. A construção de Maxwell</a></li>
+    <li><a href="#s10">10. A temperatura de Boyle</a></li>
+    <li><a href="#s11">11. Expansão livre e resfriamento</a></li>
+    <li><a href="#s12">12. O gás ultrarrelativístico</a></li>
+    <li><a href="#s13">13. Exercícios resolvidos</a></li>
+    <li><a href="#s14">14. Exercícios propostos</a></li>
+  </ol>
+</aside>
+
+<main class="conteudo">
+
+  <p class="chapeu">Módulo 7 · Gases</p>
+  <h1>Gases clássicos</h1>
+  <p class="subtitulo">Ligue a interação entre as moléculas e o gás ideal se desfaz. Em seu
+  lugar aparece uma série sistemática de correções, a expansão do virial, cujo primeiro termo
+  já contém tudo o que importa: a liquefação, o ponto crítico e a temperatura de Boyle
+  prometida no Módulo 1.</p>
+
+  <div class="bloco def">
+    <span class="rotulo">Objetivos</span>
+    <ul>
+      <li>Separar a integral configuracional da parte cinética na função de partição;</li>
+      <li>Definir a função de Mayer e entender por que ela torna a expansão possível;</li>
+      <li>Obter \(P=\frac{N\kB T}{V}\left(1+B_2\frac{N}{V}\right)\) e a expressão de \(B_2\);</li>
+      <li>Calcular \(B_2=b-a/\kB T\) para caroço duro mais atração e chegar a van der Waals;</li>
+      <li>Localizar o ponto crítico e aplicar a construção de Maxwell;</li>
+      <li>Definir a temperatura de Boyle e explicar o resfriamento na expansão livre;</li>
+      <li>Resolver o gás ultrarrelativístico e obter \(U=3N\kB T\) e \(\gamma=4/3\).</li>
+    </ul>
+  </div>
+
+  <hr class="linha">
+
+  <!-- ================================================== -->
+  <h2 id="s1">1. Onde o gás ideal falha</h2>
+
+  <p>No Módulo 6 o hamiltoniano era só energia cinética. Num gás real há interação, e ela
+  não acontece apenas no instante do choque: as moléculas se atraem a distâncias de alguns
+  diâmetros e se repelem violentamente quando se aproximam demais. O hamiltoniano passa a
+  ser</p>
+
+  <p>\[H=\sum_{i=1}^{N}\frac{p_i^2}{2m}+U(\vec r_1,\dots,\vec r_N).\]</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Quanto isso importa</span>
+    <p>Mais do que parece. Sem o termo \(U\) não existem líquidos, não existe liquefação,
+    não existe ponto crítico, não existe tensão superficial, não existe transição de fase.
+    O gás ideal é um modelo que, por construção, não pode descrever nada do que torna a
+    matéria interessante.</p>
+    <p>E há um detalhe prático: ao contrário da parte cinética, a parte configuracional
+    <strong>não fatora</strong>, porque \(U\) acopla todas as partículas. Não existe
+    \(Z=Z_1^N\) aqui. O máximo que se consegue é uma expansão sistemática, e é isso que
+    vamos construir.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s2">2. A integral configuracional</h2>
+
+  <p>A função de partição no regime clássico é a integral sobre o espaço de fase, dividida
+  por \(h^{3N}\) e por \(N!\) pelas razões do módulo anterior:</p>
+
+  <p>\[Z_N=\frac{1}{h^{3N}N!}\int\!\!\int e^{-\beta H}\,d^{3N}r\;d^{3N}p.\]</p>
+
+  <p>Como \(H\) separa cinética e potencial, e a cinética depende só dos momentos, a
+  integral fatora em duas:</p>
+
+  <p>\[Z_N=\frac{1}{N!\,\lambda_T^{3N}}\underbrace{\int e^{-\beta U}\,d^{3N}r}_{\textstyle Z^{\rm conf}_N},
+  \qquad \lambda_T=\frac{h}{\sqrt{2\pi m\kB T}}.\]</p>
+
+  <p>Toda a dificuldade está em \(Z^{\rm conf}_N\). Sem interação, \(U=0\) e a integral é
+  trivial, \(Z^{\rm conf}_N=V^N\), devolvendo o gás ideal. Com interação, supondo que ela
+  seja soma de termos de pares,</p>
+
+  <p>\[U=\sum_{i<j}^{N}u(r_{ij}),\qquad r_{ij}=|\vec r_i-\vec r_j|,\]</p>
+
+  <p>a exponencial vira um produto sobre os \(N(N-1)/2\) pares:</p>
+
+  <p>\[Z^{\rm conf}_N=\int\prod_{i<j}e^{-\beta u(r_{ij})}\,d^{3N}r.\]</p>
+
+  <!-- ================================================== -->
+  <h2 id="s3">3. A função de Mayer</h2>
+
+  <p>Expandir esse produto diretamente é inútil: cada fator \(e^{-\beta u}\) tende a 1
+  quando as moléculas estão longe, de modo que todos os termos contribuem igualmente e nada
+  é pequeno. O truque de Joseph Mayer, de 1937, é subtrair esse 1:</p>
+
+  <div class="destaque">
+    <span class="anuncio">Função de Mayer</span>
+    \[\Phi(r)\equiv e^{-\beta u(r)}-1\]
+  </div>
+
+  <p>A diferença é decisiva. \(\Phi\) vale \(-1\) dentro do caroço duro, onde nenhuma
+  configuração é permitida, tem um pico positivo na região atrativa, e <strong>vai a zero
+  rapidamente</strong> quando as moléculas se afastam. Ela é diferente de zero apenas onde
+  as moléculas se enxergam, e é isso que torna as integrais finitas e a expansão
+  convergente.</p>
+
+  <p>Com ela,</p>
+
+  <p>\[Z^{\rm conf}_N=\int\prod_{i<j}\left[1+\Phi(r_{ij})\right]d^{3N}r.\]</p>
+
+  <div data-widget="virial"></div>
+
+  <!-- ================================================== -->
+  <h2 id="s4">4. A expansão em aglomerados</h2>
+
+  <p>Agora o produto se expande em potências de \(\Phi\):</p>
+
+  <p>\[\prod_{i<j}\left[1+\Phi_{ij}\right]
+  =1+\sum_{i<j}\Phi_{ij}+\sum_{\text{pares de pares}}\Phi_{ij}\Phi_{k\ell}+\dots\]</p>
+
+  <p>Cada termo corresponde a um conjunto de moléculas que interagem entre si, um
+  <strong>aglomerado</strong>, e é daí que vem o nome <em>expansão em aglomerados</em>. O
+  primeiro termo é o gás ideal; o segundo descreve pares isolados; o terceiro, quatro
+  moléculas em dois pares, e assim por diante, com importância decrescente num gás diluído.</p>
+
+  <p>Guardando só o primeiro termo de correção, e notando que há \(N(N-1)/2\approx N^2/2\)
+  pares e que a integral sobre as \(N-2\) partículas restantes dá \(V^{N-2}\):</p>
+
+  <p>\[Z^{\rm conf}_N\approx V^N+\frac{N^2}{2}V^{N-2}S_2(\beta)
+  =V^N\left[1+\frac{1}{2}\frac{N^2}{V^2}S_2\right],\]</p>
+
+  <p>onde \(S_2=\int\Phi(r_{12})\,d^3r_1\,d^3r_2=V\int\Phi(r)\,d^3r\) depende apenas do
+  potencial entre <em>um</em> par isolado. O problema de \(N\) corpos virou um problema de
+  dois corpos.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s5">5. O segundo coeficiente do virial</h2>
+
+  <p>Levando à energia livre, com \(\ln(1+x)\approx x\) para \(x\) pequeno e Stirling:</p>
+
+  <p>\[\frac{F}{N\kB T}=\ln\left(n\lambda_T^3\right)-1
+  -\frac{1}{2}\frac{N}{V^2}S_2,\qquad n=\frac{N}{V}.\]</p>
+
+  <p>Definindo</p>
+
+  <div class="destaque">
+    <span class="anuncio">Segundo coeficiente do virial</span>
+    \[B_2(T)=-\frac{1}{2}\int\Phi(r)\,d^3r
+    =-2\pi\int_0^{\infty}\left[e^{-u(r)/\kB T}-1\right]r^2\,dr\]
+  </div>
+
+  <p>a energia livre fica \(F/N\kB T=\ln(n\lambda_T^3)-1+B_2 n\,/2\cdot 2\), e a pressão sai
+  da derivada:</p>
+
+  <p>\[\boxed{\;P=-\dpar{F}{V}{T,N}=\frac{N\kB T}{V}\left(1+B_2\,\frac{N}{V}\right)\;}\]</p>
+
+  <p>Esta é a <strong>equação do virial</strong> truncada no primeiro termo. A forma geral é
+  uma série em potências da densidade,</p>
+
+  <p>\[\frac{PV}{N\kB T}=1+B_2\,n+B_3\,n^2+\dots,\]</p>
+
+  <p>e cada coeficiente mede o efeito de aglomerados de tamanho crescente. Num gás diluído,
+  \(B_2n\ll1\) e truncar é excelente.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s6">6. Caroço duro mais atração</h2>
+
+  <p>Falta calcular \(B_2\) para um potencial concreto. Tome o modelo mais simples que
+  captura a física: repulsão infinita abaixo de um diâmetro \(d=2r_0\), e uma atração fraca
+  e de longo alcance além disso.</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>Região</th><th>\(u(r)\)</th><th>\(\Phi(r)\)</th><th>Contribuição a \(B_2\)</th></tr></thead>
+    <tbody>
+      <tr><td>\(r<d\)</td><td>\(+\infty\)</td><td>\(-1\) exatamente</td>
+          <td>\(+\dfrac{2\pi}{3}d^3\equiv b\), positiva e sem \(T\)</td></tr>
+      <tr><td>\(r>d\)</td><td>pequena e negativa</td>
+          <td>\(\approx-\beta u(r)\)</td>
+          <td>\(-\dfrac{a}{\kB T}\), negativa e proporcional a \(1/T\)</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Na primeira região, \(e^{-\beta u}=0\) e \(\Phi=-1\) exatamente, de modo que</p>
+
+  <p>\[-2\pi\int_0^{d}(-1)r^2dr=\frac{2\pi}{3}d^3\equiv b.\]</p>
+
+  <p>Na segunda, \(|\beta u|\ll1\) permite expandir a exponencial, \(\Phi\approx-\beta u\), e</p>
+
+  <p>\[-2\pi\int_d^{\infty}\left(-\beta u\right)r^2dr
+  =-\frac{1}{\kB T}\underbrace{2\pi\int_d^{\infty}|u(r)|\,r^2dr}_{\textstyle a}.\]</p>
+
+  <div class="destaque">
+    <span class="anuncio">O resultado que organiza o módulo</span>
+    \[B_2(T)=b-\frac{a}{\kB T}\]
+  </div>
+
+  <p>Duas constantes, com significados físicos limpos: \(b\) é o <strong>volume
+  excluído</strong>, e \(a\) mede a <strong>intensidade da atração</strong>. Note que
+  \(b=\frac{2\pi}{3}d^3=4\times\frac{4}{3}\pi r_0^3\): quatro vezes o volume de uma
+  molécula, e não uma vez, porque duas esferas de raio \(r_0\) não podem ter os centros a
+  menos de \(2r_0\).</p>
+
+  <!-- ================================================== -->
+  <h2 id="s7">7. A equação de van der Waals</h2>
+
+  <p>Substituindo na equação do virial:</p>
+
+  <p>\[P=\frac{N\kB T}{V}\left[1+\left(b-\frac{a}{\kB T}\right)\frac{N}{V}\right]
+  =\frac{N\kB T}{V}+\frac{N^2\kB T b}{V^2}-\frac{aN^2}{V^2}.\]</p>
+
+  <p>Reagrupando, e notando que \(\frac{N\kB T}{V}\left(1+\frac{Nb}{V}\right)
+  \approx\frac{N\kB T}{V-Nb}\) quando \(Nb\ll V\):</p>
+
+  <div class="destaque">
+    <span class="anuncio">Equação de van der Waals (1873)</span>
+    \[\left(P+\frac{aN^2}{V^2}\right)\left(V-Nb\right)=N\kB T\]
+  </div>
+
+  <p>Ela tem a virtude de ser legível. O volume disponível não é \(V\), e sim \(V-Nb\),
+  porque as moléculas ocupam lugar. E a pressão nas paredes é menor do que seria, porque as
+  moléculas que estão prestes a bater são puxadas para dentro pelas vizinhas; a correção
+  \(aN^2/V^2\) é quadrática na densidade porque envolve pares.</p>
+
+  <div class="bloco alerta">
+    <span class="rotulo">O que van der Waals é e o que não é</span>
+    <p>Ela foi deduzida aqui como uma <em>reescrita</em> da expansão do virial truncada em
+    \(B_2\), válida portanto apenas para gases diluídos. Van der Waals, em 1873, a propôs
+    com argumentos físicos diretos e a estendeu, sem justificativa, a toda a faixa de
+    densidades, incluindo o líquido.</p>
+    <p>Essa extrapolação é <strong>quantitativamente ruim</strong>: perto do ponto crítico
+    os expoentes que ela prevê estão todos errados. Mas é <strong>qualitativamente
+    genial</strong>, porque produz a liquefação e o ponto crítico a partir de uma única
+    equação analítica, e rendeu a van der Waals o Nobel de 1910.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s8">8. O ponto crítico</h2>
+
+  <p>Abaixo de certa temperatura a isoterma de van der Waals deixa de ser monótona e
+  desenvolve um máximo e um mínimo. A temperatura em que os dois se fundem num ponto de
+  inflexão é a <strong>temperatura crítica</strong>, definida por</p>
+
+  <p>\[\dpar{P}{V}{T}=0\qquad\text{e}\qquad \left(\frac{\partial^2P}{\partial V^2}\right)_T=0.\]</p>
+
+  <p>Resolvendo o par de equações obtém-se</p>
+
+  <p>\[V_c=3Nb,\qquad \kB T_c=\frac{8a}{27b},\qquad P_c=\frac{a}{27b^2}.\]</p>
+
+  <p>E agora um resultado de alcance inesperado. Defina as variáveis reduzidas
+  \(P_r=P/P_c\), \(V_r=V/V_c\), \(T_r=T/T_c\). Substituindo, <em>todas</em> as constantes
+  desaparecem:</p>
+
+  <div class="destaque">
+    <span class="anuncio">Lei dos estados correspondentes</span>
+    \[\left(P_r+\frac{3}{V_r^2}\right)\left(3V_r-1\right)=8T_r\]
+  </div>
+
+  <p>Não há mais \(a\) nem \(b\). Todas as substâncias, medidas em unidades do seu próprio
+  ponto crítico, obedecem à <strong>mesma</strong> equação. É uma previsão forte e
+  verificável, e funciona razoavelmente bem para gases simples.</p>
+
+  <p>O teste mais direto é o fator de compressibilidade crítico:</p>
+
+  <p>\[Z_c=\frac{P_cV_c}{N\kB T_c}=\frac{3}{8}=0{,}375\quad\text{para qualquer substância.}\]</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>Substância</th><th>\(T_c\) (K)</th><th>\(P_c\) (MPa)</th><th>\(Z_c\) medido</th></tr></thead>
+    <tbody>
+      <tr><td>Hélio</td><td>5,2</td><td>0,227</td><td>0,301</td></tr>
+      <tr><td>Argônio</td><td>150,9</td><td>4,90</td><td>0,291</td></tr>
+      <tr><td>Nitrogênio</td><td>126,2</td><td>3,39</td><td>0,289</td></tr>
+      <tr><td>Gás carbônico</td><td>304,1</td><td>7,38</td><td>0,274</td></tr>
+      <tr><td>Água</td><td>647,1</td><td>22,06</td><td>0,229</td></tr>
+      <tr><td><b>van der Waals</b></td><td colspan="2">qualquer</td><td><b>0,375</b></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Os valores medidos se agrupam entre 0,27 e 0,30, confirmando a <em>ideia</em> dos
+  estados correspondentes, e ficam bem abaixo de 0,375, mostrando que van der Waals erra
+  quantitativamente. A água, com suas ligações de hidrogênio, é a que mais se afasta: o
+  potencial de pares isotrópico não dá conta dela.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s9">9. A construção de Maxwell</h2>
+
+  <p>Abaixo de \(T_c\), a isoterma tem um trecho com \(\partial P/\partial V>0\): comprimir
+  aumentaria o volume. Isso é mecanicamente instável e não pode ser observado. O que a
+  natureza faz é separar o sistema em duas fases, líquido e vapor, coexistindo à mesma
+  pressão.</p>
+
+  <p>Qual pressão? A condição de equilíbrio entre fases é a igualdade dos potenciais
+  químicos, \(\mu_{\rm líq}=\mu_{\rm vap}\). Como \(d\mu=-s\,dT+v\,dP\) a \(T\) constante,
+  integrar ao longo da isoterma dá</p>
+
+  <p>\[\int_{\rm líq}^{\rm vap}V\,dP=0,\]</p>
+
+  <p>que é exatamente a condição de que as duas áreas entre a isoterma e o patamar sejam
+  iguais. Essa é a <strong>construção de Maxwell</strong>.</p>
+
+  <div data-widget="vanderwaals"></div>
+
+  <!-- ================================================== -->
+  <h2 id="s10">10. A temperatura de Boyle</h2>
+
+  <p>Volte a \(B_2=b-a/\kB T\). As duas contribuições têm sinais opostos e dependências
+  diferentes com a temperatura, de modo que existe uma temperatura em que se cancelam:</p>
+
+  <div class="destaque">
+    <span class="anuncio">Temperatura de Boyle</span>
+    \[B_2(T_B)=0\quad\Longrightarrow\quad T_B=\frac{a}{\kB b}\]
+  </div>
+
+  <p>Em \(T_B\) o gás obedece a \(PV=N\kB T\) com precisão muito maior do que seria de
+  esperar, numa faixa larga de pressões, apesar de as moléculas interagirem o tempo todo. Os
+  efeitos do volume excluído e da atração se anulam em primeira ordem.</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>Gás</th><th>\(T_B\) medida</th><th>\(T_c\)</th><th>\(T_B/T_c\)</th>
+    <th>van der Waals prevê \(27/8=3{,}375\)</th></tr></thead>
+    <tbody>
+      <tr><td>Hélio</td><td>23 K</td><td>5,2 K</td><td>4,4</td><td>desvio de 31%</td></tr>
+      <tr><td>Hidrogênio</td><td>110 K</td><td>33,2 K</td><td>3,3</td><td>desvio de 2%</td></tr>
+      <tr><td>Nitrogênio</td><td>327 K</td><td>126,2 K</td><td>2,6</td><td>desvio de 23%</td></tr>
+      <tr><td>Argônio</td><td>410 K</td><td>150,9 K</td><td>2,7</td><td>desvio de 20%</td></tr>
+      <tr><td>Gás carbônico</td><td>714 K</td><td>304,1 K</td><td>2,3</td><td>desvio de 30%</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Repare no que isso diz. O nitrogênio tem \(T_B=327\) K, pouco acima da temperatura
+  ambiente: é por isso que o ar se comporta tão bem como gás ideal no laboratório. O hélio
+  tem \(T_B=23\) K, o que significa que à temperatura ambiente ele está muito <em>acima</em>
+  da sua temperatura de Boyle, com \(B_2>0\), e é portanto <strong>menos</strong>
+  compressível que um gás ideal.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Um aviso sobre o widget da seção 3</span>
+    <p>Lá, para o potencial de Lennard-Jones, obtém-se \(T_B^*=3{,}418\) em unidades de
+    \(\epsilon/\kB\). Com os parâmetros tabelados, isso prevê 325 K para o nitrogênio contra
+    327 K medidos, e 409 K para o argônio contra 410 K. O acordo é excelente.</p>
+    <p>Lennard-Jones acerta onde van der Waals erra porque não trunca o potencial em caroço
+    duro mais atração fraca: ele tem a repulsão suave e a atração \(1/r^6\) corretas. A moral
+    é que \(B_2\) é sensível à <strong>forma</strong> do potencial, e medi-lo
+    experimentalmente é, na prática, uma maneira de sondar \(u(r)\).</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s11">11. Expansão livre e resfriamento</h2>
+
+  <p>No Módulo 1 vimos que a energia interna de um gás ideal não depende do volume, e que
+  por isso uma expansão livre não muda a temperatura. Num gás real isso é falso, e a conta
+  agora pode ser feita.</p>
+
+  <p>Numa expansão livre \(U\) é constante, de modo que</p>
+
+  <p>\[dU=\dpar{U}{T}{V}dT+\dpar{U}{V}{T}dV=0
+  \;\Longrightarrow\;
+  \alpha_J\equiv\dpar{T}{V}{U}=-\frac{1}{C_V}\dpar{U}{V}{T}.\]</p>
+
+  <p>Usando a equação da energia do Módulo 1,
+  \(\left(\partial U/\partial V\right)_T=T\left(\partial P/\partial T\right)_V-P\), e a
+  equação do virial:</p>
+
+  <p>\[\alpha_J=-\frac{\kB T^2}{C_V}\left(\frac{N}{V}\right)^2\frac{dB_2}{dT}
+  =-\frac{\kB T^2}{C_V}\left(\frac{N}{V}\right)^2\frac{a}{\kB T^2}
+  =-\frac{a}{C_V}\left(\frac{N}{V}\right)^2.\]</p>
+
+  <p>O coeficiente é <strong>negativo</strong>: ao expandir (\(dV>0\)), a temperatura cai.
+  Integrando,</p>
+
+  <p>\[\Delta T=-\frac{aN^2}{C_V}\int_{V_1}^{V_2}\frac{dV}{V^2}
+  =\frac{a}{c_V}\left(\frac{1}{v_2}-\frac{1}{v_1}\right),\qquad v=\frac{V}{N}.\]</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Por que esfria</span>
+    <p>Porque separar moléculas que se atraem custa energia potencial, e numa expansão livre
+    não há ninguém de fora para fornecê-la. O gás paga com a própria energia cinética, e
+    energia cinética é temperatura.</p>
+    <p>Repare que só o termo \(a\) aparece: o volume excluído \(b\) não contribui, porque a
+    repulsão não armazena energia potencial a distâncias típicas. Esse é o
+    <strong>efeito Joule</strong>, e o seu primo mais útil, o efeito Joule e Thomson (a
+    expansão por uma válvula a entalpia constante), é a base de todos os liquefatores de
+    gases, do nitrogênio líquido ao hélio.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s12">12. O gás ultrarrelativístico</h2>
+
+  <p>Para fechar, um gás clássico de outro tipo. A relação energia e momento é</p>
+
+  <p>\[E^2=p^2c^2+m^2c^4,\]</p>
+
+  <p>que no limite \(p\ll mc\) devolve \(E\approx mc^2+p^2/2m\), o caso de sempre. No limite
+  oposto, \(p\gg mc\), vale</p>
+
+  <p>\[E\approx pc.\]</p>
+
+  <p>É o caso de fótons, de neutrinos e de elétrons em estrelas muito densas. Refaça a função
+  de partição com essa energia:</p>
+
+  <p>\[Z_1=\frac{4\pi V}{h^3}\int_0^{\infty}e^{-\beta pc}p^2\,dp
+  =\frac{4\pi V}{h^3}\cdot\frac{2}{(\beta c)^3}
+  =\frac{V}{\pi^2}\left(\frac{\kB T}{\hbar c}\right)^3,\]</p>
+
+  <p>usando \(\int_0^\infty e^{-x}x^2dx=2\). Definindo
+  \(\Lambda=\pi^{2/3}\hbar c/\kB T\), isso é outra vez \(Z_1=V/\Lambda^3\), com um
+  comprimento térmico que agora cai como \(1/T\) em vez de \(1/\sqrt T\).</p>
+
+  <p>Com \(Z_N=Z_1^N/N!\) e Stirling, \(F=-N\kB T\left[1+\ln\left(V/N\Lambda^3\right)\right]\),
+  e as derivadas dão</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th></th><th>Não relativístico</th><th>Ultrarrelativístico</th></tr></thead>
+    <tbody>
+      <tr><td>Energia</td><td>\(U=\frac{3}{2}N\kB T\)</td><td>\(U=3N\kB T\)</td></tr>
+      <tr><td>Calor específico</td><td>\(c_V=\frac32\kB\)</td><td>\(c_V=3\kB\)</td></tr>
+      <tr><td>Equação de estado</td><td>\(PV=N\kB T\)</td><td>\(PV=N\kB T\)</td></tr>
+      <tr><td>Pressão e energia</td><td>\(P=\frac{2}{3}\dfrac{U}{V}\)</td>
+          <td>\(P=\dfrac{1}{3}\dfrac{U}{V}\)</td></tr>
+      <tr><td>Expoente adiabático</td><td>\(\gamma=5/3\)</td><td>\(\gamma=4/3\)</td></tr>
+      <tr><td>Comprimento térmico</td><td>\(\propto T^{-1/2}\)</td><td>\(\propto T^{-1}\)</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Onde o 4/3 decide o destino de uma estrela</span>
+    <p>A equação de estado \(PV=N\kB T\) sobrevive intacta, o que é notável. Mas a energia
+    dobra, porque a equipartição conta diferente: com \(E=pc\), o hamiltoniano é
+    <em>linear</em> no momento em vez de quadrático, e cada grau de liberdade passa a
+    contribuir com \(\kB T\) em vez de \(\frac12\kB T\).</p>
+    <p>A consequência astrofísica é severa. A estabilidade de uma estrela contra o colapso
+    gravitacional depende de \(\gamma\): com \(\gamma>4/3\) ela é estável, e com
+    \(\gamma\le4/3\) não é. Um gás não relativístico tem \(5/3\) e segura. Quando a matéria
+    se torna relativística, \(\gamma\) cai para \(4/3\) e a estrela fica no limiar. É essa
+    conta que está por trás do <strong>limite de Chandrasekhar</strong>, de 1,4 massas
+    solares, acima do qual uma anã branca não resiste. Voltaremos a isso no Módulo 8.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s13">13. Exercícios resolvidos</h2>
+
+  <div class="bloco ex">
+    <span class="rotulo">Exercício resolvido 7.1: as constantes do argônio</span>
+    <p><b>O argônio tem \(T_c=150{,}9\) K e \(P_c=4{,}90\) MPa. Obtenha \(a\) e \(b\) de van
+    der Waals, estime o diâmetro molecular e a temperatura de Boyle, e compare com os valores
+    medidos.</b></p>
+    <details class="solucao"><summary>Ver solução</summary>
+    <div class="corpo-solucao">
+    <p><b>Inverter as relações críticas.</b> De \(\kB T_c=8a/27b\) e \(P_c=a/27b^2\),
+    dividindo uma pela outra elimina-se \(a\):</p>
+    <p>\[\frac{\kB T_c}{P_c}=\frac{8a/27b}{a/27b^2}=8b
+    \;\Longrightarrow\;
+    b=\frac{\kB T_c}{8P_c}.\]</p>
+    <p>Numericamente,</p>
+    <p>\[b=\frac{1{,}381\times10^{-23}\times150{,}9}{8\times4{,}90\times10^{6}}
+    =5{,}32\times10^{-29}\ \mathrm{m^3}.\]</p>
+    <p>E de \(P_c=a/27b^2\),</p>
+    <p>\[a=27P_cb^2=27\times4{,}90\times10^{6}\times(5{,}32\times10^{-29})^2
+    =3{,}74\times10^{-49}\ \mathrm{J\cdot m^3}.\]</p>
+
+    <p><b>Diâmetro molecular.</b> De \(b=\frac{2\pi}{3}d^3\),</p>
+    <p>\[d=\left(\frac{3b}{2\pi}\right)^{1/3}
+    =\left(\frac{3\times5{,}32\times10^{-29}}{6{,}283}\right)^{1/3}
+    =\left(2{,}54\times10^{-29}\right)^{1/3}=2{,}94\times10^{-10}\ \mathrm{m}.\]</p>
+    <p>Ou seja, 0,294 nm, contra \(\sigma=0{,}3405\) nm do ajuste de Lennard-Jones. A ordem
+    está certa e a diferença é esperada, já que "diâmetro" significa coisas ligeiramente
+    diferentes nos dois modelos.</p>
+
+    <p><b>Temperatura de Boyle.</b></p>
+    <p>\[T_B=\frac{a}{\kB b}=\frac{3{,}74\times10^{-49}}
+    {1{,}381\times10^{-23}\times5{,}32\times10^{-29}}=509\ \mathrm{K},\]</p>
+    <p>contra 410 K medidos: 24% de erro, consistente com \(T_B/T_c=27/8=3{,}375\) previsto
+    contra 2,7 observado. Van der Waals acerta a ordem e a tendência, mas não os números.
+    Usando Lennard-Jones em vez dele, com \(\epsilon/\kB=119{,}8\) K, obtém-se
+    \(T_B=3{,}418\times119{,}8=409\) K, praticamente exato.</p>
+    </div></details>
+  </div>
+
+  <div class="bloco ex">
+    <span class="rotulo">Exercício resolvido 7.2: o sinal de B₂ e o que ele faz</span>
+    <p><b>Um gás tem \(B_2=-150\) cm³/mol a 300 K. Determine se ele é mais ou menos
+    compressível que o ideal e calcule o desvio de \(PV/nRT\) a 10 atm.</b></p>
+    <details class="solucao"><summary>Ver solução</summary>
+    <div class="corpo-solucao">
+    <p>Em unidades molares a equação do virial é</p>
+    <p>\[\frac{PV}{nRT}=1+\frac{B_2}{V_m},\qquad V_m=\frac{V}{n}.\]</p>
+    <p>A 10 atm e 300 K, o volume molar ideal é</p>
+    <p>\[V_m\approx\frac{RT}{P}=\frac{8{,}314\times300}{1{,}013\times10^{6}}
+    =2{,}46\times10^{-3}\ \mathrm{m^3/mol}=2460\ \mathrm{cm^3/mol}.\]</p>
+    <p>Logo</p>
+    <p>\[\frac{PV}{nRT}=1+\frac{-150}{2460}=1-0{,}061=0{,}939.\]</p>
+    <p><b>Leitura.</b> \(B_2<0\) significa que a atração domina: o gás ocupa menos volume do
+    que um ideal nas mesmas condições, ou seja, é <strong>mais</strong> compressível. O
+    desvio de 6% a 10 atm é típico e mostra por que a equação do gás ideal só serve a
+    pressões baixas.</p>
+    <p>Como \(B_2<0\), este gás está <em>abaixo</em> da sua temperatura de Boyle a 300 K.
+    Aquecendo-o, \(B_2\) sobe, passa por zero em \(T_B\) e fica positivo, momento em que o
+    gás se torna menos compressível que o ideal. Acompanhe isso no widget da seção 3,
+    movendo o deslizante de temperatura através de \(T^*_B\).</p>
+    </div></details>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s14">14. Exercícios propostos</h2>
+
+  <div class="bloco def">
+    <span class="rotulo">Para resolver</span>
+    <ol>
+      <li><b>7.1</b> Calcule \(B_2(T)\) exatamente para o potencial de poço quadrado:
+      \(u=\infty\) para \(r<d\), \(u=-\epsilon\) para \(d<r<\lambda d\), e \(u=0\) além
+      disso. Mostre que \(T_B=\epsilon/\left[\kB\ln\frac{\lambda^3}{\lambda^3-1}\right]\) e
+      confirme no widget da seção 3.</li>
+
+      <li><b>7.2</b> Derive as três relações críticas \(V_c=3Nb\), \(\kB T_c=8a/27b\) e
+      \(P_c=a/27b^2\) impondo que a primeira e a segunda derivadas de \(P\) em relação a
+      \(V\) se anulem.</li>
+
+      <li><b>7.3</b> Obtenha a forma reduzida \(\left(P_r+3/V_r^2\right)(3V_r-1)=8T_r\) e
+      verifique que ela não contém \(a\) nem \(b\). Calcule \(Z_c=3/8\) e compare com a
+      tabela da seção 8.</li>
+
+      <li><b>7.4</b> Mostre que \(T_B/T_c=27/8\) segundo van der Waals. Compare com a
+      tabela da seção 10 e comente por que os valores reais são sistematicamente menores.</li>
+
+      <li><b>7.5</b> Um mol de gás carbônico (\(a=0{,}364\) Pa·m⁶/mol²,
+      \(b=4{,}27\times10^{-5}\) m³/mol) expande livremente de 1 L para 10 L a partir de
+      300 K. Calcule \(\Delta T\) usando \(c_V=\frac52 R\).</li>
+
+      <li><b>7.6</b> Para o gás ultrarrelativístico, mostre que \(S\) é extensiva, que
+      \(PV^{4/3}\) é constante num processo adiabático e que \(U=3PV\).</li>
+
+      <li><b>7.7</b> Verifique que a construção de Maxwell equivale a
+      \(\mu_{\rm líq}=\mu_{\rm vap}\), partindo de \(d\mu=v\,dP\) a \(T\) constante. Em
+      seguida, no widget da seção 9, leia \(P_r\) de coexistência para \(T_r=0{,}9\) e
+      compare com o valor tabelado 0,647.</li>
+
+      <li><b>7.8</b> <b>Regra da alavanca.</b> No patamar de coexistência, mostre que a
+      fração de massa no estado líquido é \((V_g-V)/(V_g-V_\ell)\). Aplique a um ponto no
+      meio do patamar e interprete.</li>
+    </ol>
+  </div>
+
+  <nav class="nav-aulas">
+    <a href="aula06.html"><small>Módulo anterior</small>← 6. Gás ideal</a>
+    <span class="em-breve"><small>Em preparação</small>8. Gases quânticos</span>
+  </nav>
+
+</main>
+</div>
+
+<footer class="rodape">
+  <img class="logo-rodape" src="assets/img/logo-lfca.png" alt="LFCA | URCA">
+  <p><strong>Prof. Apiano Morais</strong> · <a href="mailto:apiano.morais@urca.br">apiano.morais@urca.br</a><br>
+  Laboratório de Física Computacional Aplicada (LFCA) · Universidade Regional do Cariri</p>
+</footer>
+
+<script src="assets/js/widgets.js?v=202611071747"></script>
+</body>
+</html>

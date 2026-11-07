@@ -3746,6 +3746,455 @@
     tipografar(corpo);
   };
 
+
+  /* =================================================================
+     21. A função de Mayer e o segundo coeficiente do virial
+     Do potencial entre duas moléculas sai B2(T), e dele a temperatura
+     de Boyle. Unidades reduzidas: r em sigma, u em epsilon, T em
+     epsilon/kB, B2 em sigma^3.
+     ================================================================= */
+  REGISTRO.virial = function (raiz) {
+    var corpo = moldura(raiz, 'Do potencial molecular ao segundo coeficiente do virial');
+
+    var POT = {
+      lj: {
+        rot: 'Lennard-Jones',
+        u: function (r) { var s6 = Math.pow(r, -6); return 4 * (s6 * s6 - s6); },
+        rmin: 0.85, TB: null
+      },
+      poco: {
+        rot: 'Poço quadrado',
+        u: function (r) { return r < 1 ? 1e6 : (r < 1.5 ? -1 : 0); },
+        rmin: 0.9, TB: null
+      },
+      rigida: {
+        rot: 'Esfera rígida',
+        u: function (r) { return r < 1 ? 1e6 : 0; },
+        rmin: 0.9, TB: null
+      }
+    };
+
+    /* gases reais, com parâmetros de Lennard-Jones tabelados */
+    var GASES = [
+      { nome: 'He', eps: 10.22, sig: 0.2556, TBexp: 23 },
+      { nome: 'H\u2082', eps: 37.0, sig: 0.293, TBexp: 110 },
+      { nome: 'N\u2082', eps: 95.05, sig: 0.3698, TBexp: 327 },
+      { nome: 'Ar', eps: 119.8, sig: 0.3405, TBexp: 410 },
+      { nome: 'CO\u2082', eps: 195.0, sig: 0.3941, TBexp: 714 }
+    ];
+
+    var est = { pot: 'lj', T: 1.5 };
+
+    var ctr0 = el('div', { class: 'controles' });
+    corpo.appendChild(ctr0);
+    opcoes(ctr0, Object.keys(POT).map(function (k) {
+      return { rot: POT[k].rot, v: k };
+    }), 0, function (v) { est.pot = v; desenhar(); });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    deslizante(corpo, 'temperatura reduzida \\(T^{*}=\\kB T/\\epsilon\\)', 0.4, 8, 0.05, 1.5,
+      function (v) { est.T = v; desenhar(); },
+      function (v) { return v.toFixed(2).replace('.', ','); });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'B\u2082* nesta temperatura', k: 'b2' },
+      { rot: 'temperatura de Boyle T*<sub>B</sub>', k: 'tb' },
+      { rot: 'sinal de B\u2082', k: 'sg' },
+      { rot: 'desvio de PV = Nk<sub>B</sub>T', k: 'dv' }
+    ]);
+    var tabela = el('div', { class: 'tabela-rolavel' });
+    corpo.appendChild(tabela);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    /* B2*(T) = -2.pi.integral de [e^{-u/T} - 1] r² dr, em unidades de sigma³ */
+    function B2(T, pot) {
+      var u = POT[pot].u;
+      var f = function (r) {
+        if (r < 1e-6) return -r * r;
+        var x = -u(r) / T;
+        if (x < -700) return -r * r;      // e^{-u/T} -> 0
+        return (Math.exp(x) - 1) * r * r;
+      };
+      /* Três trechos: o caroço duro, onde o integrando é só -r²; a região
+         do poço, onde tudo acontece; e a cauda, que decai depressa. */
+      return -2 * Math.PI * (F.simpson(f, 1e-9, 0.9, 2000)
+                           + F.simpson(f, 0.9, 2.5, 6000)
+                           + F.simpson(f, 2.5, 20, 4000));
+    }
+
+    function boyle(pot) {
+      if (POT[pot].TB !== null) return POT[pot].TB;
+      var v = F.bissecao(function (t) { return B2(t, pot); }, 0.2, 60, 1e-9);
+      POT[pot].TB = v;
+      return v;
+    }
+
+    function desenhar() {
+      var P = POT[est.pot], T = est.T;
+      var p = G.preparar(cv, 320);
+      var meia = p.L / 2 - 8;
+
+      /* ---------- painel esquerdo: u(r) e a função de Mayer ---------- */
+      var ct = p.ct;
+      var mx = 48, my = 16, alt = p.A - 58, larg = meia - mx - 10;
+      function X1(r) { return mx + (r - 0.7) / (3.0 - 0.7) * larg; }
+      function Y1(y) { return my + alt / 2 - y / 3.2 * (alt / 2); }
+
+      ct.save();
+      ct.strokeStyle = G.COR.grade;
+      ct.beginPath(); ct.moveTo(mx, Y1(0)); ct.lineTo(mx + larg, Y1(0)); ct.stroke();
+      ct.strokeStyle = G.COR.suave; ct.lineWidth = 1.2;
+      ct.beginPath(); ct.moveTo(mx, my); ct.lineTo(mx, my + alt); ct.stroke();
+      ct.fillStyle = G.COR.suave;
+      ct.font = '600 11px system-ui, sans-serif';
+      ct.textAlign = 'center';
+      ct.fillText('distância r/\u03c3', mx + larg / 2, p.A - 6);
+      ct.fillText('0', mx - 14, Y1(0) + 4);
+      ct.restore();
+
+      function traco(fn, cor, larguraL) {
+        ct.save();
+        ct.strokeStyle = cor; ct.lineWidth = larguraL;
+        ct.beginPath();
+        var dentro = false;
+        for (var i = 0; i <= 500; i++) {
+          var r = 0.7 + (3.0 - 0.7) * i / 500;
+          var y = fn(r);
+          if (!isFinite(y) || y > 3.2 || y < -3.2) { dentro = false; continue; }
+          var xx = X1(r), yy = Y1(y);
+          if (dentro) ct.lineTo(xx, yy); else { ct.moveTo(xx, yy); dentro = true; }
+        }
+        ct.stroke();
+        ct.restore();
+      }
+      traco(function (r) { return P.u(r); }, G.COR.azul, 2.4);
+      traco(function (r) {
+        var x = -P.u(r) / T;
+        return x < -700 ? -1 : Math.exp(x) - 1;
+      }, G.COR.vinho, 2.4);
+
+      ct.save();
+      ct.font = '11px system-ui, sans-serif';
+      ct.textAlign = 'left';
+      ct.fillStyle = G.COR.azul;
+      ct.fillText('u(r)/\u03b5', mx + 6, my + 12);
+      ct.fillStyle = G.COR.vinho;
+      ct.fillText('\u03a6(r) = e\u207b\u1d58\u141f\u1d40 \u2212 1', mx + 6, my + 28);
+      ct.restore();
+
+      /* ---------- painel direito: B2(T) ---------- */
+      var gx = p.L / 2 + 40, gl = p.L - gx - 14;
+      var TB = boyle(est.pot);
+      var tmax = Math.max(8, TB * 1.8);
+      var b2max = 3.0, b2min = -6.0;
+      function X2(t) { return gx + t / tmax * gl; }
+      function Y2(b) { return my + alt - (b - b2min) / (b2max - b2min) * alt; }
+
+      ct.save();
+      ct.strokeStyle = G.COR.grade;
+      ct.beginPath(); ct.moveTo(gx, Y2(0)); ct.lineTo(gx + gl, Y2(0)); ct.stroke();
+      ct.strokeStyle = G.COR.suave; ct.lineWidth = 1.2;
+      ct.beginPath(); ct.moveTo(gx, my); ct.lineTo(gx, my + alt); ct.stroke();
+      ct.fillStyle = G.COR.suave;
+      ct.font = '600 11px system-ui, sans-serif';
+      ct.textAlign = 'center';
+      ct.fillText('temperatura T* = \u03baT/\u03b5', gx + gl / 2, p.A - 6);
+      ct.textAlign = 'right';
+      ct.font = '10px system-ui, sans-serif';
+      [-6, -3, 0, 3].forEach(function (b) {
+        ct.fillText(String(b), gx - 5, Y2(b) + 3);
+      });
+      ct.restore();
+
+      ct.save();
+      ct.strokeStyle = G.COR.azul; ct.lineWidth = 2.4;
+      ct.beginPath();
+      var prim = true;
+      for (var k = 1; k <= 160; k++) {
+        var t = tmax * k / 160;
+        var b = B2(t, est.pot);
+        if (b < b2min || b > b2max) { prim = true; continue; }
+        if (prim) { ct.moveTo(X2(t), Y2(b)); prim = false; }
+        else ct.lineTo(X2(t), Y2(b));
+      }
+      ct.stroke();
+      // temperatura de Boyle
+      ct.strokeStyle = G.COR.ambar; ct.lineWidth = 1.6;
+      ct.setLineDash([5, 4]);
+      ct.beginPath(); ct.moveTo(X2(TB), my); ct.lineTo(X2(TB), my + alt); ct.stroke();
+      ct.setLineDash([]);
+      ct.fillStyle = G.COR.ambar;
+      ct.font = '600 11px system-ui, sans-serif';
+      ct.textAlign = 'left';
+      ct.fillText('T*\u1d2e = ' + TB.toFixed(3).replace('.', ','), X2(TB) + 5, my + 12);
+      // ponto da temperatura atual
+      var bAtual = B2(T, est.pot);
+      if (bAtual > b2min && bAtual < b2max && T < tmax) {
+        ct.fillStyle = G.COR.vinho;
+        ct.beginPath(); ct.arc(X2(T), Y2(bAtual), 4.5, 0, 2 * Math.PI); ct.fill();
+      }
+      ct.fillStyle = G.COR.suave;
+      ct.font = '11px system-ui, sans-serif';
+      ct.fillText('B\u2082*(T)', gx + 6, my + 12);
+      ct.restore();
+
+      mostrar({
+        b2: F.fmt(bAtual, 4),
+        tb: F.fmt(TB, 3),
+        sg: bAtual > 0 ? 'positivo: repulsão domina'
+          : bAtual < 0 ? 'negativo: atração domina' : 'nulo',
+        dv: bAtual > 0 ? 'P maior que a do gás ideal'
+                       : 'P menor que a do gás ideal'
+      });
+
+      if (est.pot === 'lj') {
+        tabela.innerHTML = '<table><thead><tr><th>Gás</th><th>\u03b5/k<sub>B</sub> (K)</th>'
+          + '<th>\u03c3 (nm)</th><th>T<sub>B</sub> previsto = 3,418 \u03b5/k<sub>B</sub></th>'
+          + '<th>T<sub>B</sub> medido</th><th>desvio</th></tr></thead><tbody>'
+          + GASES.map(function (g) {
+              var prev = 3.4179 * g.eps;
+              return '<tr><td><b>' + g.nome + '</b></td><td>'
+                + g.eps.toFixed(2).replace('.', ',') + '</td><td>'
+                + g.sig.toFixed(4).replace('.', ',') + '</td><td>'
+                + prev.toFixed(0) + ' K</td><td>' + g.TBexp + ' K</td><td>'
+                + F.pct(Math.abs(prev - g.TBexp) / g.TBexp, 0) + '</td></tr>';
+            }).join('') + '</tbody></table>';
+      } else {
+        tabela.innerHTML = '';
+      }
+
+      nota.innerHTML =
+        '<p>À esquerda, o potencial entre duas moléculas e a <b>função de Mayer</b> '
+        + '\\(\\Phi(r)=e^{-u(r)/\\kB T}-1\\). Repare que \\(\\Phi\\) vale \\(-1\\) dentro do '
+        + 'caroço duro, onde nenhuma configuração é possível, e tende a zero onde não há '
+        + 'interação. Ela é, portanto, <b>diferente de zero apenas onde as moléculas se '
+        + 'enxergam</b>, e é isso que torna a integral finita.</p>'
+        + '<p>À direita, \\(B_2^*(T)=-2\\pi\\int\\Phi(r)r^2dr\\). O caroço duro contribui '
+        + 'positivamente e não depende da temperatura; a atração contribui negativamente e '
+        + 'vai com \\(1/T\\). Daí a forma \\(B_2 = b - a/\\kB T\\).</p>'
+        + '<p>A <b>temperatura de Boyle</b> é onde as duas contribuições se cancelam e o gás '
+        + 'imita o ideal apesar de não ser. Abaixo dela a atração domina, o gás é mais '
+        + 'compressível que o ideal e pode liquefazer; acima, a repulsão domina e ele é '
+        + 'menos compressível. Para Lennard-Jones ela vale \\(T^*_B=3{,}418\\), e a tabela '
+        + 'mostra o acordo com gases reais: excelente para nitrogênio e argônio, pior para '
+        + 'hélio e hidrogênio, que são leves o bastante para que efeitos quânticos contem.</p>';
+      tipografar(nota);
+    }
+
+    registrarRedesenho(desenhar);
+    tipografar(corpo);
+  };
+
+  /* =================================================================
+     22. Isotermas de van der Waals e a construção de Maxwell
+     Em unidades reduzidas, (P + 3/V²)(3V - 1) = 8T, sem parâmetro
+     algum: todas as substâncias caem na mesma curva. É a lei dos
+     estados correspondentes.
+     ================================================================= */
+  REGISTRO.vanderwaals = function (raiz) {
+    var corpo = moldura(raiz, 'Isotermas de van der Waals e a construção de Maxwell');
+
+    var est = { T: 0.9, maxwell: true };
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+
+    deslizante(ctr, 'temperatura reduzida \\(T_r=T/T_c\\)', 0.80, 1.25, 0.01, 0.90,
+      function (v) { est.T = v; desenhar(); },
+      function (v) { return v.toFixed(2).replace('.', ','); });
+
+    var cx = el('label', { class: 'caixa' });
+    var chk = el('input', { type: 'checkbox', checked: 'checked' });
+    cx.appendChild(chk);
+    cx.appendChild(el('span', { texto: 'construção de Maxwell' }));
+    chk.addEventListener('change', function () { est.maxwell = chk.checked; desenhar(); });
+    ctr.appendChild(cx);
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'P de coexistência', k: 'p' },
+      { rot: 'V do líquido', k: 'vl' },
+      { rot: 'V do vapor', k: 'vg' },
+      { rot: 'razão V<sub>vapor</sub>/V<sub>líq</sub>', k: 'rz' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    /* forma reduzida: P = 8T/(3V-1) - 3/V² */
+    function Pvdw(V, T) { return 8 * T / (3 * V - 1) - 3 / (V * V); }
+
+    /* raízes de Pvdw(V) = P, procuradas por varredura mais bisseção */
+    function raizes(P, T) {
+      var r = [], V0 = 0.36, V1 = 12, n = 4000, ant = Pvdw(V0, T) - P;
+      for (var i = 1; i <= n; i++) {
+        var V = V0 + (V1 - V0) * i / n;
+        var f = Pvdw(V, T) - P;
+        if (ant * f < 0) {
+          var a = V0 + (V1 - V0) * (i - 1) / n, b = V;
+          r.push(F.bissecao(function (x) { return Pvdw(x, T) - P; }, a, b, 1e-12));
+        }
+        ant = f;
+      }
+      return r;
+    }
+
+    /* Maxwell: a pressão do patamar é aquela em que as duas áreas entre a
+       isoterma e a reta se igualam, o que equivale a igualar os potenciais
+       químicos das duas fases. Ela tem de ficar entre o mínimo e o máximo
+       locais da isoterma, e é isso que delimita a busca. */
+    function extremos(T) {
+      var Vmin = null, Vmax = null, ant = null, antV = null;
+      for (var i = 0; i <= 4000; i++) {
+        var V = 0.35 + (10 - 0.35) * i / 4000;
+        var d = (Pvdw(V + 1e-6, T) - Pvdw(V - 1e-6, T)) / 2e-6;
+        if (ant !== null && ant * d < 0) {
+          if (d > 0) Vmin = 0.5 * (antV + V); else Vmax = 0.5 * (antV + V);
+        }
+        ant = d; antV = V;
+      }
+      return { Vmax: Vmax, Vmin: Vmin };
+    }
+
+    function maxwell(T) {
+      if (T >= 1) return null;
+      var ex = extremos(T);
+      if (ex.Vmax === null || ex.Vmin === null) return null;
+      var Palto = Pvdw(ex.Vmax, T);          // máximo local, do lado do líquido
+      var Pbaixo = Pvdw(ex.Vmin, T);         // mínimo local, do lado do vapor
+      var lo = Math.max(1e-6, Pbaixo), hi = Palto;
+      if (!(hi > lo)) return null;
+
+      function diff(P) {
+        var r = raizes(P, T);
+        if (r.length < 3) return null;
+        var V1 = r[0], V3 = r[r.length - 1];
+        return F.simpson(function (V) { return Pvdw(V, T); }, V1, V3, 2000)
+             - P * (V3 - V1);
+      }
+
+      /* Afasta-se um pouco das pontas: junto ao mínimo e ao máximo locais
+         duas das três raízes quase coincidem, e a varredura as perderia. */
+      var a = lo + 0.03 * (hi - lo), b = hi - 0.03 * (hi - lo);
+      var fa = diff(a), fb = diff(b);
+      if (fa === null || fb === null || fa * fb > 0) return null;
+      for (var k = 0; k < 90; k++) {
+        var m = 0.5 * (a + b), fm = diff(m);
+        if (fm === null) break;
+        if (fa * fm <= 0) { b = m; fb = fm; } else { a = m; fa = fm; }
+      }
+      var Pf = 0.5 * (a + b), rr = raizes(Pf, T);
+      if (rr.length < 3) return null;
+      return { P: Pf, Vl: rr[0], Vg: rr[rr.length - 1] };
+    }
+
+    function desenhar() {
+      var ax = G.eixos(cv, {
+        xmin: 0.33, xmax: 4.2, ymin: 0, ymax: 2.0, altura: 330,
+        rotX: 'volume reduzido V/V\u1d9c', rotY: 'pressão reduzida P/P\u1d9c',
+        marcasX: G.marcasLineares(0.5, 4, 7, 1),
+        formataY: function (v) { return v.toFixed(1).replace('.', ','); }
+      });
+
+      // família de isotermas, em cinza
+      [0.85, 0.90, 0.95, 1.00, 1.05, 1.15].forEach(function (t) {
+        G.curva(ax, function (V) { return Pvdw(V, t); },
+                t === 1 ? G.COR.ambar : G.COR.grade, t === 1 ? 1.8 : 1.2);
+      });
+      // a isoterma escolhida
+      G.curva(ax, function (V) { return Pvdw(V, est.T); }, G.COR.azul, 2.6);
+
+      // ponto crítico
+      ax.ct.save();
+      ax.ct.fillStyle = G.COR.ambar;
+      ax.ct.beginPath(); ax.ct.arc(ax.X(1), ax.Y(1), 5, 0, 2 * Math.PI); ax.ct.fill();
+      ax.ct.font = '600 11px system-ui, sans-serif';
+      ax.ct.fillStyle = G.COR.ambar;
+      ax.ct.textAlign = 'left';
+      ax.ct.fillText('ponto crítico', ax.X(1) + 8, ax.Y(1) - 6);
+      ax.ct.restore();
+
+      // curva de coexistência (binodal), traçada ponto a ponto
+      ax.ct.save();
+      ax.ct.strokeStyle = G.COR.vinho;
+      ax.ct.lineWidth = 1.6;
+      ax.ct.setLineDash([4, 3]);
+      var esq = [], dir = [];
+      for (var t = 0.80; t < 0.999; t += 0.01) {
+        var mw = maxwell(t);
+        if (mw) { esq.push([mw.Vl, mw.P]); dir.push([mw.Vg, mw.P]); }
+      }
+      var bin = esq.concat([[1, 1]]).concat(dir.reverse());
+      ax.ct.beginPath();
+      bin.forEach(function (q, i) {
+        if (i) ax.ct.lineTo(ax.X(q[0]), ax.Y(q[1])); else ax.ct.moveTo(ax.X(q[0]), ax.Y(q[1]));
+      });
+      ax.ct.stroke();
+      ax.ct.setLineDash([]);
+      ax.ct.restore();
+
+      var m = est.maxwell ? maxwell(est.T) : null;
+      if (m) {
+        // patamar e as duas áreas iguais
+        ax.ct.save();
+        ax.ct.fillStyle = 'rgba(181,131,31,.30)';
+        var passo = (m.Vg - m.Vl) / 300;
+        for (var V = m.Vl; V < m.Vg; V += passo) {
+          var y1 = Pvdw(V, est.T), y2 = m.P;
+          ax.ct.fillRect(ax.X(V), ax.Y(Math.max(y1, y2)),
+                         Math.max(1, ax.X(V + passo) - ax.X(V)),
+                         Math.abs(ax.Y(y1) - ax.Y(y2)));
+        }
+        ax.ct.strokeStyle = G.COR.vinho;
+        ax.ct.lineWidth = 2.4;
+        ax.ct.beginPath();
+        ax.ct.moveTo(ax.X(m.Vl), ax.Y(m.P)); ax.ct.lineTo(ax.X(m.Vg), ax.Y(m.P));
+        ax.ct.stroke();
+        ax.ct.fillStyle = G.COR.vinho;
+        [[m.Vl, 'líquido'], [m.Vg, 'vapor']].forEach(function (q) {
+          ax.ct.beginPath(); ax.ct.arc(ax.X(q[0]), ax.Y(m.P), 4, 0, 2 * Math.PI); ax.ct.fill();
+        });
+        ax.ct.restore();
+      }
+
+      mostrar({
+        p: m ? F.fmt(m.P, 4) : (est.T >= 1 ? 'acima de T\u1d9c' : '\u00b7'),
+        vl: m ? F.fmt(m.Vl, 4) : '\u00b7',
+        vg: m ? F.fmt(m.Vg, 4) : '\u00b7',
+        rz: m ? F.fmt(m.Vg / m.Vl, 2) : '\u00b7'
+      });
+
+      nota.innerHTML = est.T >= 1
+        ? '<p>Acima da temperatura crítica a isoterma é monótona: não há patamar, não há '
+          + 'duas fases, e não existe distinção entre líquido e gás. Comprimir apenas deixa '
+          + 'o fluido mais denso, continuamente. É por isso que não se liquefaz oxigênio à '
+          + 'temperatura ambiente por mais pressão que se aplique: é preciso primeiro '
+          + 'resfriar abaixo de \\(T_c=155\\) K.</p>'
+          + '<p>Baixe \\(T_r\\) abaixo de 1 e o patamar aparece.</p>'
+        : '<p>Abaixo de \\(T_c\\) a isoterma de van der Waals tem um trecho com '
+          + '\\(\\partial P/\\partial V>0\\): comprimir aumentaria o volume. Isso é '
+          + '<b>mecanicamente instável</b> e não pode ocorrer. A natureza resolve separando '
+          + 'o sistema em duas fases que coexistem à mesma pressão.</p>'
+          + '<p>A <b>construção de Maxwell</b> determina essa pressão exigindo que as duas '
+          + 'áreas sombreadas sejam iguais, o que equivale a igualar os potenciais químicos '
+          + 'das duas fases. O patamar em vinho liga o líquido, à esquerda, ao vapor, à '
+          + 'direita; entre eles o sistema é uma mistura dos dois, e a proporção segue a '
+          + 'regra da alavanca.</p>'
+          + '<p>A curva tracejada é a <b>binodal</b>, o contorno da região de coexistência, '
+          + 'que se fecha no ponto crítico. Como a equação em unidades reduzidas não tem '
+          + 'nenhum parâmetro, esta figura é a mesma para <em>toda</em> substância: é a '
+          + '<b>lei dos estados correspondentes</b>, e ela funciona surpreendentemente bem '
+          + 'para gases simples.</p>';
+      tipografar(nota);
+    }
+
+    registrarRedesenho(desenhar);
+    tipografar(corpo);
+  };
+
   /* ---------- inicialização ---------- */
   document.addEventListener('DOMContentLoaded', function () {
     Array.prototype.forEach.call(document.querySelectorAll('[data-widget]'), function (n) {
