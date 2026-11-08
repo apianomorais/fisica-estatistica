@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Módulo 1: Revisão de termodinâmica | Física Estatística</title>
 <link rel="icon" type="image/png" href="assets/img/favicon.png">
-<link rel="stylesheet" href="assets/css/estilo.css?v=202611080933">
-<script src="assets/js/comum.js?v=202611080933"></script>
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611081153">
+<script src="assets/js/comum.js?v=202611081153"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
 <body>
@@ -49,7 +49,7 @@
     <li><a href="#s8">8. Os quatro potenciais termodinâmicos</a></li>
     <li><a href="#s9">9. Relações de Maxwell</a></li>
     <li><a href="#s10">10. Funções resposta</a></li>
-    <li><a href="#s11">11. Sistemas magnéticos e elétricos</a></li>
+    <li><a href="#s11">11. Sistemas magnéticos, elétricos e superficiais</a></li>
     <li><a href="#s12">12. Terceira lei</a></li>
     <li><a href="#s13">13. A pressão vem dos choques</a></li>
     <li><a href="#s14">14. Equipartição</a></li>
@@ -331,6 +331,11 @@
   <p>Com várias espécies químicas, \(N=\sum_{i=1}^{k}N_i\) e o trabalho químico é
   \(\dbar W=\sum_{i=1}^{k}\mu_i\,dN_i\), cada espécie com seu potencial.</p>
 
+  <p>A última linha da tabela é a tensão superficial, e ela merece atenção à parte: é o caso
+  em que a variável intensiva se mede de duas maneiras que parecem diferentes e não são, força
+  por unidade de comprimento ou energia por unidade de área. A seção 11 trata dela junto com
+  os pares magnético e elétrico.</p>
+
   <div class="bloco alerta">
     <span class="rotulo">Por que o símbolo \(\dbar\) e não \(d\)</span>
     <p>Escrevemos \(\dbar W\) com a barra cortada (muitos livros usam \(\delta W\), como nas
@@ -570,7 +575,7 @@
   som de Newton.</p>
 
   <!-- ================================================== -->
-  <h2 id="s11">11. Sistemas magnéticos e elétricos</h2>
+  <h2 id="s11">11. Sistemas magnéticos, elétricos e superficiais</h2>
 
   <p>Tudo o que foi feito das seções 5 a 10 partiu de \(\dbar W=-P\,dV\), e é hora de
   perguntar o que nesse ponto de partida era realmente sobre fluidos. A resposta é:
@@ -649,6 +654,145 @@
 
   <p>com \(E=U-\Em\wp\) e \(G=U-TS-\Em\wp\). E, como no caso magnético, há a versão com o
   par invertido, \(\dbar W=-\wp\,d\Em\), de tradução \(V\equiv\Em\) e \(P\equiv\wp\).</p>
+
+  <h3>O par superficial</h3>
+
+  <p>O terceiro par conjugado é o mais fácil de ver com as mãos e o mais instrutivo quanto ao
+  que uma variável intensiva significa. Molhe um quadro de arame numa solução de sabão e deixe
+  um dos lados do quadro livre para deslizar. O filme puxa o fio para dentro, e manter o fio
+  parado exige força. O trabalho para aumentar a área da superfície é</p>
+
+  <p>\[\dbar W=\sigma\,dA,\]</p>
+
+  <p>com \(A\) extensiva, \(\sigma\) intensiva, e a mesma estrutura de sempre. A primeira lei
+  fica \(dU=T\,dS+\sigma\,dA\), a tradução é \(V\equiv-A\) e \(P\equiv\sigma\), e os análogos
+  dos potenciais são \(E=U-\sigma A\) e \(G=U-TS-\sigma A\).</p>
+
+  <h4>Força por unidade de comprimento, energia por unidade de área</h4>
+
+  <p>A tensão superficial é a única grandeza deste curso que aparece nos livros com duas
+  definições aparentemente diferentes, e vale parar nisso. A primeira é mecânica: \(\sigma\) é
+  a força por unidade de comprimento com que a superfície tira a borda para dentro. A segunda
+  é energética: \(\sigma\) é a energia necessária para criar uma unidade de área nova. As duas
+  são a mesma afirmação lida em dois sentidos, e a aritmética das unidades já diz isso:</p>
+
+  <p>\[\left[\sigma\right]=\frac{\rm N}{\rm m}=\frac{\rm N\cdot m}{\rm m^2}=\frac{\rm J}{\rm m^2}.\]</p>
+
+  <p>Dividir e multiplicar por um metro não é truque de dimensões: é a própria conta do
+  trabalho. No quadro de arame, o fio deslizante tem comprimento \(L\) e o filme tem
+  <em>duas</em> faces, de modo que a força que o segura é</p>
+
+  <p>\[F=2\sigma L.\]</p>
+
+  <p>Deslocando o fio de \(dx\), a área cresce de \(dA=2L\,dx\) e o trabalho vale
+  \(F\,dx=2\sigma L\,dx=\sigma\,dA\). A força por comprimento multiplicada pelo deslocamento
+  <em>é</em> a energia por área multiplicada pela área criada. Com água a 20 graus Celsius,
+  \(\sigma=72{,}8\) mN/m, e um fio de 5 cm é segurado por 7,3 mN, o peso de 0,74 g.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Por que o filme não é uma mola</span>
+    <p>Estique o filme e meça a força outra vez: ela não mudou. Isso contraria o instinto
+    treinado em molas, onde \(F=kx\), e é o ponto em que a termodinâmica tem algo a dizer.</p>
+    <p>Numa mola, estirar afasta átomos uns dos outros e a força cresce porque as ligações
+    estão sendo deformadas. Num filme, estirar não afasta molécula nenhuma: moléculas novas
+    sobem do volume para a superfície, e as que já estavam lá continuam com a mesma vizinhança
+    e a mesma distância média. O que aumenta é o <em>número</em> de moléculas na superfície,
+    não a separação entre elas, e uma grandeza intensiva não tem como perceber a diferença.</p>
+    <p>Esse é exatamente o comportamento de um fluido na região de coexistência líquido e
+    vapor, onde empurrar o pistão não muda a pressão porque a matéria apenas troca de fase.
+    A analogia é literal: \(\sigma\) de um líquido puro depende só de \(T\), nunca de \(A\),
+    assim como \(P\) na coexistência depende só de \(T\), nunca de \(V\). A consequência é que
+    a resposta análoga à compressibilidade,
+    \(\kappa^{\rm s}_T=\left(\partial A/\partial\sigma\right)_T/A\), diverge, e a superfície de
+    um líquido puro não tem elasticidade alguma.</p>
+    <p>Uma superfície só fica elástica quando algo nela se dilui ao ser estirado, isto é, com
+    surfactantes: aí a cobertura cai, \(\sigma\) sobe, e a <strong>elasticidade de Gibbs</strong>
+    \(\varepsilon_T=A\left(\partial\sigma/\partial A\right)_T\) fica finita e positiva. É ela
+    que cicatriza o ponto fino de uma bolha de sabão antes que ele arrebente, e é por isso que
+    bolhas de água pura não existem.</p>
+  </div>
+
+  <div data-widget="tensao"></div>
+
+  <h4>E energia de quê?</h4>
+
+  <p>Dizer que \(\sigma\) é "energia por unidade de área" está certo, mas incompleto, e o que
+  falta é importante. De \(F=U-TS\) com \(dF=-S\,dT+\sigma\,dA\) sai</p>
+
+  <p>\[\sigma=\dpar{F}{A}{T},\]</p>
+
+  <p>de modo que \(\sigma\) é a <strong>energia livre de Helmholtz</strong> por unidade de
+  área, não a energia interna. A relação de Maxwell deste par, que é a tradução literal de
+  \(\left(\partial S/\partial V\right)_T=\left(\partial P/\partial T\right)_V\), dá a entropia
+  da superfície por unidade de área:</p>
+
+  <p>\[s_{\rm s}=\dpar{S}{A}{T}=-\dpar{\sigma}{T}{A}.\]</p>
+
+  <p>Como \(\sigma\) cai com a temperatura em todo líquido conhecido, \(s_{\rm s}\) é positiva:
+  a superfície é mais desordenada que o volume, e criar área isotermicamente <em>aumenta</em> a
+  entropia do sistema, que portanto absorve calor do banho. Somando esse calor ao trabalho,
+  a energia interna por unidade de área é</p>
+
+  <p>\[u_{\rm s}=\sigma+Ts_{\rm s}=\sigma-T\dpar{\sigma}{T}{A}.\]</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>Líquido</th><th>\(\sigma\) a 20 °C<br>(mJ/m²)</th>
+      <th>\(s_{\rm s}=-d\sigma/dT\)<br>(mJ/m²K)</th>
+      <th>\(Ts_{\rm s}\)<br>(mJ/m²)</th>
+      <th>\(u_{\rm s}\)<br>(mJ/m²)</th><th>\(u_{\rm s}/\sigma\)</th></tr></thead>
+    <tbody>
+      <tr><td>água</td><td>72,8</td><td>0,151</td><td>44,4</td><td>117,2</td><td>1,61</td></tr>
+      <tr><td>glicerol</td><td>64,0</td><td>0,060</td><td>17,5</td><td>81,5</td><td>1,27</td></tr>
+      <tr><td>benzeno</td><td>28,9</td><td>0,129</td><td>37,8</td><td>66,7</td><td>2,31</td></tr>
+      <tr><td>acetona</td><td>25,2</td><td>0,112</td><td>32,8</td><td>58,0</td><td>2,30</td></tr>
+      <tr><td>etanol</td><td>22,1</td><td>0,083</td><td>24,4</td><td>46,5</td><td>2,10</td></tr>
+      <tr><td>mercúrio</td><td>425,4</td><td>0,205</td><td>60,1</td><td>485,5</td><td>1,14</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Na água, a energia interna por unidade de área é 1,6 vezes a tensão superficial, e nos
+  solventes orgânicos chega a 2,3 vezes. Os dois números têm as mesmas unidades e são
+  diferentes, e só o menor deles é a força por unidade de comprimento que a balança mede. A
+  diferença não é erro de tabela: é o calor latente de criar superfície. Estique um filme de
+  água de 1 cm² isotermicamente e ele toma 4,4 μJ do banho ao mesmo tempo que recebe 7,3 μJ de
+  trabalho.</p>
+
+  <p>Vale uma estimativa microscópica para fechar. O volume por molécula de água é
+  \(18\ {\rm cm^3/mol}\) dividido por \(N_A\), ou \(3{,}0\times10^{-29}\ {\rm m^3}\), de modo
+  que cada molécula ocupa na superfície uma área da ordem de
+  \(a^2\approx9{,}6\times10^{-20}\ {\rm m^2}\). A energia que custa pôr uma molécula na
+  superfície é então \(u_{\rm s}a^2\approx1{,}1\times10^{-20}\) J, ou 0,070 eV, uns
+  \(2{,}8\,\kB T\) à temperatura ambiente. É a fração esperada de uma ligação de hidrogênio,
+  que vale cerca de 0,2 eV: a molécula da superfície perde algo como um quarto de seus
+  vizinhos, e paga por isso. Tensão superficial é contabilidade de vizinhos faltando.</p>
+
+  <p>Daí também se entende por que \(\sigma\) cai com a temperatura e se anula no ponto
+  crítico: lá o líquido e o vapor deixam de ser distinguíveis, e não há mais nenhum vizinho
+  faltando para cobrar. Para a água, a correlação de referência da IAPWS escreve</p>
+
+  <p>\[\sigma=235{,}8\left(1-\frac{T}{T_c}\right)^{1{,}256}
+  \left[1-0{,}625\left(1-\frac{T}{T_c}\right)\right]\ {\rm mN/m},
+  \qquad T_c=647{,}096\ {\rm K},\]</p>
+
+  <p>cuja derivada em 20 graus Celsius vale \(-0{,}1513\) mN/(m·K) e reproduz o coeficiente
+  tabelado. O expoente 1,256 não é ajuste cego: é o expoente crítico da tensão superficial, e
+  voltaremos a ele quando discutirmos leis de escala.</p>
+
+  <h4>A pressão de Laplace</h4>
+
+  <p>Um último fruto do par. Infle uma gota de raio \(R\) em \(dR\): a área cresce de
+  \(dA=8\pi R\,dR\) e o trabalho de superfície é \(\sigma\,dA\), que tem de ser pago pelo
+  excesso de pressão interna empurrando o volume \(dV=4\pi R^2dR\). Igualando,</p>
+
+  <p>\[\Delta P=\frac{2\sigma}{R}\quad\text{(uma interface)},
+  \qquad \Delta P=\frac{4\sigma}{R}\quad\text{(filme de sabão, duas)}.\]</p>
+
+  <p>Uma gota de água de 1 mm de raio tem 146 Pa de pressão a mais que o ar em volta; uma de
+  1 μm tem 1,4 atm a mais. É por isso que a nucleação de gotas exige supersaturação, e é essa
+  dependência em \(1/R\) que fará a diferença entre uma fase estável e uma metaestável quando
+  tratarmos de transições de fase.</p>
 
   <div data-widget="analogias"></div>
 
@@ -945,6 +1089,6 @@
   Laboratório de Física Computacional Aplicada (LFCA) · Universidade Regional do Cariri</p>
 </footer>
 
-<script src="assets/js/widgets.js?v=202611080933"></script>
+<script src="assets/js/widgets.js?v=202611081153"></script>
 </body>
 </html>

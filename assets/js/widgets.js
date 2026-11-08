@@ -6297,7 +6297,7 @@
      que fique claro que não há nada novo a decorar.
      ================================================================= */
   REGISTRO.analogias = function (raiz) {
-    var corpo = moldura(raiz, 'O mesmo esqueleto, três sistemas');
+    var corpo = moldura(raiz, 'O mesmo esqueleto, quatro sistemas');
 
     /* x é a variável extensiva e y a intensiva, com dU = T dS + y dx.
        corrV e corrP dizem o que, nesse sistema, faz o papel de V e de P
@@ -6374,6 +6374,36 @@
            + 'de dipolo total da amostra é \\(\\Em\\,d\\wp\\), e a polarização '
            + '\\(\\Pol=d\\wp/dV\\) faz o papel da magnetização.'
       },
+      superf: {
+        rot: 'Superficial, trabalho em A', trab: '\\sigma\\,dA',
+        x: 'A', y: '\\sigma',
+        xnome: 'área da superfície', ynome: 'tensão superficial',
+        corrV: '-A', corrP: '\\sigma',
+        E: 'E = U - \\sigma A', G: 'G = U - TS - \\sigma A',
+        max: '\\dpar{S}{A}{T} = -\\dpar{\\sigma}{T}{A}',
+        cx: 'C_A', cy: 'C_{\\sigma}',
+        respT: '\\kappa^{\\rm s}_T = \\frac1A\\dpar{A}{\\sigma}{T} '
+             + '= \\frac{1}{\\varepsilon_T}',
+        respS: '\\kappa^{\\rm s}_S = \\frac1A\\dpar{A}{\\sigma}{S}',
+        alfa: '\\alpha_\\sigma = \\frac1A\\dpar{A}{T}{\\sigma}',
+        id1: '\\kappa^{\\rm s}_T\\left(C_{\\sigma} - C_A\\right) '
+           + '= TA\\alpha_\\sigma^2',
+        id2: 'C_{\\sigma}\\left(\\kappa^{\\rm s}_T - \\kappa^{\\rm s}_S\\right) '
+           + '= TA\\alpha_\\sigma^2',
+        obs: 'Um filme de líquido num quadro de arame. A superfície é mais '
+           + 'desordenada que o volume, e por isso \\(\\sigma\\) cai com a '
+           + 'temperatura e a entropia por área '
+           + '\\(s_{\\rm s}=-\\left(\\partial\\sigma/\\partial T\\right)_A\\) '
+           + 'é positiva. Há uma degenerescência curiosa: num líquido puro '
+           + '\\(\\sigma\\) depende só de \\(T\\), nunca de \\(A\\), de modo '
+           + 'que \\(\\varepsilon_T=A\\left(\\partial\\sigma/\\partial A'
+           + '\\right)_T\\) se anula e \\(\\kappa^{\\rm s}_T\\) diverge. É o '
+           + 'análogo exato de um fluido na região de coexistência, onde '
+           + '\\(P=P(T)\\) e \\(\\kappa_T\\) diverge, e pelo mesmo motivo: '
+           + 'mudar a variável extensiva só move matéria de uma fase para a '
+           + 'outra. A superfície só fica elástica com surfactantes, e é essa '
+           + 'elasticidade que segura uma bolha de sabão.'
+      },
       eleE: {
         rot: 'Elétrico, trabalho em ℰ', trab: '-\\wp\\,d\\Em',
         x: '\\Em', y: '-\\wp',
@@ -6392,7 +6422,7 @@
       }
     };
 
-    var ordem = ['fluido', 'magM', 'magH', 'eleP', 'eleE'];
+    var ordem = ['fluido', 'magM', 'magH', 'eleP', 'eleE', 'superf'];
     var est = { k: 'fluido' };
 
     var ctr = el('div', { class: 'controles' });
@@ -6450,7 +6480,422 @@
   };
 
   /* =================================================================
-     31. Modelo de Potts sem interação
+     31. Tensão superficial: as duas leituras de σ
+     O mesmo número é força por unidade de comprimento e energia por
+     unidade de área, porque N/m = J/m². A vista da força mostra que
+     ela não cresce com o estiramento (o filme não é mola, porque
+     estirar recruta moléculas do volume em vez de esticar ligações);
+     a vista do trabalho mostra as duas leituras na mesma figura, a
+     altura da reta e a área sob ela; e a vista térmica mostra que σ é
+     energia LIVRE por área, com a energia interna por área valendo
+     σ − T dσ/dT, umas 1,6 vezes maior na água.
+     Dados: σ a 20 °C e dσ/dT de surface-tension.de; para a água, a
+     correlação de referência da IAPWS, cuja derivada em 20 °C dá
+     −0,1513 mN/(m·K) e confirma o valor tabelado.
+     ================================================================= */
+  REGISTRO.tensao = function (raiz) {
+    /* σ em mN/m a 20 °C e dσ/dT em mN/(m·K). O mercúrio tem faixa
+       larga na literatura (425 a 487) porque o valor depende muito da
+       limpeza da superfície; fica o valor da mesma tabela dos outros. */
+    var LIQ = [
+      { nome: 'água', s20: 72.80, ds: -0.1514, cor: '#2c5f8d', iapws: true },
+      { nome: 'glicerol', s20: 64.00, ds: -0.0598, cor: '#1f6f54' },
+      { nome: 'acetona', s20: 25.20, ds: -0.1120, cor: '#b5831f' },
+      { nome: 'benzeno', s20: 28.88, ds: -0.1291, cor: '#7a5ea8' },
+      { nome: 'etanol', s20: 22.10, ds: -0.0832, cor: '#1b7f9e' },
+      { nome: 'mercúrio', s20: 425.41, ds: -0.2049, cor: '#8c2f39' }
+    ];
+    var GRAV = 9.80665;
+    var est = { k: 0, vista: 'forca', L: 5, x: 4, T: 20 };
+
+    var corpo = moldura(raiz, 'Tensão superficial: força por comprimento ou energia por área');
+
+    var ctr0 = el('div', { class: 'controles' });
+    corpo.appendChild(ctr0);
+    opcoes(ctr0, [
+      { rot: 'Força por comprimento', v: 'forca' },
+      { rot: 'Trabalho e área', v: 'trabalho' },
+      { rot: 'Qual energia?', v: 'termica' }
+    ], 0, function (v) { est.vista = v; desenhar(); });
+
+    var ctr1 = el('div', { class: 'controles' });
+    corpo.appendChild(ctr1);
+    opcoes(ctr1, LIQ.map(function (g, i) { return { rot: g.nome, v: i }; }), 0,
+      function (v) { est.k = v; desenhar(); });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'comprimento do fio L', 2, 8, 0.5, 5,
+      function (v) { est.L = v; desenhar(); },
+      function (v) { return F.fmt(v, 1) + ' cm'; });
+    deslizante(ctr, 'deslocamento x', 0.5, 8, 0.25, 4,
+      function (v) { est.x = v; desenhar(); },
+      function (v) { return F.fmt(v, 2) + ' cm'; });
+    deslizante(ctr, 'temperatura', 5, 50, 1, 20,
+      function (v) { est.T = v; desenhar(); },
+      function (v) { return String(v) + ' °C'; });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'σ na temperatura (mN/m)', k: 'sig' },
+      { rot: 'força F = 2σL (mN)', k: 'forca' },
+      { rot: 'massa que o filme segura', k: 'massa' },
+      { rot: 'área criada ΔA (cm²)', k: 'area' },
+      { rot: 'trabalho W = σΔA (μJ)', k: 'trab' },
+      { rot: 'u<sub>s</sub> = σ − T dσ/dT (mJ/m²)', k: 'us' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    /* Correlação de referência da IAPWS para a água, válida de 0 °C ao
+       ponto crítico. Em 20 °C devolve 72,74 mN/m. */
+    function sigAgua(T) {
+      var tau = 1 - T / 647.096;
+      return tau <= 0 ? 0 : 235.8 * Math.pow(tau, 1.256) * (1 - 0.625 * tau);
+    }
+    function sigma(g, tC) {
+      var T = tC + 273.15;
+      return g.iapws ? sigAgua(T) : g.s20 + g.ds * (T - 293.15);
+    }
+    function dsigma(g, tC) {
+      if (!g.iapws) return g.ds;
+      var T = tC + 273.15, h = 0.02;
+      return (sigAgua(T + h) - sigAgua(T - h)) / (2 * h);
+    }
+    function energia(g, tC) {        // u_s = σ − T dσ/dT, em mJ/m²
+      return sigma(g, tC) - (tC + 273.15) * dsigma(g, tC);
+    }
+
+    function seta(ct, xa, ya, xb, yb, cor, esp) {
+      var dx = xb - xa, dy = yb - ya, r = Math.sqrt(dx * dx + dy * dy);
+      if (r < 1) return;
+      var ux = dx / r, uy = dy / r, p = 7;
+      ct.save();
+      ct.strokeStyle = cor; ct.fillStyle = cor;
+      ct.lineWidth = esp || 2; ct.lineCap = 'round';
+      ct.beginPath(); ct.moveTo(xa, ya); ct.lineTo(xb - ux * p, yb - uy * p); ct.stroke();
+      ct.beginPath();
+      ct.moveTo(xb, yb);
+      ct.lineTo(xb - ux * p - uy * p * 0.5, yb - uy * p + ux * p * 0.5);
+      ct.lineTo(xb - ux * p + uy * p * 0.5, yb - uy * p - ux * p * 0.5);
+      ct.closePath(); ct.fill();
+      ct.restore();
+    }
+
+    function cota(ct, xa, ya, xb, yb, rot) {
+      ct.save();
+      ct.strokeStyle = G.COR.suave; ct.fillStyle = G.COR.suave;
+      seta(ct, xa, ya, xb, yb, G.COR.suave, 1.2);
+      seta(ct, xb, yb, xa, ya, G.COR.suave, 1.2);
+      ct.font = '600 11px system-ui, sans-serif';
+      ct.textAlign = 'center'; ct.textBaseline = 'middle';
+      var mx = (xa + xb) / 2, my = (ya + yb) / 2;
+      var hor = Math.abs(xb - xa) > Math.abs(yb - ya);
+      ct.fillStyle = '#fff';
+      var w = ct.measureText(rot).width + 6;
+      ct.fillRect(mx - w / 2, my - 7, w, 14);
+      ct.fillStyle = G.COR.suave;
+      ct.fillText(rot, mx, my + (hor ? 0 : 0));
+      ct.restore();
+    }
+
+    /* ---------- vista 1: o quadro de arame ---------- */
+    function desenhaQuadro() {
+      var g = LIQ[est.k];
+      var escp = Math.min((cv.clientWidth - 180) / 9.2, 26);
+      /* a altura acompanha o maior L possível, para o quadro não pular
+         de tamanho enquanto o deslizante de L é arrastado */
+      var alt = Math.round(104 + 8 * escp);
+      var p = G.preparar(cv, alt), ct = p.ct, Lp = p.L, esc = escp;
+      ct.clearRect(0, 0, Lp, alt);
+
+      /* centra o desenho: 34 px à esquerda para a cota de L e 86 à
+         direita para a seta da força e o peso pendurado */
+      var larg = 8.7 * esc + 120;
+      var x0 = Math.max(54, (Lp - larg) / 2 + 34), yc = (alt - 30) / 2;
+      var hf = est.L * esc, xw = x0 + est.x * esc;
+      var topo = yc - hf / 2, base = yc + hf / 2;
+      var xfim = x0 + 8.7 * esc;
+
+      /* o filme: duas faces, por isso o leve degradê */
+      var grad = ct.createLinearGradient(x0 - 10, topo, xw, base);
+      grad.addColorStop(0, 'rgba(44,95,141,.30)');
+      grad.addColorStop(0.5, 'rgba(123,167,204,.42)');
+      grad.addColorStop(1, 'rgba(44,95,141,.30)');
+      ct.fillStyle = grad;
+      ct.fillRect(x0 - 10, topo, xw - x0 + 10, hf);
+
+      /* trilhos e barra de fechamento, por cima do filme */
+      ct.strokeStyle = '#8a8f96'; ct.lineWidth = 4; ct.lineCap = 'round';
+      ct.beginPath();
+      ct.moveTo(x0 - 10, topo); ct.lineTo(xfim, topo);
+      ct.moveTo(x0 - 10, base); ct.lineTo(xfim, base);
+      ct.moveTo(x0 - 10, topo); ct.lineTo(x0 - 10, base);
+      ct.stroke();
+
+      /* fio deslizante */
+      ct.strokeStyle = G.COR.tinta; ct.lineWidth = 5;
+      ct.beginPath(); ct.moveTo(xw, topo - 5); ct.lineTo(xw, base + 5); ct.stroke();
+
+      /* a força do filme sobre o fio: uma seta por face */
+      var y1 = yc - hf * 0.26, y2 = yc + hf * 0.26;
+      seta(ct, xw - 4, y1, xw - 4 - 38, y1, G.COR.azul, 2.2);
+      seta(ct, xw - 4, y2, xw - 4 - 38, y2, G.COR.azul, 2.2);
+      ct.fillStyle = G.COR.azul;
+      ct.font = '600 11px system-ui, sans-serif';
+      ct.textAlign = 'right'; ct.textBaseline = 'bottom';
+      /* no celular o rótulo inteiro transborda o filme pela esquerda */
+      var curto = Lp < 560;
+      ct.fillText(curto ? 'σL' : 'σL (face de cima)', xw - 6, y1 - 5);
+      ct.textBaseline = 'top';
+      ct.fillText(curto ? 'σL' : 'σL (face de baixo)', xw - 6, y2 + 5);
+
+      /* a força aplicada e o peso equivalente */
+      var sig = sigma(g, est.T) * 1e-3;            // N/m
+      var Fn = 2 * sig * est.L * 1e-2;             // N
+      seta(ct, xw + 4, yc, xw + 4 + 44, yc, G.COR.vinho, 2.6);
+      ct.fillStyle = G.COR.vinho;
+      ct.textAlign = 'left'; ct.textBaseline = 'bottom';
+      ct.fillText('F = 2σL', xw + 10, yc - 6);
+      ct.textBaseline = 'top';
+      ct.fillText(F.fmt(Fn * 1e3, 2) + ' mN', xw + 10, yc + 6);
+
+      var mg = Fn / GRAV * 1e3;                    // g
+      var xp = xw + 62, yp = base + 20;
+      ct.strokeStyle = G.COR.suave; ct.lineWidth = 1;
+      ct.beginPath(); ct.moveTo(xp, yc + 10); ct.lineTo(xp, yp + 4); ct.stroke();
+      ct.font = '600 10px system-ui, sans-serif';
+      var rotm = F.fmt(mg, 2) + ' g', wm = Math.max(24, ct.measureText(rotm).width + 10);
+      ct.fillStyle = '#c9ced6';
+      ct.fillRect(xp - wm / 2, yp + 4, wm, 15);
+      ct.strokeStyle = G.COR.suave; ct.strokeRect(xp - wm / 2, yp + 4, wm, 15);
+      ct.fillStyle = G.COR.tinta;
+      ct.textAlign = 'center'; ct.textBaseline = 'middle';
+      ct.fillText(rotm, xp, yp + 11.5);
+
+      /* cotas */
+      cota(ct, x0 - 30, topo, x0 - 30, base, 'L');
+      cota(ct, x0 - 10, topo - 20, xw, topo - 20, 'x');
+
+      /* rótulo do líquido */
+      ct.fillStyle = G.COR.suave;
+      ct.font = '600 11px system-ui, sans-serif';
+      ct.textAlign = 'left'; ct.textBaseline = 'bottom';
+      ct.fillText('σ = ' + F.fmt(sigma(g, est.T), 2) + ' mN/m = '
+        + F.fmt(sigma(g, est.T), 2) + ' mJ/m²', 6, alt - 4);
+      ct.fillText('filme de ' + g.nome + ' a ' + est.T + ' °C', 6, alt - 20);
+    }
+
+    /* ---------- vista 2: a força contra o deslocamento ---------- */
+    /* Teto do eixo arredondado para que as cinco divisões caiam em
+       números legíveis em vez de 3,1 / 6,2 / 9,4. */
+    function teto(v) {
+      var e = Math.pow(10, Math.floor(Math.log(v / 5) / Math.LN10));
+      var m = v / 5 / e, ns = [1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10], n = 10, i;
+      for (i = 0; i < ns.length; i++) { if (m <= ns[i]) { n = ns[i]; break; } }
+      return n * e * 5;
+    }
+
+    function desenhaTrabalho() {
+      var g = LIQ[est.k];
+      var sig = sigma(g, est.T) * 1e-3;
+      var Fn = 2 * sig * est.L * 1e-2 * 1e3;       // mN
+      var kmola = 1.5 * Fn / 8;                    // mN/cm
+      var ymax = teto(1.5 * Fn * 1.16);
+
+      var gr = G.eixos(cv, {
+        altura: 290, xmin: 0, xmax: 8, ymin: 0, ymax: ymax,
+        rotX: 'deslocamento x do fio (cm)', rotY: 'força aplicada (mN)',
+        marcasX: G.marcasLineares(0, 8, 8, 0),
+        formataY: function (v) { return F.fmt(v, ymax >= 25 ? 0 : 1); }
+      });
+      var ct = gr.ct;
+
+      var fFilme = function () { return Fn; };
+      var fMola = function (x) { return kmola * x; };
+
+      G.area(gr, fFilme, 0, est.x, 'rgba(44,95,141,.26)');
+      G.curva(gr, fMola, G.COR.vinho, 2, [6, 5]);
+      G.curva(gr, fFilme, G.COR.azul, 2.6);
+      G.vertical(gr, est.x, G.COR.suave, '', true);
+
+      /* a altura é a leitura de força, a área é a leitura de energia */
+      ct.save();
+      ct.font = '600 11px system-ui, sans-serif';
+      ct.textAlign = 'center'; ct.textBaseline = 'middle';
+      if (gr.Y(0) - gr.Y(Fn) > 28 && est.x > 1.6) {
+        var xm = gr.X(est.x * 0.45), ym = (gr.Y(0) + gr.Y(Fn)) / 2;
+        ct.fillStyle = '#20486c';
+        ct.fillText('W = σ ΔA', xm, ym - 8);
+        ct.font = '11px system-ui, sans-serif';
+        ct.fillText(F.fmt(sig * 2 * est.L * est.x * 1e-4 * 1e6, 0) + ' μJ', xm, ym + 8);
+      }
+      ct.font = '600 11px system-ui, sans-serif';
+      ct.textAlign = 'left'; ct.textBaseline = 'bottom';
+      ct.fillStyle = G.COR.azul;
+      ct.fillText('filme: F = 2σL, não depende de x', gr.x0 + 8, gr.Y(Fn) - 7);
+      ct.textAlign = 'right'; ct.textBaseline = 'bottom';
+      ct.fillStyle = G.COR.vinho;
+      ct.fillText('mola, para comparar: F = kx', gr.x1 - 6, gr.Y(kmola * 8) - 7);
+      ct.restore();
+    }
+
+    /* ---------- vista 3: energia livre contra energia interna ---------- */
+    function desenhaTermica() {
+      var g = LIQ[est.k];
+      var umax = energia(g, 5);
+      var gr = G.eixos(cv, {
+        altura: 290, xmin: 0, xmax: 55, ymin: 0, ymax: teto(umax * 1.02),
+        rotX: 'temperatura (°C)', rotY: 'por unidade de área (mJ/m²)',
+        marcasX: G.marcasLineares(0, 55, 11, 0),
+        formataY: function (v) { return F.fmt(v, 0); }
+      });
+      var fs = function (t) { return sigma(g, t); };
+      var fu = function (t) { return energia(g, t); };
+
+      /* faixas opacas: duas camadas translúcidas sobrepostas davam um
+         cinza esverdeado que não lembrava nem âmbar nem azul */
+      G.area(gr, fu, 0, 55, '#f7ecd7');
+      G.area(gr, fs, 0, 55, '#d7e3ee');
+      G.curva(gr, fu, G.COR.ambar, 2.4);
+      G.curva(gr, fs, G.COR.azul, 2.6);
+      G.vertical(gr, est.T, G.COR.suave, est.T + ' °C', true);
+
+      var ct = gr.ct;
+      ct.save();
+      ct.font = '600 11px system-ui, sans-serif';
+      ct.textAlign = 'left'; ct.textBaseline = 'top';
+      ct.lineJoin = 'round'; ct.lineWidth = 3.5; ct.strokeStyle = '#fff';
+      /* rótulos abaixo de cada curva: acima não cabem, e a legenda do
+         canto esbarrava na curva de u_s */
+      var curto = gr.L < 560;
+      var rot = [
+        { t: curto ? 'u\u209B: energia interna'
+                   : 'u\u209B = σ − T dσ/dT   (energia interna por área)',
+          y: gr.Y(fu(6)) + 6, c: '#7a5712' },
+        { t: curto ? 'σ: energia livre (= tensão)'
+                   : 'σ   (energia livre por área, que é a tensão)',
+          y: gr.Y(fs(6)) + 6, c: '#20486c' }
+      ];
+      rot.forEach(function (r) {
+        ct.strokeText(r.t, gr.X(1.2), r.y);
+        ct.fillStyle = r.c;
+        ct.fillText(r.t, gr.X(1.2), r.y);
+      });
+
+      if (gr.Y(fs(est.T)) - gr.Y(fu(est.T)) > 46) {
+        ct.textAlign = 'center'; ct.textBaseline = 'middle';
+        var yt = (gr.Y(fs(est.T)) + gr.Y(fu(est.T))) / 2 + 14;
+        var xt = gr.X(est.T > 30 ? 14 : 41);
+        var rt = curto ? 'T s\u209B: o calor' : 'T s\u209B: o calor que entra';
+        ct.strokeText(rt, xt, yt);
+        ct.fillStyle = '#7a5712';
+        ct.fillText(rt, xt, yt);
+      }
+      ct.restore();
+    }
+
+    function desenhar() {
+      var g = LIQ[est.k];
+      var sig = sigma(g, est.T);                   // mN/m
+      var Fn = 2 * sig * 1e-3 * est.L * 1e-2;      // N
+      var dA = 2 * est.L * est.x;                  // cm²
+      var W = sig * 1e-3 * dA * 1e-4;              // J
+      var us = energia(g, est.T);
+      var ss = -dsigma(g, est.T);                  // mJ/(m²·K)
+      var Q = (est.T + 273.15) * ss * 1e-3 * dA * 1e-4;   // J
+
+      if (est.vista === 'forca') desenhaQuadro();
+      else if (est.vista === 'trabalho') desenhaTrabalho();
+      else desenhaTermica();
+
+      mostrar({
+        sig: F.fmt(sig, 2),
+        forca: F.fmt(Fn * 1e3, 2),
+        massa: F.fmt(Fn / GRAV * 1e3, 2) + ' g',
+        area: F.fmt(dA, 1),
+        trab: F.fmt(W * 1e6, 1),
+        us: F.fmt(us, 1)
+      });
+
+      var comum =
+        '<p>O trabalho para aumentar a área de uma superfície é '
+        + '\\(\\dbar W=\\sigma\\,dA\\), com \\(A\\) extensiva e \\(\\sigma\\) intensiva, '
+        + 'exatamente como \\(-P\\,dV\\). Daí saem as duas maneiras de ler o mesmo '
+        + 'número, que têm as mesmas dimensões: '
+        + '\\[\\left[\\sigma\\right]=\\frac{\\rm N}{\\rm m}'
+        + '=\\frac{\\rm N\\cdot m}{\\rm m^2}=\\frac{\\rm J}{\\rm m^2}.\\]</p>';
+
+      if (est.vista === 'forca') {
+        nota.innerHTML = comum
+          + '<p><strong>Força por unidade de comprimento.</strong> O filme tem '
+          + '<em>duas</em> faces, e cada uma tira o fio para dentro com \\(\\sigma L\\). '
+          + 'Para manter o fio parado é preciso \\(F=2\\sigma L\\), que aqui vale '
+          + F.fmt(Fn * 1e3, 2) + ' mN: o filme de ' + g.nome + ' sustenta um fio de '
+          + F.fmt(Fn / GRAV * 1e3, 2) + ' g.</p>'
+          + '<p>Mexa o deslizante de \\(x\\) e repare no que <em>não</em> acontece: a '
+          + 'força não muda. <strong>O filme não é uma mola.</strong> Estirá-lo não '
+          + 'afasta moléculas umas das outras, e sim traz moléculas novas do volume '
+          + 'para a superfície. O que cresce é o número de moléculas na superfície, não '
+          + 'a distância entre elas, e por isso \\(\\sigma\\) fica igual. É o mesmo '
+          + 'motivo pelo qual a pressão não muda quando se empurra o pistão sobre um '
+          + 'líquido em equilíbrio com seu vapor: a matéria só troca de fase.</p>'
+          + '<p>Mexa agora \\(L\\), e a força muda em proporção. É isso que faz de '
+          + '\\(\\sigma\\) uma força <em>por unidade de comprimento</em>, e não uma '
+          + 'força.</p>';
+      } else if (est.vista === 'trabalho') {
+        nota.innerHTML = comum
+          + '<p><strong>As duas leituras na mesma figura.</strong> A curva é a força '
+          + 'aplicada contra o deslocamento do fio. A <em>altura</em> da reta azul, '
+          + 'dividida por \\(2L\\), é \\(\\sigma\\) lido como força por comprimento. A '
+          + '<em>área</em> sombreada, que é o trabalho, dividida pela área criada '
+          + '\\(\\Delta A=2Lx\\), é \\(\\sigma\\) lido como energia por área. Aqui a área '
+          + 'sombreada vale ' + F.fmt(W * 1e6, 1) + ' μJ e \\(\\Delta A='
+          + F.fmt(dA, 1) + '\\) cm², e a razão devolve os mesmos '
+          + F.fmt(sig, 2) + ' mN/m.</p>'
+          + '<p>Como a reta é horizontal, o trabalho é <em>linear</em> no deslocamento: '
+          + '\\(W=2\\sigma L\\,x\\). Compare com a mola tracejada, cujo trabalho é a '
+          + 'área de um triângulo e cresce com \\(x^2\\). Uma mola guarda energia '
+          + 'deformando ligações; um filme guarda energia fabricando superfície.</p>';
+      } else {
+        nota.innerHTML = comum
+          + '<p><strong>Mas energia de quê?</strong> De \\(F=U-TS\\) com '
+          + '\\(dF=-S\\,dT+\\sigma\\,dA\\) sai</p>'
+          + '\\[\\sigma=\\dpar{F}{A}{T},\\]'
+          + '<p>e portanto \\(\\sigma\\) é a energia <strong>livre</strong> de Helmholtz '
+          + 'por unidade de área, não a energia interna. A diferença não é pequena. A '
+          + 'relação de Maxwell do par dá a entropia da superfície,</p>'
+          + '\\[s_{\\rm s}=\\dpar{S}{A}{T}=-\\dpar{\\sigma}{T}{A},\\]'
+          + '<p>positiva porque \\(\\sigma\\) cai com a temperatura: a superfície é mais '
+          + 'desordenada que o volume. Somando o calor a ela associado,</p>'
+          + '\\[u_{\\rm s}=\\sigma+Ts_{\\rm s}=\\sigma-T\\dpar{\\sigma}{T}{A}.\\]'
+          + '<p>Para ' + g.nome + ' a ' + est.T + ' °C: \\(\\sigma=' + F.fmt(sig, 2)
+          + '\\) mJ/m², \\(s_{\\rm s}=' + F.fmt(ss, 4) + '\\) mJ/(m²·K) e '
+          + '\\(u_{\\rm s}=' + F.fmt(us, 1) + '\\) mJ/m², ou seja '
+          + F.fmt(us / sig, 2) + ' vezes a tensão. A faixa âmbar entre as duas curvas é '
+          + '\\(Ts_{\\rm s}\\), o <strong>calor que o banho tem de fornecer</strong> '
+          + 'enquanto a superfície é criada isotermicamente: ' + F.fmt(Q * 1e6, 1)
+          + ' μJ para os ' + F.fmt(dA, 1) + ' cm² desta configuração, contra '
+          + F.fmt(W * 1e6, 1) + ' μJ de trabalho.</p>'
+          + '<p>Então "energia por unidade de área" só é igual à tensão se for a '
+          + 'energia <em>livre</em>. Dizer energia interna erra por um fator de '
+          + F.fmt(us / sig, 2) + ' neste caso.</p>'
+          + '<p>As duas curvas convergem para zero no ponto crítico, onde líquido e '
+          + 'vapor deixam de ser distintos e não há mais o que custear numa interface. '
+          + 'Para a água, a correlação de referência da IAPWS escreve isso como '
+          + '\\(\\sigma=235{,}8\\,(1-T/T_c)^{1{,}256}\\left[1-0{,}625(1-T/T_c)\\right]\\) '
+          + 'mN/m, com \\(T_c=647{,}096\\) K.</p>';
+      }
+      tipografar(corpo);
+    }
+
+    registrarRedesenho(desenhar);
+  };
+
+  /* =================================================================
+     32. Modelo de Potts sem interação
      Um estado fundamental e q−1 estados excitados degenerados. Em q = 2
      é o sistema de dois níveis da seção 11; em q = 3 é o caso do
      σ = 0, ±1. A degenerescência entra como um 2^{n} na contagem, e é
@@ -6656,7 +7101,7 @@
   };
 
   /* =================================================================
-     32. O modelo de Weiss
+     33. O modelo de Weiss
      A equação de autoconsistência m = tanh(T_C m/T + ℌ). A primeira
      vista é a construção gráfica que resolve a equação; a segunda é a
      magnetização espontânea comparada com dados de ferromagnetos reais.
@@ -6866,7 +7311,7 @@
   };
 
   /* =================================================================
-     33. A energia livre de Landau
+     34. A energia livre de Landau
      F(m) = (a/2)m² + (b/4)m⁴ − hm, com a ∝ (T − T_C). O poço duplo
      nasce quando a troca de sinal, e o campo o inclina.
      ================================================================= */
@@ -7032,7 +7477,7 @@
   };
 
   /* =================================================================
-     34. Histerese
+     35. Histerese
      A isoterma ℌ(m) = arctgh(m) − m T_C/T tem a mesma forma em S da
      isoterma de van der Waals, e pelo mesmo motivo: um laço de
      estados metaestáveis em torno de um trecho instável.
@@ -7204,7 +7649,7 @@
   };
 
   /* =================================================================
-     35. O modelo de Ising por Metropolis
+     36. O modelo de Ising por Metropolis
      Rede quadrada com condições periódicas. ΔE = 2J s_i Σ_viz s_j, e
      aceita-se o giro com probabilidade min(1, e^{−ΔE/kT}). Em duas
      dimensões a solução exata de Onsager dá kT_C/J = 2/ln(1+√2).
@@ -7448,7 +7893,7 @@
   };
 
   /* =================================================================
-     36. Ginzburg-Landau dependente do tempo
+     37. Ginzburg-Landau dependente do tempo
      ∂ψ/∂t = −δℱ/δψ = −aψ − bψ³ + γ∇²ψ. Com a < 0 o sistema escolhe
      ±√(−a/b) em cada região e depois as fronteiras se engolem: é o
      engrossamento de domínios, com ℓ(t) ∝ √t.
