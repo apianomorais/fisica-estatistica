@@ -6428,6 +6428,1006 @@
     tipografar(corpo);
   };
 
+  /* =================================================================
+     32. O modelo de Weiss
+     A equação de autoconsistência m = tanh(T_C m/T + ℌ). A primeira
+     vista é a construção gráfica que resolve a equação; a segunda é a
+     magnetização espontânea comparada com dados de ferromagnetos reais.
+     ================================================================= */
+  REGISTRO.weiss = function (raiz) {
+    var corpo = moldura(raiz, 'O modelo de Weiss: um ímã que se sustenta sozinho');
+
+    /* T_C medido, momento por átomo em magnétons de Bohr e o spin efetivo
+       que o campo médio precisaria para reproduzir aquele T_C */
+    var MAT = [
+      { nome: 'Fe', rot: 'ferro', Tc: 1043, mu: 2.22 },
+      { nome: 'Co', rot: 'cobalto', Tc: 1388, mu: 1.72 },
+      { nome: 'Ni', rot: 'níquel', Tc: 627, mu: 0.606 },
+      { nome: 'Gd', rot: 'gadolínio', Tc: 292, mu: 7.63 },
+      { nome: 'EuO', rot: 'óxido de európio', Tc: 69, mu: 6.9 }
+    ];
+
+    var est = { i: 0, T: 800, h: 0, vista: 'grafica' };
+
+    var ctr0 = el('div', { class: 'controles' });
+    corpo.appendChild(ctr0);
+    opcoes(ctr0, [
+      { rot: 'Construção gráfica', v: 'grafica' },
+      { rot: 'Magnetização espontânea', v: 'ms' },
+      { rot: 'Susceptibilidade', v: 'chi' }
+    ], 0, function (v) { est.vista = v; desenhar(); });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    var desT = deslizante(ctr, 'temperatura', 5, 2000, 5, 800,
+      function (v) { est.T = v; desenhar(); },
+      function (v) { return v + ' K'; });
+    deslizante(ctr, 'campo reduzido ℌ', 0, 0.6, 0.01, 0,
+      function (v) { est.h = v; desenhar(); },
+      function (v) { return F.fmt(v, 2); });
+    opcoes(ctr, MAT.map(function (m) { return { rot: m.rot, v: m.nome }; }), 0,
+      function (v) {
+        MAT.forEach(function (m, k) { if (m.nome === v) est.i = k; });
+        /* cada material tem a sua escala de temperatura: o deslizante segue */
+        desT.max = Math.round(2 * MAT[est.i].Tc);
+        desT.value = Math.round(0.77 * MAT[est.i].Tc);
+        desT.dispatchEvent(new Event('input'));
+      });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'T<sub>C</sub> medido', k: 'tc' }, { rot: 'T/T<sub>C</sub>', k: 'r' },
+      { rot: 'm = ℳ/ℳ₀', k: 'm' },
+      { rot: 'momento por átomo', k: 'mu' },
+      { rot: 'raízes da equação', k: 'nr' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    /* A solução estável é a de maior |m|: as três raízes em campo nulo são
+       0 e ±m_s, e a do meio é instável, como mostra a energia de Landau. */
+    function resolver(r, h) {
+      if (r >= 1 && h === 0) return 0;
+      var m = 0.999;
+      for (var k = 0; k < 500; k++) {
+        var novo = Math.tanh(h + m / r);
+        m = m + 0.55 * (novo - m);
+      }
+      return m;
+    }
+
+    function desenhar() {
+      var M = MAT[est.i], r = est.T / M.Tc, m = resolver(r, est.h);
+
+      if (est.vista === 'grafica') {
+        var ax = G.eixos(cv, {
+          xmin: -1.25, xmax: 1.25, ymin: -1.25, ymax: 1.25, altura: 320,
+          rotX: 'magnetização reduzida m', rotY: 'os dois lados da equação',
+          marcasX: G.marcasLineares(-1.25, 1.25, 10, 1),
+          formataY: function (v) { return F.fmt(v, 1); }
+        });
+        /* lado esquerdo: a reta y = m. Lado direito: a tangente hiperbólica */
+        G.curva(ax, function (x) { return x; }, G.COR.suave, 1.8, [5, 4]);
+        G.curva(ax, function (x) { return Math.tanh(est.h + x / r); },
+                G.COR.vinho, 2.8);
+        /* a solução é o cruzamento */
+        ax.ct.save();
+        ax.ct.fillStyle = G.COR.azul;
+        [m, est.h === 0 ? -m : null, est.h === 0 && r < 1 ? 0 : null]
+          .forEach(function (s) {
+            if (s === null) return;
+            ax.ct.beginPath();
+            ax.ct.arc(ax.X(s), ax.Y(s), 5, 0, 2 * Math.PI);
+            ax.ct.fill();
+          });
+        ax.ct.restore();
+        G.legenda(ax, [
+          { cor: G.COR.suave, texto: 'y = m' },
+          { cor: G.COR.vinho, texto: 'y = tgh(ℌ + m T_C/T)' },
+          { cor: G.COR.azul, texto: 'solução' }
+        ]);
+      } else if (est.vista === 'ms') {
+        var ax2 = G.eixos(cv, {
+          xmin: 0, xmax: 1.4, ymin: 0, ymax: 1.05, altura: 300,
+          rotX: 'T / T_C', rotY: 'magnetização reduzida m_s',
+          marcasX: G.marcasLineares(0, 1.4, 7, 1),
+          formataY: function (v) { return F.fmt(v, 1); }
+        });
+        G.curva(ax2, function (x) { return resolver(x, 0); }, G.COR.vinho, 2.8);
+        /* a aproximação de raiz quadrada, válida só junto a T_C */
+        G.curva(ax2, function (x) {
+          return x >= 1 ? NaN : Math.min(1, x * Math.sqrt(3 * (1 - x)));
+        }, G.COR.ambar, 2, [6, 4]);
+        G.vertical(ax2, Math.min(1.4, r), G.COR.azul,
+                   'T = ' + est.T + ' K', true);
+        G.legenda(ax2, [
+          { cor: G.COR.vinho, texto: 'solução de m = tgh(m T_C/T)' },
+          { cor: G.COR.ambar, texto: '(T/T_C)√(3(1−T/T_C)), junto a T_C' }
+        ]);
+      } else {
+        /* Em T/T_C a reta é a mesma para todos. Em kelvin, cada material
+           corta o eixo no seu próprio T_C, que é justamente o que a
+           extrapolação mede: 69 K no EuO e 1043 K no ferro. */
+        var Tm = 2200;
+        var ax3 = G.eixos(cv, {
+          xmin: 0, xmax: Tm, ymin: 0, ymax: 1600, altura: 310,
+          rotX: 'temperatura (K)', rotY: '1/χ, em unidades de 1/C (K)',
+          marcasX: G.marcasLineares(0, Tm, 8, 0),
+          formataY: function (v) { return F.fmt(v, 0); }
+        });
+        MAT.forEach(function (q, k) {
+          G.curva(ax3, function (x) { return x <= q.Tc ? NaN : x - q.Tc; },
+                  k === est.i ? G.COR.vinho : G.COR.grade,
+                  k === est.i ? 3 : 1.4);
+        });
+        G.curva(ax3, function (x) { return x; }, G.COR.suave, 1.8, [5, 4]);
+        G.curva(ax3, function (x) { return x + 400 > 1600 ? NaN : x + 400; },
+                G.COR.ambar, 2, [4, 4]);
+        G.vertical(ax3, M.Tc, G.COR.tinta, M.nome + ': ' + M.Tc + ' K', true);
+        ax3.ct.save();
+        ax3.ct.font = '600 10px system-ui, sans-serif';
+        ax3.ct.textAlign = 'left'; ax3.ct.textBaseline = 'bottom';
+        MAT.forEach(function (q, k) {
+          if (k === est.i) return;
+          ax3.ct.fillStyle = 'rgba(120,128,138,.9)';
+          ax3.ct.fillText(q.nome, ax3.X(q.Tc) + 3, ax3.y1 - 3);
+        });
+        ax3.ct.restore();
+        G.legenda(ax3, [
+          { cor: G.COR.vinho, texto: 'ferromagneto: 1/χ ∝ T − T_C' },
+          { cor: G.COR.suave, texto: 'Curie, sem interação: 1/χ ∝ T' },
+          { cor: G.COR.ambar, texto: 'antiferromagneto: 1/χ ∝ T + T_N' }
+        ]);
+      }
+
+      mostrar({
+        tc: M.Tc + ' K',
+        r: F.fmt(r, 3),
+        m: F.fmt(m, 4),
+        mu: F.fmt(M.mu, 2) + ' μ_B',
+        nr: (est.h > 0 ? '1 (campo quebra a simetria)'
+             : r < 1 ? '3: 0 e ±m_s' : '1: só m = 0')
+      });
+
+      nota.innerHTML = est.vista === 'grafica'
+        ? '<p>A equação \\(m=\\tanh\\left(\\mathfrak{H}+mT_C/T\\right)\\) não se resolve por '
+          + 'álgebra, mas se resolve com os olhos: as soluções são os cruzamentos da reta '
+          + '\\(y=m\\) com a tangente hiperbólica.</p>'
+          + '<p>Tudo depende da <b>inclinação da tangente hiperbólica na origem</b>, que vale '
+          + '\\(T_C/T\\). Se ela for menor que 1, isto é \\(T>T_C\\), a curva fica abaixo da '
+          + 'reta e só há o cruzamento trivial \\(m=0\\): o material é paramagnético. Se for '
+          + 'maior que 1, a curva sai por cima e volta, e aparecem <b>três</b> cruzamentos, '
+          + '\\(0\\) e \\(\\pm m_s\\). Deslize a temperatura pelo \\(T_C\\) do '
+          + M.rot + ', ' + M.Tc + ' K, e veja os dois nascerem.</p>'
+          + '<p>Essa é a mágica do campo médio: o material cria o próprio campo que o '
+          + 'mantém magnetizado. Nada de externo precisa estar ligado, e é por isso que um '
+          + 'ímã continua sendo ímã dentro da gaveta.</p>'
+        : est.vista === 'ms'
+        ? '<p>A magnetização espontânea sai de 1 no zero absoluto e cai continuamente a zero '
+          + 'em \\(T_C\\). Como ela muda <em>continuamente</em>, a transição é de '
+          + '<b>segunda ordem</b>: não há calor latente, e o parâmetro de ordem some sem '
+          + 'salto.</p>'
+          + '<p>A curva tracejada é a expansão da seção 11, '
+          + '\\(m_s\\approx(T/T_C)\\sqrt{3\\left(1-T/T_C\\right)}\\). Ela só vale junto a '
+          + '\\(T_C\\), onde \\(m_s\\ll1\\) justifica cortar a série da tangente hiperbólica '
+          + 'no termo cúbico, e de fato cola na curva exata só nos últimos 10% antes da '
+          + 'transição. O expoente \\(\\beta=1/2\\) que ela carrega é a previsão de campo '
+          + 'médio, e a seção 16 mostra por que ele está errado.</p>'
+        : '<p>Acima de \\(T_C\\) a susceptibilidade segue a <b>lei de Curie-Weiss</b>, '
+          + '\\(\\chi=C/\\left(T-T_C\\right)\\), e o jeito de medir isso é traçar '
+          + '\\(1/\\chi\\) contra \\(T\\): dá uma reta, e <b>o ponto em que ela corta o eixo '
+          + 'é \\(T_C\\)</b>. É assim que se mede a temperatura crítica sem precisar chegar '
+          + 'perto dela.</p>'
+          + '<p>As três retas contam a história inteira do sinal da interação de troca. Sem '
+          + 'interação, \\(J=0\\), a reta passa pela origem: é a lei de Curie do Módulo 3, e '
+          + 'o material é paramagnético em qualquer temperatura. Com \\(J>0\\) a reta se '
+          + 'desloca para a direita e corta o eixo em \\(T_C>0\\): abaixo dali há '
+          + 'ferromagnetismo. Com \\(J<0\\) ela corta em temperatura negativa, o que não '
+          + 'significa nada fisicamente, mas avisa que os vizinhos querem apontar em '
+          + 'sentidos opostos: é um antiferromagneto, e o que acontece em '
+          + '\\(T_N\\) é um ordenamento alternado, não uma magnetização.</p>'
+          + '<p>Na prática a reta medida quase nunca corta exatamente onde a magnetização '
+          + 'espontânea aparece, e a diferença entre o \\(T_C\\) extrapolado e o observado é '
+          + 'uma das primeiras evidências de que o campo médio não é a última palavra.</p>';
+      tipografar(nota);
+    }
+
+    registrarRedesenho(desenhar);
+    tipografar(corpo);
+  };
+
+  /* =================================================================
+     33. A energia livre de Landau
+     F(m) = (a/2)m² + (b/4)m⁴ − hm, com a ∝ (T − T_C). O poço duplo
+     nasce quando a troca de sinal, e o campo o inclina.
+     ================================================================= */
+  REGISTRO.landau = function (raiz) {
+    var corpo = moldura(raiz, 'A energia livre de Landau: o poço que se parte em dois');
+
+    var est = { r: 0.8, h: 0, vista: 'livre' };
+
+    var ctr0 = el('div', { class: 'controles' });
+    corpo.appendChild(ctr0);
+    opcoes(ctr0, [
+      { rot: 'Energia livre', v: 'livre' },
+      { rot: 'Mínimos contra temperatura', v: 'bifurca' }
+    ], 0, function (v) { est.vista = v; desenhar(); });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'temperatura T/T<sub>C</sub>', 0.2, 1.8, 0.01, 0.8,
+      function (v) { est.r = v; desenhar(); },
+      function (v) { return F.fmt(v, 2); });
+    deslizante(ctr, 'campo externo h', -0.12, 0.12, 0.002, 0,
+      function (v) { est.h = v; desenhar(); },
+      function (v) { return F.fmt(v, 3); });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'a = T/T<sub>C</sub> − 1', k: 'a' },
+      { rot: 'mínimos', k: 'nm' },
+      { rot: 'm de equilíbrio', k: 'm' },
+      { rot: 'ℱ no mínimo', k: 'f' },
+      { rot: 'barreira', k: 'b' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    /* ℱ(m) = (a/2)m² + (1/4)m⁴ − hm, com b absorvido na escala de m */
+    function livre(m, a, h) { return a * m * m / 2 + m * m * m * m / 4 - h * m; }
+
+    /* os extremos resolvem a m + m³ = h: busca por varredura fina */
+    function extremos(a, h) {
+      var r = [], ant = null;
+      for (var i = 0; i <= 4000; i++) {
+        var m = -1.6 + 3.2 * i / 4000;
+        var d = a * m + m * m * m - h;
+        if (ant !== null && ant.d * d <= 0 && d !== ant.d) {
+          r.push({ m: 0.5 * (ant.m + m),
+                   min: a + 3 * Math.pow(0.5 * (ant.m + m), 2) > 0 });
+        }
+        ant = { m: m, d: d };
+      }
+      return r;
+    }
+
+    function desenhar() {
+      var a = est.r - 1, h = est.h;
+      var ex = extremos(a, h);
+      var mins = ex.filter(function (q) { return q.min; });
+      var maxs = ex.filter(function (q) { return !q.min; });
+      var eq = mins.length
+        ? mins.reduce(function (p, q) { return livre(q.m, a, h) < livre(p.m, a, h) ? q : p; })
+        : { m: 0 };
+
+      if (est.vista === 'livre') {
+        var ax = G.eixos(cv, {
+          xmin: -1.5, xmax: 1.5, ymin: -0.32, ymax: 0.22, altura: 310,
+          rotX: 'parâmetro de ordem m', rotY: 'energia livre ℱ(m)',
+          marcasX: G.marcasLineares(-1.5, 1.5, 6, 1),
+          formataY: function (v) { return F.fmt(v, 1); }
+        });
+        G.curva(ax, function (m) { return livre(m, a, h); }, G.COR.vinho, 3);
+        ax.ct.save();
+        mins.forEach(function (q) {
+          ax.ct.fillStyle = q.m === eq.m ? G.COR.azul : G.COR.suave;
+          ax.ct.beginPath();
+          ax.ct.arc(ax.X(q.m), ax.Y(livre(q.m, a, h)), 5.5, 0, 2 * Math.PI);
+          ax.ct.fill();
+        });
+        maxs.forEach(function (q) {
+          ax.ct.strokeStyle = G.COR.ambar; ax.ct.lineWidth = 2;
+          ax.ct.beginPath();
+          ax.ct.arc(ax.X(q.m), ax.Y(livre(q.m, a, h)), 5, 0, 2 * Math.PI);
+          ax.ct.stroke();
+        });
+        ax.ct.restore();
+        G.legenda(ax, [
+          { cor: G.COR.azul, texto: 'mínimo global: o estado de equilíbrio' },
+          { cor: G.COR.suave, texto: 'mínimo local: metaestável' },
+          { cor: G.COR.ambar, texto: 'máximo: instável' }
+        ]);
+      } else {
+        var ax2 = G.eixos(cv, {
+          xmin: 0.2, xmax: 1.8, ymin: -1.15, ymax: 1.15, altura: 310,
+          rotX: 'T / T_C', rotY: 'm nos extremos de ℱ',
+          marcasX: G.marcasLineares(0.2, 1.8, 8, 1),
+          formataY: function (v) { return F.fmt(v, 1); }
+        });
+        /* o diagrama de bifurcação: ±√(−a) abaixo de T_C, zero acima */
+        G.curva(ax2, function (x) {
+          return x >= 1 ? NaN : Math.sqrt(1 - x);
+        }, G.COR.vinho, 2.8);
+        G.curva(ax2, function (x) {
+          return x >= 1 ? NaN : -Math.sqrt(1 - x);
+        }, G.COR.vinho, 2.8);
+        G.curva(ax2, function (x) { return x >= 1 ? 0 : NaN; }, G.COR.vinho, 2.8);
+        G.curva(ax2, function (x) { return x < 1 ? 0 : NaN; },
+                G.COR.ambar, 2, [5, 4]);
+        G.vertical(ax2, est.r, G.COR.azul, 'aqui', true);
+        G.legenda(ax2, [
+          { cor: G.COR.vinho, texto: 'estável' },
+          { cor: G.COR.ambar, texto: 'instável' }
+        ]);
+      }
+
+      var barreira = (mins.length === 2 && maxs.length === 1)
+        ? livre(maxs[0].m, a, h) - Math.max(livre(mins[0].m, a, h), livre(mins[1].m, a, h))
+        : null;
+
+      mostrar({
+        a: F.fmt(a, 3),
+        nm: String(mins.length),
+        m: F.fmt(eq.m, 4),
+        f: F.fmt(livre(eq.m, a, h), 5),
+        b: barreira === null ? '—' : F.fmt(barreira, 5)
+      });
+
+      nota.innerHTML = est.vista === 'livre'
+        ? '<p>Landau não deduziu esta energia livre de microfísica nenhuma: ele a '
+          + '<em>adivinhou</em>, a partir de três exigências. Que seja analítica em '
+          + '\\(m\\), porque \\(m\\) é pequeno junto à transição; que respeite a simetria do '
+          + 'problema, \\(\\mathcal F(m)=\\mathcal F(-m)\\) em campo nulo, o que elimina as '
+          + 'potências ímpares; e que o coeficiente do termo quadrático troque de sinal em '
+          + '\\(T_C\\). Daí \\(\\mathcal F=\\frac a2m^2+\\frac b4m^4-hm\\) com '
+          + '\\(a\\propto T-T_C\\), e mais nada.</p>'
+          + '<p>Com isso a transição inteira vira geometria de uma curva. Para \\(a>0\\) há '
+          + 'um poço só, em \\(m=0\\). Quando \\(a\\) cruza zero, o fundo do poço vira um '
+          + 'morro e nascem dois mínimos em \\(m=\\pm\\sqrt{-a/b}\\), isto é '
+          + '\\(m_s\\propto\\left(T_C-T\\right)^{1/2}\\). O sistema tem de <b>escolher</b> um '
+          + 'dos dois, e é esse ato de escolha que se chama quebra espontânea de '
+          + 'simetria.</p>'
+          + '<p>Ligue o campo e veja o que acontece: ele inclina a curva, um mínimo desce e '
+          + 'o outro sobe. O que era um empate vira um preferido e um <b>metaestável</b>, '
+          + 'separados por uma barreira. É dali que vem a histerese da seção 13: o sistema '
+          + 'fica preso no mínimo errado até a barreira desaparecer.</p>'
+        : '<p>Este é o <b>diagrama de bifurcação</b>, e ele é o retrato mais econômico de uma '
+          + 'transição contínua. Vindo de temperatura alta há um único equilíbrio, '
+          + '\\(m=0\\). Em \\(T_C\\) esse ramo se torna instável e dois ramos estáveis se '
+          + 'destacam dele, como um garfo.</p>'
+          + '<p>O ramo \\(m=0\\) não desaparece abaixo de \\(T_C\\): ele continua sendo '
+          + 'solução, só que instável, como a bolinha no alto do morro. Um sistema '
+          + 'resfriado muito depressa pode ficar ali por algum tempo, e qualquer flutuação '
+          + 'o empurra para um dos lados.</p>'
+          + '<p>A forma \\(\\pm\\sqrt{1-T/T_C}\\) dá o expoente crítico '
+          + '\\(\\beta=1/2\\). Ele é o mesmo que saiu do modelo de Weiss, e não por '
+          + 'coincidência: a expansão da tangente hiperbólica até \\(m^3\\) <em>é</em> a '
+          + 'energia livre de Landau. Os dois caminhos são o mesmo caminho.</p>';
+      tipografar(nota);
+    }
+
+    registrarRedesenho(desenhar);
+    tipografar(corpo);
+  };
+
+  /* =================================================================
+     34. Histerese
+     A isoterma ℌ(m) = arctgh(m) − m T_C/T tem a mesma forma em S da
+     isoterma de van der Waals, e pelo mesmo motivo: um laço de
+     estados metaestáveis em torno de um trecho instável.
+     ================================================================= */
+  REGISTRO.histerese = function (raiz) {
+    var corpo = moldura(raiz, 'Histerese: o ímã que lembra por onde passou');
+
+    var est = { r: 0.7, vista: 'laco' };
+
+    var ctr0 = el('div', { class: 'controles' });
+    corpo.appendChild(ctr0);
+    opcoes(ctr0, [
+      { rot: 'O laço', v: 'laco' },
+      { rot: 'A isoterma completa', v: 'iso' }
+    ], 0, function (v) { est.vista = v; desenhar(); });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'temperatura T/T<sub>C</sub>', 0.3, 1.3, 0.01, 0.7,
+      function (v) { est.r = v; desenhar(); },
+      function (v) { return F.fmt(v, 2); });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'T/T<sub>C</sub>', k: 'r' },
+      { rot: 'magnetização remanente', k: 'mr' },
+      { rot: 'campo coercivo ℌ_c', k: 'hc' },
+      { rot: 'trecho instável', k: 'ins' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    /* a função inversa: dado m, qual campo o sustenta */
+    function campo(m, r) {
+      if (Math.abs(m) >= 0.99999) return NaN;
+      return 0.5 * Math.log((1 + m) / (1 - m)) - m / r;
+    }
+    /* o trecho instável é onde dℌ/dm < 0, entre ±m* com
+       1/(1−m²) = 1/r, isto é m* = √(1−r) */
+    function mEstrela(r) { return r < 1 ? Math.sqrt(1 - r) : 0; }
+
+    function desenhar() {
+      var r = est.r, me = mEstrela(r);
+      /* o campo coercivo é o extremo da curva: onde o ramo metaestável acaba */
+      var hc = me > 0 ? Math.abs(campo(me, r)) : 0;
+      /* a magnetização remanente é a solução espontânea */
+      var mr = 0.999;
+      for (var k = 0; k < 400; k++) mr += 0.55 * (Math.tanh(mr / r) - mr);
+      if (r >= 1) mr = 0;
+
+      var hmax = Math.max(0.35, hc * 2.4);
+      var ax = G.eixos(cv, {
+        xmin: -hmax, xmax: hmax, ymin: -1.1, ymax: 1.1, altura: 320,
+        rotX: 'campo reduzido ℌ', rotY: 'magnetização reduzida m',
+        marcasX: G.marcasLineares(-hmax, hmax, 8, 2),
+        formataY: function (v) { return F.fmt(v, 1); }
+      });
+
+      /* a isoterma, traçada como curva paramétrica em m */
+      function tracar(m0, m1, cor, larg, tracos) {
+        ax.ct.save();
+        ax.ct.strokeStyle = cor; ax.ct.lineWidth = larg;
+        if (tracos) ax.ct.setLineDash(tracos);
+        ax.ct.beginPath();
+        var primeiro = true;
+        for (var i = 0; i <= 600; i++) {
+          var m = m0 + (m1 - m0) * i / 600, h = campo(m, r);
+          if (!isFinite(h) || h < -hmax || h > hmax) { primeiro = true; continue; }
+          if (primeiro) { ax.ct.moveTo(ax.X(h), ax.Y(m)); primeiro = false; }
+          else ax.ct.lineTo(ax.X(h), ax.Y(m));
+        }
+        ax.ct.stroke();
+        ax.ct.restore();
+      }
+
+      if (est.vista === 'iso' || r >= 1) {
+        tracar(-0.9999, 0.9999, G.COR.suave, 1.6, [4, 4]);
+      }
+      if (r < 1) {
+        /* os dois ramos estáveis mais os trechos metaestáveis */
+        tracar(me, 0.9999, G.COR.vinho, 3);
+        tracar(-0.9999, -me, G.COR.vinho, 3);
+        if (est.vista === 'iso') {
+          tracar(-me, me, G.COR.ambar, 2.6, [6, 4]);
+        }
+        /* as setas do laço: subindo pelo ramo de baixo e caindo no coercivo */
+        if (est.vista === 'laco') {
+          ax.ct.save();
+          ax.ct.strokeStyle = G.COR.azul; ax.ct.lineWidth = 2;
+          [1, -1].forEach(function (s) {
+            ax.ct.beginPath();
+            ax.ct.moveTo(ax.X(s * hc), ax.Y(-s * me));
+            ax.ct.lineTo(ax.X(s * hc), ax.Y(s * 0.999));
+            ax.ct.stroke();
+            ax.ct.beginPath();
+            ax.ct.moveTo(ax.X(s * hc), ax.Y(s * 0.86));
+            ax.ct.lineTo(ax.X(s * hc) - 5, ax.Y(s * 0.86) + s * 9);
+            ax.ct.lineTo(ax.X(s * hc) + 5, ax.Y(s * 0.86) + s * 9);
+            ax.ct.closePath();
+            ax.ct.fillStyle = G.COR.azul; ax.ct.fill();
+          });
+          ax.ct.restore();
+        }
+        G.vertical(ax, 0, G.COR.grade, '', false);
+        ax.ct.save();
+        ax.ct.fillStyle = G.COR.verde;
+        [mr, -mr].forEach(function (s) {
+          ax.ct.beginPath();
+          ax.ct.arc(ax.X(0), ax.Y(s), 5, 0, 2 * Math.PI);
+          ax.ct.fill();
+        });
+        ax.ct.restore();
+      }
+      G.legenda(ax, est.vista === 'laco'
+        ? [{ cor: G.COR.vinho, texto: 'ramos acessíveis' },
+           { cor: G.COR.azul, texto: 'salto no campo coercivo' },
+           { cor: G.COR.verde, texto: 'magnetização remanente' }]
+        : [{ cor: G.COR.vinho, texto: 'estável e metaestável' },
+           { cor: G.COR.ambar, texto: 'instável: dm/dℌ < 0' }]);
+
+      mostrar({
+        r: F.fmt(r, 2),
+        mr: F.fmt(mr, 4),
+        hc: r < 1 ? F.fmt(hc, 4) : '0',
+        ins: r < 1 ? '|m| < ' + F.fmt(me, 3) : 'nenhum'
+      });
+
+      nota.innerHTML = est.vista === 'laco'
+        ? '<p>Invertendo a equação de Weiss obtém-se o campo que sustenta uma dada '
+          + 'magnetização, \\(\\mathfrak{H}=\\operatorname{arctgh}(m)-mT_C/T\\). Abaixo de '
+          + '\\(T_C\\) essa curva é um <b>S deitado</b>, e um mesmo campo admite três '
+          + 'magnetizações.</p>'
+          + '<p>Quem já viu o Módulo 7 reconhece a figura: é a mesma estrutura da isoterma '
+          + 'de van der Waals abaixo do ponto crítico, com \\(m\\) no lugar de \\(V\\) e '
+          + '\\(\\mathfrak{H}\\) no lugar de \\(P\\). E o motivo é o mesmo: uma energia livre '
+          + 'com dois mínimos e uma barreira entre eles. O trecho de inclinação negativa é '
+          + 'mecanicamente instável, exatamente como o trecho com '
+          + '\\(\\partial P/\\partial V>0\\).</p>'
+          + '<p>Daí a histerese. Diminuindo o campo a partir de valores altos, o sistema '
+          + 'desce pelo ramo de cima e <b>não cai</b> ao passar por zero: fica preso no '
+          + 'mínimo metaestável, com a magnetização remanente marcada em verde. Só quando o '
+          + 'campo atinge \\(-\\mathfrak{H}_c\\), onde o mínimo metaestável deixa de existir, '
+          + 'é que ele salta. Essa memória é o que faz um disco rígido guardar bits, e a '
+          + 'área do laço é a energia dissipada a cada ciclo, que é o que aquece o núcleo de '
+          + 'um transformador.</p>'
+          + '<p>Aumente a temperatura e veja o laço encolher até sumir em \\(T_C\\): acima '
+          + 'dali não há dois mínimos, não há barreira e não há memória.</p>'
+        : '<p>Aqui está a isoterma inteira, incluindo o trecho que o sistema nunca percorre. '
+          + 'O ramo âmbar, entre \\(\\pm\\sqrt{1-T/T_C}\\), tem \\(dm/d\\mathfrak{H}<0\\): '
+          + 'aumentar o campo <em>diminuiria</em> a magnetização, o que significa '
+          + 'susceptibilidade negativa e instabilidade mecânica. Nenhum estado real mora '
+          + 'ali.</p>'
+          + '<p>Repare que os dois extremos do S, que delimitam o trecho instável, são '
+          + 'exatamente onde os ramos metaestáveis acabam. São o análogo magnético da '
+          + 'espinodal de um fluido, e o campo coercivo é a distância do zero até eles.</p>'
+          + '<p>Uma diferença honesta em relação ao fluido: na transição líquido-vapor a '
+          + 'construção de Maxwell escolhe um patamar, porque as duas fases coexistem no '
+          + 'espaço. Aqui, por simetria, o patamar está em \\(\\mathfrak{H}=0\\) e liga '
+          + '\\(-m_s\\) a \\(+m_s\\). Um ímã real resolve isso formando <b>domínios</b>, '
+          + 'regiões de magnetização oposta separadas por paredes, e é por isso que um '
+          + 'pedaço de ferro virgem não atrai nada apesar de estar ordenado internamente.</p>';
+      tipografar(nota);
+    }
+
+    registrarRedesenho(desenhar);
+    tipografar(corpo);
+  };
+
+  /* =================================================================
+     35. O modelo de Ising por Metropolis
+     Rede quadrada com condições periódicas. ΔE = 2J s_i Σ_viz s_j, e
+     aceita-se o giro com probabilidade min(1, e^{−ΔE/kT}). Em duas
+     dimensões a solução exata de Onsager dá kT_C/J = 2/ln(1+√2).
+     ================================================================= */
+  REGISTRO.ising = function (raiz) {
+    var corpo = moldura(raiz, 'O modelo de Ising: a transição acontecendo');
+
+    var TC = 2 / Math.log(1 + Math.SQRT2);      // 2,269185…
+    var L = 64, N = L * L;
+    var s = new Int8Array(N);
+    var est = { T: 2.0, h: 0, rodando: true, vista: 'rede' };
+    var hist = [];                              // magnetização ao longo do tempo
+    var medias = {};                            // |m| médio por temperatura
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'temperatura k<sub>B</sub>T/J', 0.6, 4, 0.02, 2.0,
+      function (v) { est.T = v; hist = []; },
+      function (v) { return F.fmt(v, 2); });
+    deslizante(ctr, 'campo h/J', -0.3, 0.3, 0.01, 0,
+      function (v) { est.h = v; hist = []; },
+      function (v) { return F.fmt(v, 2); });
+
+    var bot = el('div', { class: 'botoes' });
+    var bPausa = el('button', { type: 'button', texto: 'pausar' });
+    var bFrio = el('button', { type: 'button', class: 'sec', texto: 'alinhar tudo' });
+    var bQuente = el('button', { type: 'button', class: 'sec', texto: 'sortear tudo' });
+    bPausa.addEventListener('click', function () {
+      est.rodando = !est.rodando;
+      bPausa.textContent = est.rodando ? 'pausar' : 'continuar';
+    });
+    bFrio.addEventListener('click', function () { s.fill(1); hist = []; });
+    bQuente.addEventListener('click', function () {
+      for (var i = 0; i < N; i++) s[i] = Math.random() < 0.5 ? 1 : -1;
+      hist = [];
+    });
+    bot.appendChild(bPausa); bot.appendChild(bFrio); bot.appendChild(bQuente);
+    ctr.appendChild(bot);
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'k<sub>B</sub>T/J', k: 'T' },
+      { rot: 'T<sub>C</sub> de Onsager', k: 'tc' },
+      { rot: 'magnetização |m|', k: 'm' },
+      { rot: 'energia por sítio', k: 'e' },
+      { rot: 'taxa de aceitação', k: 'ac' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    /* Parte alinhado: a 2,0, logo abaixo de T_C, uma rede sorteada leva
+       muitas varreduras para ordenar e costuma travar num estado de duas
+       faixas com m ≈ 0, que é verdadeiro mas não é o equilíbrio. O botão
+       "sortear tudo" permite ver justamente esse resfriamento brusco. */
+    s.fill(1);
+
+    var aceitos = 0, tentados = 0;
+
+    /* Uma varredura é N tentativas de giro. O vizinho se acha por
+       aritmética de módulo, que é a condição periódica de contorno. */
+    function varredura() {
+      var T = est.T, h = est.h;
+      /* tabela dos cinco ΔE possíveis em campo nulo, para não chamar
+         Math.exp N vezes por varredura */
+      for (var k = 0; k < N; k++) {
+        var i = (Math.random() * N) | 0;
+        var x = i % L, y = (i / L) | 0;
+        var viz = s[((x + 1) % L) + y * L] + s[((x + L - 1) % L) + y * L]
+                + s[x + ((y + 1) % L) * L] + s[x + ((y + L - 1) % L) * L];
+        var dE = 2 * s[i] * viz + 2 * h * s[i];
+        tentados++;
+        if (dE <= 0 || Math.random() < Math.exp(-dE / T)) {
+          s[i] = -s[i];
+          aceitos++;
+        }
+      }
+    }
+
+    function medir() {
+      var m = 0, e = 0;
+      for (var i = 0; i < N; i++) {
+        m += s[i];
+        var x = i % L, y = (i / L) | 0;
+        /* só dois vizinhos por sítio, para não contar cada ligação duas vezes */
+        e -= s[i] * (s[((x + 1) % L) + y * L] + s[x + ((y + 1) % L) * L]);
+      }
+      return { m: m / N, e: (e - est.h * m) / N };
+    }
+
+    function desenhar(med) {
+      if (est.vista === 'rede') {
+        var p = G.preparar(cv, 340);
+        var ct = p.ct, Lp = p.L, A = p.A;
+        var lado = Math.min(A - 30, Lp * 0.52);
+        var ox = (Lp - lado) / 2 - (Lp > 640 ? Lp * 0.17 : 0), oy = (A - lado) / 2;
+        var img = ct.createImageData(L, L);
+        for (var i = 0; i < N; i++) {
+          var c = s[i] > 0 ? [140, 47, 57] : [237, 240, 243];
+          img.data[4 * i] = c[0]; img.data[4 * i + 1] = c[1];
+          img.data[4 * i + 2] = c[2]; img.data[4 * i + 3] = 255;
+        }
+        /* o ImageData vai para um canvas auxiliar e de lá é ampliado */
+        if (!desenhar.aux) {
+          desenhar.aux = document.createElement('canvas');
+          desenhar.aux.width = L; desenhar.aux.height = L;
+        }
+        desenhar.aux.getContext('2d').putImageData(img, 0, 0);
+        ct.imageSmoothingEnabled = false;
+        ct.drawImage(desenhar.aux, ox, oy, lado, lado);
+        ct.strokeStyle = G.COR.suave; ct.lineWidth = 1;
+        ct.strokeRect(ox + 0.5, oy + 0.5, lado - 1, lado - 1);
+        ct.font = '11px system-ui, sans-serif';
+        ct.fillStyle = G.COR.suave;
+        ct.textAlign = 'center'; ct.textBaseline = 'top';
+        ct.fillText(L + ' × ' + L + ' spins, contorno periódico',
+                    ox + lado / 2, oy + lado + 8);
+        /* a série temporal da magnetização, ao lado */
+        if (Lp > 640) {
+          var gx0 = ox + lado + 34, gx1 = Lp - 16;
+          var gy0 = oy + 10, gy1 = oy + lado - 10;
+          ct.strokeStyle = G.COR.grade; ct.lineWidth = 1;
+          ct.beginPath();
+          ct.moveTo(gx0, (gy0 + gy1) / 2); ct.lineTo(gx1, (gy0 + gy1) / 2);
+          ct.stroke();
+          ct.strokeRect(gx0 + 0.5, gy0 + 0.5, gx1 - gx0 - 1, gy1 - gy0 - 1);
+          ct.strokeStyle = G.COR.azul; ct.lineWidth = 1.6;
+          ct.beginPath();
+          hist.forEach(function (v, k) {
+            var X = gx0 + (gx1 - gx0) * k / 300;
+            var Y = (gy0 + gy1) / 2 - v * (gy1 - gy0) / 2;
+            if (k === 0) ct.moveTo(X, Y); else ct.lineTo(X, Y);
+          });
+          ct.stroke();
+          ct.fillStyle = G.COR.suave;
+          ct.textAlign = 'center'; ct.textBaseline = 'bottom';
+          ct.fillText('magnetização m, entre −1 e +1', (gx0 + gx1) / 2, gy0 - 4);
+        }
+      } else {
+        /* |m| medido contra T, acumulado, com a curva exata de Onsager */
+        var ax = G.eixos(cv, {
+          xmin: 0.6, xmax: 4, ymin: 0, ymax: 1.05, altura: 310,
+          rotX: 'kₒT/J', rotY: 'magnetização |m|',
+          marcasX: G.marcasLineares(0.6, 4, 7, 1),
+          formataY: function (v) { return F.fmt(v, 1); }
+        });
+        /* Onsager: m = [1 − senh⁻⁴(2J/kT)]^{1/8} abaixo de T_C */
+        G.curva(ax, function (T) {
+          if (T >= TC) return 0;
+          var sh = Math.sinh(2 / T);
+          var y = 1 - 1 / Math.pow(sh, 4);
+          return y <= 0 ? 0 : Math.pow(y, 0.125);
+        }, G.COR.vinho, 2.8);
+        G.vertical(ax, TC, G.COR.tinta, 'T_C = 2,269', true);
+        ax.ct.save();
+        ax.ct.fillStyle = G.COR.azul;
+        Object.keys(medias).forEach(function (k) {
+          var d = medias[k];
+          if (d.n < 8) return;
+          ax.ct.beginPath();
+          ax.ct.arc(ax.X(Number(k)), ax.Y(d.s / d.n), 3.4, 0, 2 * Math.PI);
+          ax.ct.fill();
+        });
+        ax.ct.restore();
+        G.legenda(ax, [
+          { cor: G.COR.vinho, texto: 'exata (Onsager, 1944)' },
+          { cor: G.COR.azul, texto: 'medido nesta simulação' }
+        ]);
+      }
+    }
+
+    var ctr2 = el('div', { class: 'controles' });
+    corpo.insertBefore(ctr2, cv);
+    opcoes(ctr2, [
+      { rot: 'A rede', v: 'rede' },
+      { rot: 'Magnetização contra temperatura', v: 'curva' }
+    ], 0, function (v) { est.vista = v; });
+
+    var passo = 0;
+    function quadro() {
+      if (est.rodando) {
+        for (var q = 0; q < 3; q++) { varredura(); passo++; }
+        var med = medir();
+        hist.push(med.m);
+        if (hist.length > 301) hist.shift();
+        /* a média só começa a acumular depois de o sistema esquecer o
+           estado inicial, e por isso espera trinta varreduras */
+        if (passo > 90) {
+          var ch = F.fmt(est.T, 2).replace(',', '.');
+          if (!medias[ch]) medias[ch] = { s: 0, n: 0 };
+          medias[ch].s += Math.abs(med.m);
+          medias[ch].n++;
+        }
+        desenhar(med);
+        mostrar({
+          T: F.fmt(est.T, 3),
+          tc: F.fmt(TC, 4),
+          m: F.fmt(Math.abs(med.m), 4),
+          e: F.fmt(med.e, 4),
+          ac: F.pct(tentados ? aceitos / tentados : 0, 1)
+        });
+        if (tentados > 40 * N) { aceitos = 0; tentados = 0; }
+      }
+      requestAnimationFrame(quadro);
+    }
+
+    nota.innerHTML =
+      '<p>A regra é a de Metropolis, e cabe em duas linhas. Sorteia-se um sítio, calcula-se '
+      + 'o custo de girá-lo, \\(\\Delta E=2Js_i\\sum_{\\rm viz}s_j\\), e aceita-se o giro com '
+      + 'probabilidade \\(\\min\\left(1,e^{-\\Delta E/\\kB T}\\right)\\): sempre, se o giro '
+      + 'baixa a energia; com a probabilidade de Boltzmann, se a sobe.</p>'
+      + '<p>Por que isso funciona é a parte bonita. A regra satisfaz o <b>balanço '
+      + 'detalhado</b>, \\(\\wp(A)W(A\\to B)=\\wp(B)W(B\\to A)\\), com \\(\\wp\\) a '
+      + 'distribuição de Boltzmann. Qualquer cadeia que obedeça a isso e consiga alcançar '
+      + 'todos os estados converge para \\(\\wp\\), independentemente de onde comece. Não se '
+      + 'está resolvendo nada: está-se construindo um processo aleatório cujo estado '
+      + 'estacionário é a resposta.</p>'
+      + '<p>Olhe a rede nas três faixas. Bem abaixo de \\(T_C=2{,}269\\), domínios grandes e '
+      + 'contornos quase lisos. Bem acima, ruído sem estrutura. <b>Em \\(T_C\\)</b>, '
+      + 'manchas de todos os tamanhos ao mesmo tempo, aninhadas umas nas outras: o '
+      + 'comprimento de correlação divergiu e o sistema perdeu a escala. É a invariância de '
+      + 'escala, e é o que faz expoentes críticos de sistemas completamente diferentes '
+      + 'coincidirem.</p>'
+      + '<p>Repare também na magnetização ao lado: perto de \\(T_C\\) ela faz excursões '
+      + 'enormes e lentas, porque as flutuações críticas custam quase nada em energia. E se '
+      + 'esperar bastante numa rede finita em campo nulo, o sistema inteiro acaba virando de '
+      + 'sinal, o que é certo: num sistema finito a simetria nunca é quebrada de verdade, '
+      + 'só demora exponencialmente para ser restaurada.</p>';
+    tipografar(corpo);
+    requestAnimationFrame(quadro);
+    window.addEventListener('resize', function () { desenhar(medir()); });
+  };
+
+  /* =================================================================
+     36. Ginzburg-Landau dependente do tempo
+     ∂ψ/∂t = −δℱ/δψ = −aψ − bψ³ + γ∇²ψ. Com a < 0 o sistema escolhe
+     ±√(−a/b) em cada região e depois as fronteiras se engolem: é o
+     engrossamento de domínios, com ℓ(t) ∝ √t.
+     ================================================================= */
+  REGISTRO.ginzburg = function (raiz) {
+    var corpo = moldura(raiz, 'Ginzburg-Landau: como os domínios engrossam');
+
+    var L = 96, N = L * L;
+    var psi = new Float64Array(N), novo = new Float64Array(N);
+    var est = { a: -1, gama: 1.2, rodando: true, t: 0 };
+    var serie = [];
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'a  (∝ T − T_C)', -1.5, 0.6, 0.05, -1,
+      function (v) { est.a = v; },
+      function (v) { return F.fmt(v, 2); });
+    deslizante(ctr, 'rigidez γ', 0.3, 3, 0.1, 1.2,
+      function (v) { est.gama = v; },
+      function (v) { return F.fmt(v, 1); });
+
+    var bot = el('div', { class: 'botoes' });
+    var bPausa = el('button', { type: 'button', texto: 'pausar' });
+    var bZerar = el('button', { type: 'button', class: 'sec', texto: 'reiniciar' });
+    bPausa.addEventListener('click', function () {
+      est.rodando = !est.rodando;
+      bPausa.textContent = est.rodando ? 'pausar' : 'continuar';
+    });
+    bZerar.addEventListener('click', reiniciar);
+    bot.appendChild(bPausa); bot.appendChild(bZerar);
+    ctr.appendChild(bot);
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'a', k: 'a' },
+      { rot: 'fase', k: 'fase' },
+      { rot: '±√(−a/b) previsto', k: 'eq' },
+      { rot: '|ψ| médio', k: 'md' },
+      { rot: 'tamanho típico ℓ', k: 'l' },
+      { rot: 'tempo', k: 't' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function reiniciar() {
+      for (var i = 0; i < N; i++) psi[i] = 0.02 * (Math.random() - 0.5);
+      est.t = 0; serie = [];
+    }
+    reiniciar();
+
+    /* Euler explícito no laplaciano de cinco pontos, com contorno periódico.
+       dt tem de respeitar dt < h²/(4γ) para não explodir, e aqui h = 1. */
+    function passo() {
+      var a = est.a, g = est.gama;
+      var dt = Math.min(0.05, 0.2 / g);
+      for (var y = 0; y < L; y++) {
+        var ym = ((y + L - 1) % L) * L, yp = ((y + 1) % L) * L, y0 = y * L;
+        for (var x = 0; x < L; x++) {
+          var i = y0 + x;
+          var lap = psi[y0 + ((x + 1) % L)] + psi[y0 + ((x + L - 1) % L)]
+                  + psi[yp + x] + psi[ym + x] - 4 * psi[i];
+          var p = psi[i];
+          novo[i] = p + dt * (-a * p - p * p * p + g * lap);
+        }
+      }
+      psi.set(novo);
+      est.t += dt;
+    }
+
+    /* o tamanho típico sai da fração de ligações entre vizinhos de sinal
+       oposto: quanto menos paredes, maiores os domínios */
+    function medidas() {
+      var soma = 0, paredes = 0;
+      for (var y = 0; y < L; y++) {
+        for (var x = 0; x < L; x++) {
+          var i = y * L + x;
+          soma += Math.abs(psi[i]);
+          if (psi[i] * psi[y * L + ((x + 1) % L)] < 0) paredes++;
+          if (psi[i] * psi[((y + 1) % L) * L + x] < 0) paredes++;
+        }
+      }
+      return { md: soma / N, l: paredes > 0 ? 2 * N / paredes : N };
+    }
+
+    function desenhar() {
+      var p = G.preparar(cv, 340);
+      var ct = p.ct, Lp = p.L, A = p.A;
+      var lado = Math.min(A - 8, Lp * 0.52);
+      var ox = (Lp - lado) / 2 - (Lp > 640 ? Lp * 0.17 : 0), oy = (A - lado) / 2;
+      if (!desenhar.aux) {
+        desenhar.aux = document.createElement('canvas');
+        desenhar.aux.width = L; desenhar.aux.height = L;
+      }
+      var img = desenhar.aux.getContext('2d').createImageData(L, L);
+      var esc = Math.max(0.05, Math.sqrt(Math.max(0, -est.a)));
+      for (var i = 0; i < N; i++) {
+        /* vinho para ψ > 0, azul para ψ < 0, pálido onde ψ ≈ 0 */
+        var u = Math.max(-1, Math.min(1, psi[i] / esc));
+        var t = (u + 1) / 2;
+        img.data[4 * i] = Math.round(44 + t * (140 - 44));
+        img.data[4 * i + 1] = Math.round(95 + t * (47 - 95));
+        img.data[4 * i + 2] = Math.round(141 + t * (57 - 141));
+        img.data[4 * i + 3] = 255;
+      }
+      desenhar.aux.getContext('2d').putImageData(img, 0, 0);
+      ct.imageSmoothingEnabled = false;
+      ct.drawImage(desenhar.aux, ox, oy, lado, lado);
+      ct.strokeStyle = G.COR.suave; ct.lineWidth = 1;
+      ct.strokeRect(ox + 0.5, oy + 0.5, lado - 1, lado - 1);
+      ct.font = '11px system-ui, sans-serif';
+      ct.fillStyle = G.COR.suave;
+      ct.textAlign = 'center'; ct.textBaseline = 'top';
+      ct.fillText('ψ > 0 em vinho, ψ < 0 em azul', ox + lado / 2, oy + lado + 8);
+
+      /* ℓ(t) em escala log-log, onde a lei √t é uma reta de inclinação 1/2 */
+      if (Lp > 640 && serie.length > 3) {
+        var gx0 = ox + lado + 34, gx1 = Lp - 16;
+        var gy0 = oy + 16, gy1 = oy + lado - 10;
+        ct.strokeStyle = G.COR.grade; ct.lineWidth = 1;
+        ct.strokeRect(gx0 + 0.5, gy0 + 0.5, gx1 - gx0 - 1, gy1 - gy0 - 1);
+        var teto = L / 3;
+        var lx = function (v) { return gx0 + (gx1 - gx0) * (Math.log10(v) + 1) / 3.4; };
+        var ly = function (v) {
+          return gy1 - (gy1 - gy0) * Math.log10(v) / Math.log10(2 * teto);
+        };
+        /* a reta de referência passa por um ponto medido cedo, e não por um
+           ponto inventado: assim o que se compara é só a inclinação */
+        var anc = null;
+        for (var q = 0; q < serie.length; q++) {
+          if (serie[q].t > 2) { anc = serie[q]; break; }
+        }
+        if (anc) {
+          ct.strokeStyle = G.COR.ambar; ct.lineWidth = 1.6;
+          ct.setLineDash([5, 4]);
+          ct.beginPath();
+          ct.moveTo(lx(anc.t), ly(anc.l));
+          ct.lineTo(lx(600), ly(anc.l * Math.sqrt(600 / anc.t)));
+          ct.stroke();
+          ct.setLineDash([]);
+        }
+        /* o limite da caixa: passado ele, não há mais o que engrossar */
+        ct.strokeStyle = G.COR.suave; ct.lineWidth = 1;
+        ct.beginPath();
+        ct.moveTo(gx0, ly(teto)); ct.lineTo(gx1, ly(teto)); ct.stroke();
+        ct.fillStyle = G.COR.suave;
+        ct.font = '10px system-ui, sans-serif';
+        ct.textAlign = 'left'; ct.textBaseline = 'bottom';
+        ct.fillText('limite da caixa', gx0 + 4, ly(teto) - 2);
+        ct.strokeStyle = G.COR.vinho; ct.lineWidth = 2;
+        ct.beginPath();
+        var primeiro = true;
+        serie.forEach(function (d) {
+          if (d.t <= 0.1 || d.l <= 0 || d.l > 2 * teto) { primeiro = true; return; }
+          var X = lx(d.t), Y = ly(d.l);
+          if (primeiro) { ct.moveTo(X, Y); primeiro = false; } else ct.lineTo(X, Y);
+        });
+        ct.stroke();
+        ct.fillStyle = G.COR.suave;
+        ct.textAlign = 'center'; ct.textBaseline = 'bottom';
+        ct.fillText('ℓ contra t, escala log; tracejado: √t',
+                    (gx0 + gx1) / 2, gy0 - 4);
+      }
+    }
+
+    function quadro() {
+      if (est.rodando) {
+        for (var k = 0; k < 4; k++) passo();
+        var m = medidas();
+        serie.push({ t: est.t, l: m.l });
+        if (serie.length > 2000) serie.shift();
+        desenhar();
+        mostrar({
+          a: F.fmt(est.a, 2),
+          fase: est.a < 0 ? 'ordenada (T < T_C)' : 'desordenada (T > T_C)',
+          eq: est.a < 0 ? '±' + F.fmt(Math.sqrt(-est.a), 3) : '0',
+          md: F.fmt(m.md, 4),
+          l: F.fmt(m.l, 2),
+          t: F.fmt(est.t, 1)
+        });
+      }
+      requestAnimationFrame(quadro);
+    }
+
+    nota.innerHTML =
+      '<p>Landau descreve o equilíbrio. Ginzburg e Landau acrescentam duas coisas: deixam o '
+      + 'parâmetro de ordem <b>variar no espaço</b>, \\(\\psi(\\vec r)\\), e cobram por essa '
+      + 'variação um termo \\(\\frac\\gamma2\\left|\\nabla\\psi\\right|^2\\) na energia '
+      + 'livre. Esse termo é o que dá <b>rigidez</b>: criar uma parede entre duas regiões de '
+      + 'sinal oposto custa energia.</p>'
+      + '<p>A dinâmica mais simples compatível com isso é a relaxacional, em que o sistema '
+      + 'desce o gradiente da energia livre:</p>'
+      + '<p>\\[\\frac{\\partial\\psi}{\\partial t}=-\\frac{\\delta\\mathcal F}{\\delta\\psi}'
+      + '=-a\\psi-b\\psi^3+\\gamma\\nabla^2\\psi.\\]</p>'
+      + '<p>Comece com ruído e veja o que acontece quando \\(a<0\\). Primeiro, em toda parte '
+      + 'ao mesmo tempo, \\(\\psi\\) foge de zero e se instala em \\(\\pm\\sqrt{-a/b}\\), '
+      + 'escolhendo o sinal ao acaso conforme o ruído local. Isso é rápido. Depois vem a '
+      + 'parte lenta: as paredes entre domínios custam energia, e o sistema se livra delas '
+      + 'engolindo os domínios pequenos. O tamanho típico cresce como '
+      + '\\(\\ell\\sim\\sqrt{\\gamma t}\\), que é a reta tracejada no gráfico ao lado.</p>'
+      + '<p>Ponha \\(a>0\\) e tudo decai para zero: acima de \\(T_C\\) não há o que ordenar. '
+      + 'Aumente \\(\\gamma\\) e as paredes ficam caras e grossas, e os domínios nascem '
+      + 'maiores.</p>'
+      + '<p>A mesma equação, com \\(\\psi\\) complexo, descreve supercondutores e '
+      + 'superfluidos, e nesses casos a fase de \\(\\psi\\) carrega a supercorrente e os '
+      + 'defeitos topológicos viram vórtices quantizados. Nada aqui é específico de '
+      + 'magnetismo: é a física de qualquer parâmetro de ordem que tenha de escolher entre '
+      + 'estados equivalentes.</p>';
+    tipografar(corpo);
+    requestAnimationFrame(quadro);
+    window.addEventListener('resize', desenhar);
+  };
+
   /* ---------- inicialização ---------- */
   document.addEventListener('DOMContentLoaded', function () {
     Array.prototype.forEach.call(document.querySelectorAll('[data-widget]'), function (n) {
