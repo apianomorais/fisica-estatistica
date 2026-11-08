@@ -88,7 +88,7 @@
   <!-- ================================================== -->
   <h2 id="s1">1. Cadê o bêbado?</h2>
 
-  <p>Uma partícula parte da origem e se move ao longo de um eixo em passos discretos de
+  <p>Considere uma partícula que parte da origem e se move ao longo de um eixo em passos discretos de
   comprimento \(L\). A cada passo ela vai para a direita com probabilidade \(p\) ou para a
   esquerda com probabilidade \(q=1-p\), sem nunca ficar parada, de modo que</p>
 
@@ -126,7 +126,7 @@
 
   <p>Mas várias sequências diferentes dão o mesmo deslocamento. Com \(N=3\) passos, há uma só
   maneira de obter \(m=3\) (direita, direita, direita), e <em>três</em> maneiras de obter
-  \(m=1\). Essa multiplicidade é a <strong>degenerescência</strong>, e vale</p>
+  \(m=1\). Essa multiplicidade é a chamada <strong>degenerescência</strong>, e vale</p>
 
   <p>\[\frac{N!}{n_1!\,n_2!}.\]</p>
 
@@ -186,7 +186,7 @@
 
   <p>\[\overline{m}=\overline{n_1}-\overline{n_2}=(p-q)N.\]</p>
 
-  <p>Para o caminhante simétrico, \(\overline{m}=0\): em média ele não sai do lugar. O que
+  <p>Para o caminhante simétrico, \(\overline{m}=0\), tal que em média ele não sai do lugar. O que
   não quer dizer que ele fique perto da origem, e é justamente essa distinção que a seção
   seguinte resolve.</p>
 
@@ -247,8 +247,8 @@
 
   <p>\[\boxed{\;\overline{R^2}=NL^2\;}\]</p>
 
-  <p>em qualquer dimensão. A raiz de \(N\) não é um acidente unidimensional: é consequência
-  apenas da independência dos passos. O que muda com a dimensão é outra coisa, e bastante
+  <p>em qualquer dimensão. A raiz de \(N\) não é um acidente unidimensional, mas sim uma consequência
+   da independência dos passos. O que muda com a dimensão é outra coisa, e bastante
   dramática.</p>
 
   <div class="bloco fisica">
@@ -270,7 +270,7 @@
   <!-- ================================================== -->
   <h2 id="s6">6. A aproximação de Stirling</h2>
 
-  <p>Os fatoriais que apareceram são impraticáveis para \(N\) grande: \(100!\) tem 158
+  <p>Os fatoriais que apareceram na distribuição binomial são impraticáveis para \(N\) grande. Note que \(100!\) tem 158
   algarismos e \(10^{23}!\) não cabe em lugar nenhum. Precisamos de uma aproximação para
   \(\ln n!\), e ela vem de uma identidade útil:</p>
 
@@ -300,7 +300,7 @@
     \[\ln n!\;\approx\; n\ln n-n+\tfrac{1}{2}\ln(2\pi n)\]
   </div>
 
-  <p>Em física estatística \(n\) é astronômico e o último termo é desprezível diante dos
+  <p>Na Física Estatística \(n\) é astronômico e o último termo é desprezível diante dos
   outros, de modo que usaremos quase sempre a forma crua</p>
 
   <p>\[\ln n!\approx n\ln n - n.\]</p>
@@ -319,7 +319,7 @@
   </div>
 
   <p>Para \(n=10^{23}\) a forma crua erra em uma parte em \(10^{21}\). É a aproximação mais
-  segura de toda a física.</p>
+  segura de toda a Física.</p>
 
   <!-- ================================================== -->
   <h2 id="s7">7. Da binomial à gaussiana</h2>
@@ -401,14 +401,14 @@
   <div data-widget="contarestados"></div>
 
   <!-- ================================================== -->
-  <h2 id="s10">10. O ensemble microcanônico</h2>
+  <h2 id="s10">10. O Ensemble Microcanônico</h2>
 
-  <p>Agora podemos começar. O <strong>ensemble microcanônico</strong> descreve um sistema
-  isolado: energia \(U\), volume \(V\) e número de partículas \(N\) fixos, sem troca de nada
+  <p>Agora podemos começar. O <strong>Ensemble Microcanônico</strong> descreve um sistema
+  isolado com energia \(U\), volume \(V\) e número de partículas \(N\) fixos, sem troca de nada
   com o exterior. Pela hipótese de igual probabilidade a priori do Módulo 2, todos os
   \(\Omega(U,V,N)\) microestados compatíveis com esses vínculos são igualmente prováveis.</p>
 
-  <p>A ponte com a termodinâmica é um único postulado:</p>
+  <p>A ponte com a Termodinâmica é um único postulado:</p>
 
   <div class="destaque">
     <span class="anuncio">Entropia de Boltzmann</span>
