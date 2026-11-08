@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Módulo 1: Revisão de termodinâmica | Física Estatística</title>
 <link rel="icon" type="image/png" href="assets/img/favicon.png">
-<link rel="stylesheet" href="assets/css/estilo.css?v=202611072208">
-<script src="assets/js/comum.js?v=202611072208"></script>
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611072214">
+<script src="assets/js/comum.js?v=202611072214"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
 <body>
@@ -47,12 +47,13 @@
     <li><a href="#s8">8. Os quatro potenciais termodinâmicos</a></li>
     <li><a href="#s9">9. Relações de Maxwell</a></li>
     <li><a href="#s10">10. Funções resposta</a></li>
-    <li><a href="#s11">11. Terceira lei</a></li>
-    <li><a href="#s12">12. A pressão vem dos choques</a></li>
-    <li><a href="#s13">13. Equipartição</a></li>
-    <li><a href="#s14">14. A entropia do gás ideal</a></li>
-    <li><a href="#s15">15. Exercícios resolvidos</a></li>
-    <li><a href="#s16">16. Exercícios propostos</a></li>
+    <li><a href="#s11">11. Sistemas magnéticos e elétricos</a></li>
+    <li><a href="#s12">12. Terceira lei</a></li>
+    <li><a href="#s13">13. A pressão vem dos choques</a></li>
+    <li><a href="#s14">14. Equipartição</a></li>
+    <li><a href="#s15">15. A entropia do gás ideal</a></li>
+    <li><a href="#s16">16. Exercícios resolvidos</a></li>
+    <li><a href="#s17">17. Exercícios propostos</a></li>
   </ol>
 </aside>
 
@@ -236,13 +237,13 @@
   <div class="bloco fisica">
     <span class="rotulo">Por que a massa não entra</span>
     <p>À primeira vista é estranho: moléculas de oxigênio pesam 32 unidades e as de hidrogênio
-    pesam 2, e ainda assim contribuem igualmente para a pressão. A razão aparece na seção 12,
+    pesam 2, e ainda assim contribuem igualmente para a pressão. A razão aparece na seção 13,
     quando deduzirmos \(PV=\frac{1}{3}Nm\overline{v^2}\) dos choques.</p>
     <p>O que entra na pressão é o produto \(m\overline{v^2}\), e a equipartição garante que
     \(\frac{1}{2}m\overline{v^2}=\frac{3}{2}\kB T\) para toda espécie na mesma temperatura.
     As moléculas leves se movem mais depressa exatamente na proporção que compensa a sua
     massa menor. <strong>O produto é o mesmo, e por isso a contribuição à pressão é a
-    mesma.</strong> O widget da seção 12 permite verificar isso com duas espécies de massas
+    mesma.</strong> O widget da seção 13 permite verificar isso com duas espécies de massas
     diferentes na mesma caixa.</p>
     <p>É também de onde vem a lei de Graham: a velocidade típica vai com \(1/\sqrt{m}\), e é
     por isso que o hidrogênio escapa de um balão mais depressa que o hélio, e que o
@@ -561,7 +562,110 @@
   som de Newton.</p>
 
   <!-- ================================================== -->
-  <h2 id="s11">11. Terceira lei</h2>
+  <h2 id="s11">11. Sistemas magnéticos e elétricos</h2>
+
+  <p>Tudo o que foi feito das seções 5 a 10 partiu de \(\dbar W=-P\,dV\), e é hora de
+  perguntar o que nesse ponto de partida era realmente sobre fluidos. A resposta é:
+  praticamente nada. O que se usou foi que \(P\) e \(V\) formam um <strong>par
+  conjugado</strong> cujo produto tem dimensão de energia, um deles extensivo e o outro
+  intensivo. Troque o par e tudo sobrevive.</p>
+
+  <h3>O par magnético</h3>
+
+  <p>O trabalho realizado por um campo magnético \(\Hm\) ao aumentar o momento magnético
+  total \(M=\sum_i m_i\) de uma amostra é</p>
+
+  <p>\[\dbar W=\mu_0\Hm\,dM,\qquad \mu_0=4\pi\times10^{-7}\ \mathrm{H/m},\]</p>
+
+  <p>com \(M\) a componente de \(\vec M\) na direção de \(\vec{\Hm}\), de modo que a primeira
+  lei fica</p>
+
+  <p>\[dU=T\,dS+\mu_0\Hm\,dM.\]</p>
+
+  <p>Comparando com \(dU=T\,dS-P\,dV\), a tradução é imediata:</p>
+
+  <p>\[V\equiv-M,\qquad P\equiv\mu_0\Hm.\]</p>
+
+  <p>O sinal negativo não é capricho de contabilidade: ele registra um fato físico. Aumentar
+  a pressão <em>diminui</em> o volume, ao passo que aumentar o campo <em>aumenta</em> o
+  momento magnético. Os dois pares respondem em sentidos opostos, e o sinal é o que torna a
+  analogia exata em vez de apenas sugestiva.</p>
+
+  <p>Feita a substituição, todo o aparato das seções anteriores vem junto. Os análogos da
+  entalpia e da energia de Gibbs são</p>
+
+  <p>\[E=U-\mu_0\Hm M,\qquad G=U-TS-\mu_0\Hm M,\]</p>
+
+  <p>as capacidades caloríficas a momento e a campo constantes são</p>
+
+  <p>\[C_M=\dpar{U}{T}{M}=T\dpar{S}{T}{M}=-T\left(\frac{\partial^2F}{\partial T^2}\right)_M,
+  \qquad
+  C_{\Hm}=\dpar{E}{T}{\Hm}=T\dpar{S}{T}{\Hm}
+  =-T\left(\frac{\partial^2G}{\partial T^2}\right)_{\Hm},\]</p>
+
+  <p>e a compressibilidade dá lugar à <strong>susceptibilidade magnética</strong>, definida
+  a partir da magnetização \(\Mg=dM/dV\), que é o momento magnético por unidade de volume:</p>
+
+  <p>\[\chi_T=\frac{1}{\mu_0}\dpar{\Mg}{\Hm}{T}=\frac{1}{\mu_0V}\dpar{M}{\Hm}{T}
+  =-\frac{1}{\mu_0^2V}\left(\frac{\partial^2G}{\partial\Hm^2}\right)_T.\]</p>
+
+  <p>As duas identidades da seção 10 reaparecem letra por letra, com
+  \(\alpha_{\Hm}=\left(\partial\Mg/\partial T\right)_{\Hm}\) no lugar do coeficiente de
+  dilatação:</p>
+
+  <p>\[\chi_T\left(C_{\Hm}-C_M\right)=TV\alpha_{\Hm}^2,
+  \qquad
+  C_{\Hm}\left(\chi_T-\chi_S\right)=TV\alpha_{\Hm}^2.\]</p>
+
+  <p>Às vezes convém o par invertido, quando o experimento controla o campo em vez do
+  momento. O trabalho fica \(\dbar W=-\mu_0M\,d\Hm\), a primeira lei fica
+  \(dU=T\,dS-\mu_0M\,d\Hm\), e a tradução passa a ser \(V\equiv\mu_0\Hm\) e \(P\equiv M\).
+  É a mesma amostra, descrita pelo outro membro do par.</p>
+
+  <h3>O par elétrico</h3>
+
+  <p>Agora uma amostra dielétrica entre as placas de um capacitor plano ligado a uma bateria,
+  isto é, a potencial constante. O trabalho para aumentar o momento de dipolo elétrico total
+  \(\wp\) da amostra é</p>
+
+  <p>\[\dbar W=\Em\,d\wp
+  \qquad\Longrightarrow\qquad
+  dU=T\,dS+\Em\,d\wp,\]</p>
+
+  <p>com a tradução \(V\equiv-\wp\) e \(P\equiv\Em\), pelo mesmo motivo de sinal de antes.
+  Definindo a <strong>polarização</strong> \(\Pol=d\wp/dV\) como o momento de dipolo por
+  unidade de volume, a susceptibilidade elétrica é</p>
+
+  <p>\[\chi_T=\dpar{\Pol}{\Em}{T}=\frac1V\dpar{\wp}{\Em}{T}
+  =-\frac1V\left(\frac{\partial^2G}{\partial\Em^2}\right)_T,\]</p>
+
+  <p>com \(E=U-\Em\wp\) e \(G=U-TS-\Em\wp\). E, como no caso magnético, há a versão com o
+  par invertido, \(\dbar W=-\wp\,d\Em\), de tradução \(V\equiv\Em\) e \(P\equiv\wp\).</p>
+
+  <div data-widget="analogias"></div>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Por que isso vale a pena</span>
+    <p>O ganho imediato é não ter o que decorar: são as mesmas quinze fórmulas com outras
+    letras. Mas há dois ganhos maiores.</p>
+    <p>O primeiro é que a analogia <strong>transporta resultados experimentais</strong>.
+    Medir \(\chi_T\) de uma amostra em função da temperatura é, pela relação de Maxwell
+    \(\left(\partial S/\partial M\right)_T=-\mu_0\left(\partial\Hm/\partial T\right)_M\),
+    medir como a entropia depende da magnetização. Um magnetômetro vira um calorímetro.</p>
+    <p>O segundo é que a analogia <strong>transporta processos</strong>. A expansão
+    adiabática esfria um gás; o análogo magnético é a <strong>desmagnetização
+    adiabática</strong>, em que se magnetiza uma amostra paramagnética em contato térmico
+    com um banho, isola-se a amostra e reduz-se o campo. Os spins, ao se desalinharem,
+    tomam entropia dos graus de liberdade da rede, e a amostra esfria. É assim que se chega
+    abaixo de um milikelvin, muito além do que qualquer gás permite, e foi assim que o
+    hélio-3 superfluido foi descoberto. A versão com spins nucleares chega a alguns
+    microkelvin.</p>
+    <p>Voltaremos a estes sistemas no Módulo 9, onde a magnetização deixará de ser uma
+    variável termodinâmica dada e passará a ser calculada a partir dos spins.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s12">12. Terceira lei</h2>
 
   <p>No enunciado de Nernst e Simon: <em>a variação de entropia associada a qualquer processo
   isotérmico reversível de um sistema condensado tende a zero quando a temperatura em que ele
@@ -586,7 +690,7 @@
   </div>
 
   <!-- ================================================== -->
-  <h2 id="s12">12. A pressão vem dos choques</h2>
+  <h2 id="s13">13. A pressão vem dos choques</h2>
 
   <p>Esta é a primeira vez no curso em que olhamos para dentro do gás. O argumento é de
   Bernoulli, tem três séculos, e é o embrião de toda a física estatística.</p>
@@ -629,7 +733,7 @@
   <div data-widget="cinetica"></div>
 
   <!-- ================================================== -->
-  <h2 id="s13">13. Equipartição</h2>
+  <h2 id="s14">14. Equipartição</h2>
 
   <p>O resultado \(\overline{E}=\frac{3}{2}\kB T\) tem uma leitura que o generaliza. As três
   parcelas da energia cinética, \(\frac{1}{2}mv_x^2\), \(\frac{1}{2}mv_y^2\) e
@@ -661,7 +765,7 @@
   <div data-widget="equiparticao"></div>
 
   <!-- ================================================== -->
-  <h2 id="s14">14. A entropia do gás ideal</h2>
+  <h2 id="s15">15. A entropia do gás ideal</h2>
 
   <p>Para fechar a revisão, um cálculo que será refeito do zero no Módulo 3, com contagem de
   microestados, e que serve de gabarito. Trabalhando por partícula, com
@@ -685,7 +789,7 @@
   tipo de pergunta que a física estatística existe para responder.</p>
 
   <!-- ================================================== -->
-  <h2 id="s15">15. Exercícios resolvidos</h2>
+  <h2 id="s16">16. Exercícios resolvidos</h2>
 
   <div class="bloco ex">
     <span class="rotulo">Exercício resolvido 1.2: EUF 2019-1, questão 5</span>
@@ -783,7 +887,7 @@
   </div>
 
   <!-- ================================================== -->
-  <h2 id="s16">16. Exercícios propostos</h2>
+  <h2 id="s17">17. Exercícios propostos</h2>
 
   <div class="bloco def">
     <span class="rotulo">Para resolver</span>
@@ -810,7 +914,7 @@
       <li><b>1.6</b> Um sólido obedece a Dulong e Petit, \(C_V=3N\kB\), acima da temperatura
       ambiente. Mostre que essa lei é a equipartição aplicada a \(3N\) osciladores
       tridimensionais, e explique por que ela falha a baixas temperaturas. Confirme com o
-      widget da seção 13 qual é o parâmetro que controla o congelamento.</li>
+      widget da seção 14 qual é o parâmetro que controla o congelamento.</li>
 
       <li><b>1.7</b> Dois corpos idênticos de capacidade calorífica \(C\) constante, às
       temperaturas \(T_1\) e \(T_2\), são postos em contato térmico. Determine a temperatura
@@ -833,6 +937,6 @@
   Laboratório de Física Computacional Aplicada (LFCA) · Universidade Regional do Cariri</p>
 </footer>
 
-<script src="assets/js/widgets.js?v=202611072208"></script>
+<script src="assets/js/widgets.js?v=202611072214"></script>
 </body>
 </html>

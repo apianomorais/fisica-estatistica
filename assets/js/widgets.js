@@ -5857,6 +5857,166 @@
     tipografar(corpo);
   };
 
+  /* =================================================================
+     30. O dicionário das analogias
+     Toda a termodinâmica de um fluido é a de um par conjugado
+     (extensiva, intensiva). Trocado o par, as fórmulas são as mesmas
+     com outras letras. O widget gera todas elas do mesmo molde, para
+     que fique claro que não há nada novo a decorar.
+     ================================================================= */
+  REGISTRO.analogias = function (raiz) {
+    var corpo = moldura(raiz, 'O mesmo esqueleto, três sistemas');
+
+    /* x é a variável extensiva e y a intensiva, com dU = T dS + y dx.
+       corrV e corrP dizem o que, nesse sistema, faz o papel de V e de P
+       nas fórmulas de fluido: a tradução é literal, termo a termo. */
+    var SIS = {
+      fluido: {
+        rot: 'Fluido', trab: '-P\\,dV',
+        x: 'V', y: '-P', xnome: 'volume', ynome: 'pressão',
+        corrV: 'V', corrP: 'P',
+        E: 'E = U + PV', G: 'G = U - TS + PV',
+        max: '\\dpar{S}{V}{T} = \\dpar{P}{T}{V}',
+        cx: 'C_V', cy: 'C_P',
+        respT: '\\kappa_T = -\\frac1V\\dpar{V}{P}{T}',
+        respS: '\\kappa_S = -\\frac1V\\dpar{V}{P}{S}',
+        alfa: '\\alpha = \\frac1V\\dpar{V}{T}{P}',
+        id1: '\\kappa_T\\left(C_P - C_V\\right) = TV\\alpha^2',
+        id2: 'C_P\\left(\\kappa_T - \\kappa_S\\right) = TV\\alpha^2',
+        obs: 'O caso de referência, deduzido nas seções 8 a 10. Tudo o que '
+           + 'vem depois é esta mesma estrutura com outras letras.'
+      },
+      magM: {
+        rot: 'Magnético, trabalho em M', trab: '\\mu_0\\Hm\\,dM',
+        x: 'M', y: '\\mu_0\\Hm',
+        xnome: 'momento magnético total', ynome: 'campo magnético',
+        corrV: '-M', corrP: '\\mu_0\\Hm',
+        E: 'E = U - \\mu_0\\Hm M', G: 'G = U - TS - \\mu_0\\Hm M',
+        max: '\\dpar{S}{M}{T} = -\\mu_0\\dpar{\\Hm}{T}{M}',
+        cx: 'C_M', cy: 'C_{\\Hm}',
+        respT: '\\chi_T = \\frac{1}{\\mu_0 V}\\dpar{M}{\\Hm}{T}',
+        respS: '\\chi_S = \\frac{1}{\\mu_0 V}\\dpar{M}{\\Hm}{S}',
+        alfa: '\\alpha_{\\Hm} = \\dpar{\\Mg}{T}{\\Hm}',
+        id1: '\\chi_T\\left(C_{\\Hm} - C_M\\right) = TV\\alpha_{\\Hm}^2',
+        id2: 'C_{\\Hm}\\left(\\chi_T - \\chi_S\\right) = TV\\alpha_{\\Hm}^2',
+        obs: 'O sinal da correspondência \\(V\\equiv-M\\) tem um motivo físico: '
+           + 'aumentar a pressão <em>diminui</em> o volume, enquanto aumentar o '
+           + 'campo <em>aumenta</em> o momento magnético. A compressibilidade '
+           + 'vira susceptibilidade, e o coeficiente de dilatação vira o '
+           + 'coeficiente térmico da magnetização.'
+      },
+      magH: {
+        rot: 'Magnético, trabalho em 𝓗', trab: '-\\mu_0 M\\,d\\Hm',
+        x: '\\mu_0\\Hm', y: '-M',
+        xnome: 'campo magnético', ynome: 'momento magnético total',
+        corrV: '\\mu_0\\Hm', corrP: 'M',
+        E: 'E = U + \\mu_0\\Hm M', G: 'G = U - TS + \\mu_0\\Hm M',
+        max: '\\dpar{S}{\\Hm}{T} = \\mu_0\\dpar{M}{T}{\\Hm}',
+        cx: 'C_{\\Hm}', cy: 'C_M',
+        respT: '\\tilde K_T = -\\frac{1}{\\mu_0\\Hm}\\dpar{\\mu_0\\Hm}{M}{T}',
+        respS: '\\tilde K_S = -\\frac{1}{\\mu_0\\Hm}\\dpar{\\mu_0\\Hm}{M}{S}',
+        alfa: '\\tilde\\alpha = \\frac{1}{\\Hm}\\dpar{\\Hm}{T}{M}',
+        id1: '\\tilde K_T\\left(C_M - C_{\\Hm}\\right) = T\\mu_0\\Hm\\tilde\\alpha^2',
+        id2: 'C_M\\left(\\tilde K_T - \\tilde K_S\\right) = T\\mu_0\\Hm\\tilde\\alpha^2',
+        obs: 'A mesma amostra, outro par conjugado. Aqui o que se controla é o '
+           + 'momento magnético e o que responde é o campo, e os papéis de '
+           + '\\(V\\) e \\(P\\) se invertem em relação ao caso anterior. '
+           + 'Na prática usa-se este quando o experimento fixa \\(M\\), e o '
+           + 'anterior quando fixa \\(\\Hm\\).'
+      },
+      eleP: {
+        rot: 'Elétrico, trabalho em ℘', trab: '\\Em\\,d\\wp',
+        x: '\\wp', y: '\\Em',
+        xnome: 'momento de dipolo total', ynome: 'campo elétrico',
+        corrV: '-\\wp', corrP: '\\Em',
+        E: 'E = U - \\Em\\wp', G: 'G = U - TS - \\Em\\wp',
+        max: '\\dpar{S}{\\wp}{T} = -\\dpar{\\Em}{T}{\\wp}',
+        cx: 'C_{\\wp}', cy: 'C_{\\Em}',
+        respT: '\\chi_T = \\frac1V\\dpar{\\wp}{\\Em}{T}',
+        respS: '\\chi_S = \\frac1V\\dpar{\\wp}{\\Em}{S}',
+        alfa: '\\alpha_{\\Em} = \\dpar{\\Pol}{T}{\\Em}',
+        id1: '\\chi_T\\left(C_{\\Em} - C_{\\wp}\\right) = TV\\alpha_{\\Em}^2',
+        id2: 'C_{\\Em}\\left(\\chi_T - \\chi_S\\right) = TV\\alpha_{\\Em}^2',
+        obs: 'Um dielétrico entre as placas de um capacitor ligado a uma bateria, '
+           + 'isto é, a potencial constante. O trabalho para aumentar o momento '
+           + 'de dipolo total da amostra é \\(\\Em\\,d\\wp\\), e a polarização '
+           + '\\(\\Pol=d\\wp/dV\\) faz o papel da magnetização.'
+      },
+      eleE: {
+        rot: 'Elétrico, trabalho em ℰ', trab: '-\\wp\\,d\\Em',
+        x: '\\Em', y: '-\\wp',
+        xnome: 'campo elétrico', ynome: 'momento de dipolo total',
+        corrV: '\\Em', corrP: '\\wp',
+        E: 'E = U + \\Em\\wp', G: 'G = U - TS + \\Em\\wp',
+        max: '\\dpar{S}{\\Em}{T} = \\dpar{\\wp}{T}{\\Em}',
+        cx: 'C_{\\Em}', cy: 'C_{\\wp}',
+        respT: '\\tilde K_T = -\\frac{1}{\\Em}\\dpar{\\Em}{\\wp}{T}',
+        respS: '\\tilde K_S = -\\frac{1}{\\Em}\\dpar{\\Em}{\\wp}{S}',
+        alfa: '\\tilde\\alpha = \\frac{1}{\\Em}\\dpar{\\Em}{T}{\\wp}',
+        id1: '\\tilde K_T\\left(C_{\\wp} - C_{\\Em}\\right) = T\\Em\\tilde\\alpha^2',
+        id2: 'C_{\\wp}\\left(\\tilde K_T - \\tilde K_S\\right) = T\\Em\\tilde\\alpha^2',
+        obs: 'O par invertido, como no caso magnético: aqui se controla o campo '
+           + 'e o que responde é o momento de dipolo.'
+      }
+    };
+
+    var ordem = ['fluido', 'magM', 'magH', 'eleP', 'eleE'];
+    var est = { k: 'fluido' };
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    opcoes(ctr, ordem.map(function (k) { return { rot: SIS[k].rot, v: k }; }), 0,
+      function (v) { est.k = v; mostrar(); });
+
+    var tabela = el('div', { class: 'tabela-rolavel' });
+    corpo.appendChild(tabela);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function linha(rot, tex) {
+      return '<tr><td>' + rot + '</td><td>\\(' + tex + '\\)</td></tr>';
+    }
+
+    function mostrar() {
+      var s = SIS[est.k];
+      tabela.innerHTML = '<table><thead><tr><th>Item</th><th>'
+        + s.rot + '</th></tr></thead><tbody>'
+        + linha('Variável extensiva', s.x + '\\quad\\text{(' + s.xnome + ')}')
+        + linha('Variável intensiva', s.y + '\\quad\\text{(' + s.ynome + ')}')
+        + linha('Trabalho \\(\\dbar W\\)', s.trab)
+        + linha('Primeira lei', 'dU = T\\,dS '
+            + (s.trab.charAt(0) === '-' ? '- ' + s.trab.slice(1) : '+ ' + s.trab))
+        + linha('No lugar de \\(V\\)', s.corrV)
+        + linha('No lugar de \\(P\\)', s.corrP)
+        + linha('Energia livre de Helmholtz', 'F = U - TS')
+        + linha('Análogo da entalpia', s.E)
+        + linha('Análogo da energia de Gibbs', s.G)
+        + linha('Uma relação de Maxwell', s.max)
+        + linha('Capacidades caloríficas', s.cx + ',\\qquad ' + s.cy)
+        + linha('Resposta isotérmica', s.respT)
+        + linha('Resposta adiabática', s.respS)
+        + linha('Coeficiente térmico', s.alfa)
+        + linha('Identidade das capacidades', s.id1)
+        + linha('Identidade das respostas', s.id2)
+        + '</tbody></table>';
+
+      nota.innerHTML = '<p>' + s.obs + '</p>'
+        + '<p>Compare esta coluna com a do fluido e veja que <strong>nenhuma fórmula '
+        + 'mudou de forma</strong>. Toda a termodinâmica das seções 5 a 10 foi deduzida '
+        + 'a partir de \\(dU=T\\,dS-P\\,dV\\) sem usar nada sobre o que \\(P\\) e \\(V\\) '
+        + 'são: só que formam um par conjugado cujo produto é energia. Trocado o par, as '
+        + 'relações de Maxwell, os potenciais e as identidades entre funções resposta '
+        + 'sobrevivem letra por letra.</p>'
+        + '<p>Isso é mais do que economia de esforço. É o que permite medir uma '
+        + 'susceptibilidade magnética e concluir alguma coisa sobre entropia, ou usar '
+        + 'desmagnetização adiabática para resfriar uma amostra, que é a versão magnética '
+        + 'da expansão adiabática de um gás e o método que chega aos microkelvin.</p>';
+      tipografar(corpo);
+    }
+
+    mostrar();
+  };
+
   /* ---------- inicialização ---------- */
   document.addEventListener('DOMContentLoaded', function () {
     Array.prototype.forEach.call(document.querySelectorAll('[data-widget]'), function (n) {

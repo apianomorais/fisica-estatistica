@@ -30,6 +30,12 @@ window.MathJax = {
       Tr: '\\operatorname{Tr}',
       med: ['\\left\\langle #1 \\right\\rangle', 1],
       dpar: ['\\left(\\frac{\\partial #1}{\\partial #2}\\right)_{#3}', 3],
+      /* campos e momentos: o H reto fica reservado à hamiltoniana e o E à
+         entalpia, de modo que os campos recebem letras caligráficas */
+      Hm: '\\mathcal{H}',
+      Em: '\\mathcal{E}',
+      Mg: '\\mathcal{M}',
+      Pol: '\\mathcal{P}',
       E: '\\mathbb{E}',
       R: '\\mathbb{R}',
       N: '\\mathbb{N}'
