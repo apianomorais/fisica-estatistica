@@ -63,10 +63,9 @@
 
   <p class="chapeu">Módulo 1 · Fundamentos</p>
   <h1>Revisão de termodinâmica</h1>
-  <p class="subtitulo">A termodinâmica descreve um copo de água com meia dúzia de números,
-  sem jamais perguntar o que fazem as moléculas lá dentro. Antes de construir a ponte entre
-  os dois mundos, vale reconstruir com cuidado o lado macroscópico dessa ponte: é dele que
-  virão as perguntas que a física estatística terá de responder.</p>
+  <p class="subtitulo">A Termodinâmica descreve um copo de água com meia dúzia de números,
+  sem jamais perguntar o que fazem as moléculas lá dentro. Antes de construir o dispostivo que servirá como a ponte entre
+  os dois mundos, vale reconstruir com cuidado o lado macroscópico dessa ponte.  É de onda virão as perguntas que a Física Estatística irá responder.</p>
 
   <div class="bloco def">
     <span class="rotulo">Objetivos</span>
@@ -83,35 +82,36 @@
   <hr class="linha">
 
   <!-- ================================================== -->
-  <h2 id="s1">1. O que a termodinâmica sabe sem ver os átomos</h2>
+  <h2 id="s1">1. O que a Termodinâmica sabe sem ver os átomos</h2>
 
-  <p>Um litro de ar nesta sala tem da ordem de \(10^{22}\) moléculas. Descrever o estado
-  mecânico desse gás exigiria três coordenadas e três componentes de momento para cada
-  molécula: algo como \(10^{23}\) números. Nenhum computador guardaria essa lista, e se
-  guardasse ela seria inútil, porque mudaria por inteiro a cada bilionésimo de segundo.</p>
+  <p>Um litro de ar nesta sala tem da ordem de \(10^{22}\) moléculas. Para descrever o estado
+  mecânico desse gás exigimos conhecer três coordenadas espaciais e três componentes de momento para cada
+  molécula, algo como \(10^{23}\) números. Nenhum computador guardaria essa lista, e se
+  guardasse a lista ela seria inútil, porque mudaria toda a cada bilionésimo de segundo.</p>
 
   <div class="destaque">
-    <span class="anuncio">E, no entanto, três números bastam</span>
+    <span class="anuncio">Todavia, três números bastam</span>
     Pressão, volume e temperatura descrevem completamente esse gás para qualquer finalidade
-    prática. A termodinâmica é a ciência que descobriu isso, e funcionou por um século inteiro
+    prática. A Termodinâmica é a ciência que descobriu isso, e funcionou por um século inteiro
     sem precisar acreditar em átomos.
   </div>
 
   <p>A pergunta que organiza toda a disciplina é: <strong>por que funciona?</strong> Por que
-  \(10^{23}\) graus de liberdade colapsam em três? A resposta é a física estatística, e ela
+  \(10^{23}\) graus de liberdade colapsam em três? A resposta vem da Física Estatística, e ela
   tem duas partes. A primeira é que, em um sistema enorme, as flutuações relativas de qualquer
-  grandeza macroscópica caem como \(1/\sqrt{N}\): com \(N\sim 10^{23}\), isso é uma parte em
+  grandeza macroscópica caem como \(1/\sqrt{N}\) com \(N\sim 10^{23}\). Isso é uma parte em
   \(10^{11}\), e a média vira a única coisa observável. A segunda é que o equilíbrio é,
   esmagadoramente, a configuração mais provável, e não uma configuração especial.</p>
 
-  <p>Neste módulo o programa é outro, mais modesto e indispensável: reconstruir o lado
+  <p>Neste módulo o programa é outro, mais modesto e indispensável, que é reconstruir o lado
   macroscópico com precisão suficiente para que, nos módulos seguintes, cada resultado
   estatístico possa ser confrontado com uma lei termodinâmica já conhecida. Quando mais
-  adiante aparecer \(F=-\kB T\ln Z\), o senhor precisará saber exatamente o que \(F\) é e o
-  que se extrai dela. Essa é a razão desta revisão.</p>
+  adiante aparecer \(F=-\kB T\ln Z\), o(a) senhor(a) precisará saber exatamente o que \(F\) é e o
+  que se extrai dela. Essa é a razão de fazermos esta revisão.</p>
 
   <div class="bloco fisica">
     <span class="rotulo">Equilíbrio termodinâmico</span>
+  <div class="bloco">
     <p>Um sistema está em equilíbrio termodinâmico quando seus parâmetros macroscópicos
     <strong>não variam no tempo</strong> e não há fluxos líquidos de matéria ou energia
     atravessando-o. Só nesse estado as variáveis de estado estão definidas.</p>
@@ -125,6 +125,15 @@
   equilíbrio é um <strong>ponto</strong> no diagrama PV. Um processo lento o bastante é uma
   <strong>curva</strong>, feita de pontos. E um processo brusco não é curva nenhuma: durante
   ele o sistema simplesmente não está no gráfico.</p>
+
+  <p>Para entender por quê, imagine o recipiente dividido em pequenas porções — não paredes
+  reais, apenas regiões que acompanham o gás. Se o processo é lento, cada porção tem tempo de
+  trocar energia com as vizinhas, e todas acabam com a mesma pressão (e a mesma temperatura)
+  quando ocupam o mesmo volume. As porções colapsam num único ponto, e o processo inteiro
+  desenha uma linha contínua no diagrama PV. Se o processo é brusco, não há tempo para isso: a
+  porção junto ao pistão é comprimida antes que as demais percebam, e as pressões divergem de
+  uma região para outra. Não há colapso — há uma nuvem de pontos — e nenhuma linha pode ser
+  traçada.</p>
 
   <div data-widget="estadopv"></div>
 
@@ -148,8 +157,7 @@
   </table>
   </div>
 
-  <p>A última linha é a mais importante e costuma passar despercebida. Quando dois corpos
-  trocam calor livremente, o que fica igual no equilíbrio é a <em>temperatura</em>, uma
+  <p>Quando dois corpos trocam calor livremente, o que fica igual no equilíbrio é a <em>temperatura</em>, uma
   intensiva; a energia total é que se reparte. Quando um pistão livre separa dois gases, o
   que se iguala é a <em>pressão</em>. Quando moléculas podem passar de um lado para o outro,
   o que se iguala é o <em>potencial químico</em>. Essas três igualdades são, respectivamente,
@@ -160,47 +168,46 @@
     <span class="rotulo">Um cuidado com a palavra "intensiva"</span>
     <p>Intensiva não quer dizer "pequena" nem "secundária". Quer dizer apenas que o valor não
     depende de quanto material existe. Uma grandeza extensiva dividida por outra extensiva
-    resulta sempre intensiva: \(u = U/N\), \(v = V/N\), \(s = S/N\), \(\rho = m/V\). É assim
-    que se constroem as versões "por partícula" que usaremos o tempo todo.</p>
+    resulta sempre em uma intensiva: \(u = U/N\), \(v = V/N\), \(s = S/N\), \(\rho = m/V\). É assim
+    que construiremos as versões "por partícula" que usaremos o tempo todo.</p>
   </div>
 
   <!-- ================================================== -->
   <h2 id="s3">3. Equação de estado</h2>
 
-  <p>Se \(T\), \(V\) e \(P\) descrevem o sistema, elas não são independentes: existe um
+  <p>Se \(T\), \(V\) e \(P\) descrevem o sistema, elas não são independentes. Existe um
   vínculo entre as três, determinado experimentalmente, que chamamos de equação de estado:</p>
 
   <p>\[f(T,V,P)=0.\]</p>
 
   <p>O efeito é reduzir de três para <strong>duas</strong> o número de variáveis
   independentes. Fixados o volume e a temperatura de um gás, a pressão não é mais escolha
-  nossa. Para o gás ideal o vínculo tem a forma familiar</p>
+  nossa. Para o <a href="https://pt.wikipedia.org/wiki/G%C3%A1s_ideal">gás ideal</a> o vínculo tem a forma familiar</p>  
 
   <p>\[\boxed{\;PV = N\kB T\;}\qquad \kB = 1{,}380\,649\times 10^{-23}\ \mathrm{J/K},\]</p>
 
   <p>com \(N\) o número de moléculas. Em termos de mols, \(PV = nRT\) com
   \(R = N_A \kB = 8{,}314\) J/(mol·K). A constante de Boltzmann é o fator de conversão entre
-  temperatura e energia, e sua pequenez é apenas um acidente histórico: o kelvin foi definido
+  temperatura e energia, e seu valor pequeno é apenas um acidente histórico, pois a unidade kelvin foi definida
   antes de sabermos que temperatura <em>é</em> energia por grau de liberdade.</p>
 
   <div class="bloco fisica">
-    <span class="rotulo">A escala Kelvin</span>
+   <span class="rotulo"><a href="https://pt.wikipedia.org/wiki/Kelvin">A escala Kelvin</a></span>
     <p>A escala é ancorada no ponto triplo da água, 273,16 K, e o zero é a extrapolação do
     ponto onde a pressão de um gás ideal se anularia.</p>
-    <p>Vale demorar nesse ponto, porque ele é um dos resultados experimentais mais bonitos da
-    física. Encerre um gás num bulbo de volume fixo e meça a pressão a várias temperaturas.
+    <p>Vale demorar nesse ponto, porque ele é um dos resultados experimentais mais bonitos de toda a
+    Física. Confine um gás num bulbo de volume fixo e meça a pressão a várias temperaturas.
     O gráfico de \(P\) contra \(t\) em graus Celsius é uma reta. Mude a quantidade de gás e a
     reta muda de inclinação. Troque de gás, de hélio para nitrogênio para gás carbônico, e a
     inclinação muda outra vez.</p>
     <p>Mas prolongue todas elas para a esquerda. Todas cruzam o eixo das temperaturas
     <strong>no mesmo ponto</strong>, perto de 273,15 graus abaixo de zero. A experiência faz
-    essa pergunta a substâncias quimicamente distintas e recebe sempre a mesma resposta.</p>
+    essa pergunta a substâncias quimicamente distintas e parecem receber sempre a mesma resposta.</p>
   </div>
 
   <div data-widget="kelvin"></div>
 
-  <p>Dito em fórmula: todos os gases diluídos obedecem a
-  \(P = P_0\left(1+\alpha t\right)\) com o <em>mesmo</em> coeficiente
+  <p>Todos os gases diluídos parecem obedecer a \(P = P_0\left(1+\alpha t\right)\) com o <em>mesmo</em> coeficiente
   \(\alpha = 1/273{,}15\) por grau, qualquer que seja o gás e qualquer que seja \(P_0\). Uma
   constante que não depende da substância medida está dizendo alguma coisa sobre a
   temperatura, e não sobre o gás. Definindo \(T = t + 273{,}15\), a reta passa a ser
@@ -209,14 +216,14 @@
 
   <h3>Misturas e a lei de Dalton</h3>
 
-  <p>Uma das curvas do gráfico acima é o <strong>ar</strong>, que não é uma substância: é
+  <p>Uma das curvas do gráfico acima é o <strong>ar</strong>, que não é uma substância. Ele é
   cerca de 78% de nitrogênio, 21% de oxigênio, 0,9% de argônio e o resto em gás carbônico e
   vapor d'água. Ainda assim ele dá uma reta como as outras e aponta para o mesmo zero. Por
   quê?</p>
 
   <p>Porque, num gás diluído, cada componente ignora os demais. Nenhuma molécula de
-  nitrogênio sabe que há oxigênio na sala: as interações são desprezíveis e o que cada
-  espécie faz é bater nas paredes por conta própria. John Dalton percebeu isso em 1801 e
+  nitrogênio sabe que há oxigênio na sala até se chocarem rapidamente; as interações são desprezíveis e o que cada
+  espécie faz é bater nas paredes por conta própria. <strong><a href="https://pt.wikipedia.org/wiki/John_Dalton">John Dalton</a></strong> percebeu isso em 1801 e
   enunciou o que hoje se chama <strong>lei das pressões parciais</strong>.</p>
 
   <div class="bloco def">
@@ -231,15 +238,15 @@
     pressão total.</p>
   </div>
 
-  <p>O resultado é mais forte do que parece. Ele diz que a equação de estado de uma mistura
+  <p>O resultado diz que a equação de estado de uma mistura
   é a mesma do gás puro, com \(N\) sendo apenas a contagem total de moléculas,
   <strong>independentemente de quais sejam</strong>. O ar se comporta como um gás ideal com
   \(N\) moléculas, e não importa que haja cinco espécies ali dentro com massas diferentes.</p>
 
   <div class="bloco fisica">
     <span class="rotulo">Por que a massa não entra</span>
-    <p>À primeira vista é estranho: moléculas de oxigênio pesam 32 unidades e as de hidrogênio
-    pesam 2, e ainda assim contribuem igualmente para a pressão. A razão aparece na seção 13,
+    <p>À primeira vista é estranho que moléculas de oxigênio pesem 32 unidades e as de hidrogênio
+    pesem 2, e ainda assim contribuem igualmente para a pressão. A razão aparece na seção 13,
     quando deduzirmos \(PV=\frac{1}{3}Nm\overline{v^2}\) dos choques.</p>
     <p>O que entra na pressão é o produto \(m\overline{v^2}\), e a equipartição garante que
     \(\frac{1}{2}m\overline{v^2}=\frac{3}{2}\kB T\) para toda espécie na mesma temperatura.
