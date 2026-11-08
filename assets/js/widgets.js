@@ -4353,7 +4353,7 @@
         /* a figura do resultado de Bessel: ⟨ε⟩/kT contra log₁₀(kT/mc²) */
         var ax4 = G.eixos(cv, {
           xmin: -3, xmax: 2, ymin: 1.3, ymax: 3.2, altura: 300,
-          rotX: 'log₁₀(k₈T/mc²)', rotY: '⟨ε⟩ / k₈T',
+          rotX: 'log₁₀(kT/mc²)', rotY: '⟨ε⟩ / kT',
           marcasX: G.marcasLineares(-3, 2, 5, 0),
           formataY: function (v) { return F.fmt(v, 1); }
         });
@@ -4382,7 +4382,7 @@
       } else {
         var ax3 = G.eixos(cv, {
           xmin: 0, xmax: 10, ymin: 0, ymax: 0.62, altura: 300,
-          rotX: 'energia ε/k\u2088T', rotY: 'densidade de probabilidade',
+          rotX: 'energia ε/kT', rotY: 'densidade de probabilidade',
           marcasX: G.marcasLineares(0, 10, 10, 0),
           formataY: function () { return ''; }
         });
@@ -4541,7 +4541,7 @@
       } else {
         var ax2 = G.eixos(cv, {
           xmin: -5, xmax: 8, ymin: 0, ymax: 3, altura: 300,
-          rotX: '(ε − μ) / k\u2088T',
+          rotX: '(ε − μ) / kT',
           rotY: 'ocupação média n̄',
           marcasX: G.marcasLineares(-5, 8, 13, 0),
           formataY: function (v) { return F.fmt(v, 1); }
@@ -4696,7 +4696,9 @@
       var t = Math.pow(10, est.logt), m = muReduzido(t);
 
       if (est.vista === 'dist') {
-        var xmax = 2.6, ymax = 1.5 * Math.sqrt(xmax) * 1.05;
+        /* a folga de 28% no topo é para a legenda não cair sobre a
+           curva tracejada da densidade de estados */
+        var xmax = 2.6, ymax = 1.5 * Math.sqrt(xmax) * 1.28;
         var ocup = function (x) {
           if (x <= 0) return 0;
           var y = (x - m) / t;
@@ -4704,7 +4706,7 @@
         };
         var ax = G.eixos(cv, {
           xmin: 0, xmax: xmax, ymin: 0, ymax: ymax, altura: 310,
-          rotX: 'energia ε/ε\u2093  (ε\u2093 = energia de Fermi)',
+          rotX: 'energia em unidades da energia de Fermi',
           rotY: 'elétrons por intervalo de energia',
           marcasX: G.marcasLineares(0, xmax, 13, 1),
           formataY: function () { return ''; }
@@ -4713,7 +4715,7 @@
         G.curva(ax, function (x) { return x <= 0 ? 0 : 1.5 * Math.sqrt(x); },
                 G.COR.suave, 1.6, [5, 4]);
         G.curva(ax, ocup, G.COR.azul, 2.6);
-        G.vertical(ax, 1, G.COR.tinta, 'ε\u2093', true);
+        G.vertical(ax, 1, G.COR.tinta, 'energia de Fermi', true);
         if (Math.abs(m - 1) > 0.02) G.vertical(ax, m, G.COR.vinho, 'μ', true);
         G.legenda(ax, [
           { cor: G.COR.suave, texto: 'densidade de estados g(ε) ∝ √ε' },
@@ -4918,7 +4920,7 @@
           + ' K. Acima disso os fônons dominam de longe, e é por isso que o calor específico '
           + 'eletrônico ficou invisível por meio século: a 300 K ele responde por menos de 1% '
           + 'do total. A teoria clássica, que daria \\(\\frac32\\kB\\) por elétron, erraria o '
-          + 'calor específico de um metal por um fator de cinquenta.</p>'
+          + 'calor específico de um metal por quase duas ordens de grandeza.</p>'
         : '<p>Na escala completa o termo eletrônico (azul) é uma reta tão baixa que quase se '
           + 'confunde com o eixo, enquanto a curva de Debye sobe e satura em \\(3R\\), o valor '
           + 'de Dulong-Petit. O que se mede num calorímetro comum é essencialmente a rede.</p>'
@@ -5184,7 +5186,7 @@
         }
         var ax2 = G.eixos(cv, {
           xmin: 0, xmax: pmax, ymin: 0, ymax: ymax * 1.1 || 1, altura: 300,
-          rotX: 'momento p (unidades de √(2mk\u2088T_c))',
+          rotX: 'momento, em unidades de √(2m kT_c)',
           rotY: 'átomos por intervalo de momento',
           marcasX: G.marcasLineares(0, pmax, 8, 1),
           formataY: function () { return ''; }
@@ -5358,7 +5360,7 @@
       ct.fillStyle = G.COR.vinho;
       ct.font = '600 11px system-ui, sans-serif';
       ct.textAlign = 'left'; ct.textBaseline = 'bottom';
-      ct.fillText('nível de Fermi', xb0 + 6, Y(mu) - 3);
+      ct.fillText('nível de Fermi', xb1 + 6, Y(mu) - 3);
 
       /* rótulos das bandas */
       ct.fillStyle = G.COR.tinta;
@@ -5371,7 +5373,8 @@
         ct.fillStyle = '#ffffff';
         ct.fillText('banda de valência', (xb0 + xb1) / 2, Y(emin / 2));
         ct.fillStyle = G.COR.suave;
-        ct.fillText('E_g = ' + F.fmt(M.Eg, 2) + ' eV', (xb0 + xb1) / 2, Y(M.Eg / 2));
+        ct.fillText('separação: ' + F.fmt(M.Eg, 2) + ' eV',
+                    (xb0 + xb1) / 2, Y(M.Eg * 0.22));
       }
 
       /* eixo de energia à esquerda */
@@ -5411,9 +5414,7 @@
         eg: M.Eg === 0 ? 'sem separação' : F.fmt(M.Eg, 2) + ' eV',
         kt: F.fmt(kt, 4) + ' eV',
         raz: M.Eg === 0 ? '—' : F.fmt(M.Eg / kt, 1),
-        ni: ni === null ? '~10²²' : (ni < 1e-3 || ni > 1e6
-            ? ni.toExponential(2).replace('.', ',').replace('e', '×10^')
-            : F.fmt(ni, 2)),
+        ni: ni === null ? '~10²²' : F.fmt(ni, 2),
         rel: ni === null ? 'não muda' : '×' + F.fmt(ni / ni300, 3)
       });
 
@@ -5633,8 +5634,8 @@
         nr: 'hiperesfera',
         ur: 'hiper-octaedro',
         om: 'E^{N/2} ou E^{N}',
-        en: '½Nk\u2088T ou Nk\u2088T',
-        cc: '½k\u2088 ou k\u2088'
+        en: '½NkT ou NkT',
+        cc: '½k ou k'
       });
 
       nota.innerHTML = est.vista === 'duas'
@@ -5670,6 +5671,185 @@
           + '<p>Nada disso usou a função de partição, o ensemble canônico ou a distribuição '
           + 'de Boltzmann. Saiu de contar pontos dentro de um sólido geométrico, que é o que '
           + 'o ensemble microcanônico sempre foi.</p>';
+      tipografar(nota);
+    }
+
+    registrarRedesenho(desenhar);
+    tipografar(corpo);
+  };
+
+  /* =================================================================
+     29. A esfera de Fermi deslocada
+     Sob campo, toda a esfera escorrega de δk = eEτ/ħ. Só a casquinha
+     em forma de lua muda de ocupação, e é dela que vem a corrente.
+     O deslocamento real é ridículo: no cobre a 1 V/m vale 3×10⁻⁹ do
+     raio, e o widget precisa exagerá-lo para que apareça.
+     ================================================================= */
+  REGISTRO.deriva = function (raiz) {
+    var corpo = moldura(raiz, 'A esfera de Fermi deslocada: de onde vem a corrente');
+
+    var n = 8.47e28;               // elétrons de condução no cobre, m⁻³
+    var sigma = 5.96e7;            // condutividade medida, S/m
+    var est = { logE: 4, logAmp: 4 };
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'campo elétrico', 0, 8, 0.1, 4,
+      function (v) { est.logE = v; desenhar(); },
+      function (v) { return F.fmt(Math.pow(10, v), 0) + ' V/m'; });
+    deslizante(ctr, 'ampliação do deslocamento na figura', 0, 9, 0.1, 4,
+      function (v) { est.logAmp = v; desenhar(); },
+      function (v) { return '×' + F.fmt(Math.pow(10, v), 0); });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'k<sub>F</sub>', k: 'kf' }, { rot: 'v<sub>F</sub>', k: 'vf' },
+      { rot: 'τ', k: 'tau' }, { rot: 'livre caminho médio', k: 'lc' },
+      { rot: 'velocidade de deriva', k: 'vd' },
+      { rot: 'δk/k<sub>F</sub> de verdade', k: 'dk' },
+      { rot: 'δk/k<sub>F</sub> na figura', k: 'dkfig' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    var kF = Math.pow(3 * Math.PI * Math.PI * n, 1 / 3);
+    var vF = F.C.hbar * kF / F.C.me;
+    var tau = sigma * F.C.me / (n * F.C.e * F.C.e);
+
+    function desenhar() {
+      var campo = Math.pow(10, est.logE);
+      var dkReal = F.C.e * campo * tau / F.C.hbar;
+      var vd = F.C.e * campo * tau / F.C.me;
+
+      var p = G.preparar(cv, 320);
+      var ct = p.ct, L = p.L, A = p.A;
+      var R = Math.min(L * 0.28, A * 0.34);
+      var cx = L * 0.42, cy = A / 2 - 4;
+      /* O deslocamento desenhado é o real multiplicado pela ampliação do
+         deslizante, e não um valor inventado: com ampliação 1 e campo de
+         10^8 V/m a figura já mostra o deslocamento em escala verdadeira.
+         O teto de meio raio é só para a figura não sair do quadro. */
+      var fracao = Math.min(0.5, (dkReal / kF) * Math.pow(10, est.logAmp));
+      var d = fracao * R;
+
+      /* eixos */
+      ct.strokeStyle = G.COR.grade; ct.lineWidth = 1;
+      ct.beginPath();
+      ct.moveTo(cx - R * 1.7, cy); ct.lineTo(cx + R * 1.7, cy);
+      ct.moveTo(cx, cy - R * 1.5); ct.lineTo(cx, cy + R * 1.5);
+      ct.stroke();
+
+      /* a esfera deslocada, preenchida */
+      ct.fillStyle = 'rgba(44,95,141,.20)';
+      ct.beginPath(); ct.arc(cx + d, cy, R, 0, 2 * Math.PI); ct.fill();
+
+      /* as duas luas: o que ganhou e o que perdeu ocupação */
+      if (d > 0.5) {
+        ct.save();
+        ct.beginPath(); ct.arc(cx + d, cy, R, 0, 2 * Math.PI); ct.clip();
+        ct.beginPath(); ct.arc(cx, cy, R, 0, 2 * Math.PI);
+        ct.fillStyle = 'rgba(31,111,84,.55)';
+        ct.rect(cx - 2 * R, cy - 2 * R, 4 * R, 4 * R);
+        ct.fill('evenodd');
+        ct.restore();
+
+        ct.save();
+        ct.beginPath(); ct.arc(cx, cy, R, 0, 2 * Math.PI); ct.clip();
+        ct.beginPath(); ct.arc(cx + d, cy, R, 0, 2 * Math.PI);
+        ct.fillStyle = 'rgba(140,47,57,.45)';
+        ct.rect(cx - 2 * R, cy - 2 * R, 4 * R, 4 * R);
+        ct.fill('evenodd');
+        ct.restore();
+      }
+
+      /* contornos */
+      ct.save();
+      ct.setLineDash([5, 4]);
+      ct.strokeStyle = G.COR.suave; ct.lineWidth = 1.6;
+      ct.beginPath(); ct.arc(cx, cy, R, 0, 2 * Math.PI); ct.stroke();
+      ct.restore();
+      ct.strokeStyle = G.COR.azul; ct.lineWidth = 2.6;
+      ct.beginPath(); ct.arc(cx + d, cy, R, 0, 2 * Math.PI); ct.stroke();
+
+      /* a seta do deslocamento */
+      if (d > 2) {
+        ct.strokeStyle = G.COR.tinta; ct.lineWidth = 1.6;
+        ct.beginPath(); ct.moveTo(cx, cy - R - 16); ct.lineTo(cx + d, cy - R - 16);
+        ct.stroke();
+        ct.beginPath();
+        ct.moveTo(cx + d, cy - R - 16);
+        ct.lineTo(cx + d - 6, cy - R - 19); ct.lineTo(cx + d - 6, cy - R - 13);
+        ct.closePath(); ct.fillStyle = G.COR.tinta; ct.fill();
+        ct.font = '600 11px system-ui, sans-serif';
+        ct.textAlign = 'center'; ct.textBaseline = 'bottom';
+        ct.fillText('δk = eEτ/ħ', cx + d / 2, cy - R - 20);
+      }
+
+      ct.font = '600 11px system-ui, sans-serif';
+      ct.fillStyle = G.COR.suave;
+      ct.textAlign = 'left'; ct.textBaseline = 'top';
+      ct.fillText('kₓ, na direção do campo', cx - R * 1.66, cy + 7);
+
+      /* legenda à direita */
+      var lx = Math.min(L - 16, cx + R * 1.75 + 14), ly = cy - 40;
+      ct.font = '11px system-ui, sans-serif';
+      ct.textAlign = 'left'; ct.textBaseline = 'middle';
+      [['rgba(31,111,84,.75)', 'passaram a ser ocupados'],
+       ['rgba(140,47,57,.65)', 'ficaram vazios'],
+       [G.COR.azul, 'esfera sob campo'],
+       [G.COR.suave, 'esfera em equilíbrio']].forEach(function (it, k) {
+        ct.fillStyle = it[0];
+        ct.fillRect(lx, ly + k * 18 - 5, 11, 10);
+        ct.fillStyle = G.COR.tinta;
+        ct.fillText(it[1], lx + 17, ly + k * 18);
+      });
+
+      mostrar({
+        kf: F.fmt(kF / 1e10, 3) + '×10¹⁰ m⁻¹',
+        vf: F.fmt(vF / 1e6, 3) + '×10⁶ m/s',
+        tau: F.fmt(tau * 1e15, 1) + ' fs',
+        lc: F.fmt(vF * tau * 1e9, 1) + ' nm',
+        vd: (vd < 1 ? F.fmt(vd * 1000, 2) + ' mm/s' : F.fmt(vd, 3) + ' m/s'),
+        dk: F.fmt(dkReal / kF, 2),
+        dkfig: F.fmt(fracao, 3) + (fracao >= 0.4999 ? ' (no teto)' : '')
+      });
+
+      nota.innerHTML =
+        '<p>Sob campo, a equação de Boltzmann no tempo de relaxação tem uma solução de '
+        + 'uma linha: a distribuição de equilíbrio inteira <b>escorrega</b> no espaço dos '
+        + '\\(\\vec k\\) por \\(\\delta k=eE\\tau/\\hbar\\), sem mudar de forma. É a esfera '
+        + 'cheia deslocada da tracejada.</p>'
+        + '<p>Repare no que isso significa. O interior das duas esferas se cancela: lá, para '
+        + 'cada elétron movendo-se para a direita há outro movendo-se para a esquerda, e a '
+        + 'contribuição à corrente é nula. Só as duas luas contam, e elas vivem na '
+        + '<b>superfície de Fermi</b>. É a tradução geométrica de '
+        + '\\(\\partial\\bar n/\\partial\\epsilon\\approx-\\delta(\\epsilon-\\epsilon_F)\\), e '
+        + 'é por isso que a condutividade acaba sendo uma integral sobre a superfície, '
+        + '\\(\\sigma=\\frac{e^2}{4\\pi^3\\hbar}\\int_{\\epsilon=\\epsilon_F}'
+        + '\\frac{v_x^2}{v}\\tau\\,dS\\), e não sobre o volume.</p>'
+        + '<p>Agora o escândalo das escalas, que é o motivo de a figura precisar de uma '
+        + 'ampliação. No cobre, no campo escolhido, o deslocamento real é '
+        + F.fmt(dkReal / kF, 2)
+        + ' do raio da esfera, e a velocidade de deriva é a mesma fração da velocidade '
+        + 'de Fermi. Os elétrons voam a ' + F.fmt(vF / 1e6, 2) + '×10⁶ m/s e derivam a '
+        + (vd < 1 ? F.fmt(vd * 1000, 2) + ' mm/s' : F.fmt(vd, 3) + ' m/s')
+        + ': a corrente é um viés minúsculo sobre um movimento caótico violentíssimo. '
+        + 'E eles escorregam <em>contra</em> o campo, por terem carga negativa, ainda que '
+        + 'a corrente convencional siga com ele.</p>'
+        + '<p>O segundo deslizante é uma lupa, e ela é honesta: o que a figura desenha é o '
+        + 'deslocamento verdadeiro multiplicado por ela, não um valor inventado. Ponha a '
+        + 'ampliação em 1 e o campo no máximo, \\(10^8\\) V/m, e a figura passa a mostrar o '
+        + 'deslocamento em escala real. Esse campo, porém, é dez vezes maior que a rigidez '
+        + 'dielétrica do ar: para ver a esfera escorregar de verdade é preciso destruir a '
+        + 'amostra antes.</p>'
+        + '<p>Os três números do meio saem de \\(\\sigma=ne^2\\tau/m\\) com o \\(\\sigma\\) '
+        + 'medido do cobre: \\(\\tau=25\\) fs e um livre caminho médio de 39 nm, uns cento e '
+        + 'cinquenta espaçamentos atômicos. Drude, que não sabia de exclusão de Pauli, '
+        + 'obteve a mesma fórmula com a velocidade térmica clássica no lugar de '
+        + '\\(v_F\\), errando o livre caminho médio por cem vezes mas acertando '
+        + '\\(\\sigma\\), porque \\(v\\) não aparece nela.</p>';
       tipografar(nota);
     }
 

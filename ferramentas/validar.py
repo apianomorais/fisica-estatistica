@@ -79,6 +79,23 @@ for p in paginas:
         if a != b:
             erros.append('%s: <%s> %d aberturas, %d fechamentos' % (p, tag, a, b))
 
+# 11. nos widgets, LaTeX escrito com uma barra invertida só. Dentro de uma
+#     string JavaScript, "\(" vira "(" e "\sigma" vira "sigma": a barra some
+#     antes de o MathJax ver a expressão, e a fórmula chega destruída à
+#     página. Toda barra de LaTeX em widgets.js tem de ser dupla.
+BARRA = re.compile(r'(?<!\\)\\[(\[\])a-zA-Z]')
+PERMITIDAS = {'\\n', '\\t', '\\r', '\\u', '\\d', '\\s', '\\w', '\\b', '\\f', '\\v'}
+js = os.path.join('assets', 'js', 'widgets.js')
+if os.path.exists(js):
+    tj = open(js, encoding='utf-8').read()
+    for m in BARRA.finditer(tj):
+        if m.group(0) in PERMITIDAS:
+            continue
+        linha = tj[:m.start()].count('\n') + 1
+        erros.append('widgets.js:%d: "%s" com uma barra só; o JavaScript a '
+                     'engole antes do MathJax (use barra dupla)'
+                     % (linha, m.group(0)))
+
 print('páginas: %d' % len(paginas))
 if erros:
     print('\n'.join(erros))
