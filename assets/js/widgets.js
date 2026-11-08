@@ -6017,6 +6017,212 @@
     mostrar();
   };
 
+  /* =================================================================
+     31. Modelo de Potts sem interação
+     Um estado fundamental e q−1 estados excitados degenerados. Em q = 2
+     é o sistema de dois níveis da seção 11; em q = 3 é o caso do
+     σ = 0, ±1. A degenerescência entra como um 2^{n} na contagem, e é
+     ela que desloca o pico de Schottky e leva a entropia a kB ln q.
+     ================================================================= */
+  REGISTRO.potts = function (raiz) {
+    var est = { q: 3, vista: 'contagem', N: 6 };
+    var corpo = moldura(raiz, 'O modelo de Potts: q estados por sítio');
+
+    var ctr0 = el('div', { class: 'controles' });
+    corpo.appendChild(ctr0);
+    opcoes(ctr0, [
+      { rot: 'Contagem de estados', v: 'contagem' },
+      { rot: 'Energia e entropia', v: 'termo' },
+      { rot: 'Calor específico', v: 'calor' }
+    ], 0, function (v) { est.vista = v; desenhar(); });
+
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var ctr = el('div', { class: 'controles' });
+    corpo.appendChild(ctr);
+    deslizante(ctr, 'estados por sítio q', 2, 10, 1, 3,
+      function (v) { est.q = v; desenhar(); },
+      function (v) { return String(v); });
+    var desN = deslizante(ctr, 'número de sítios N', 2, 14, 1, 6,
+      function (v) { est.N = v; desenhar(); },
+      function (v) { return String(v); });
+
+    var mostrar = cartoes(corpo, [
+      { rot: 'configurações q<sup>N</sup>', k: 'tot' },
+      { rot: 'níveis de energia', k: 'niv' },
+      { rot: 'u/μ quando T → ∞', k: 'uinf' },
+      { rot: 's/k<sub>B</sub> quando T → ∞', k: 'sinf' },
+      { rot: 'pico de c em k<sub>B</sub>T/μ', k: 'tp' },
+      { rot: 'altura do pico', k: 'cp' }
+    ]);
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    /* Ω(n) = C(N,n)·(q−1)^n: escolhe quais n sítios estão excitados e,
+       para cada um, qual dos q−1 estados excitados ele ocupa. */
+    function lnOmega(n, N, q) {
+      return F.lnBinom(N, n) + n * Math.log(q - 1);
+    }
+    function u(x, q) { return (q - 1) / (Math.exp(x) + q - 1); }      // u/μ
+    function entropia(x, q) {                                         // s/kB
+      return Math.log(1 + (q - 1) * Math.exp(-x)) + x * u(x, q);
+    }
+    function calor(x, q) {                                            // c/kB
+      var g = q - 1, e = Math.exp(x);
+      return g * x * x * e / ((e + g) * (e + g));
+    }
+
+    function desenhar() {
+      var q = est.q, N = est.N;
+
+      if (est.vista === 'contagem') {
+        var maior = 0;
+        for (var n = 0; n <= N; n++) maior = Math.max(maior, lnOmega(n, N, q));
+        var ax = G.eixos(cv, {
+          xmin: -0.6, xmax: N + 0.6, ymin: 0, ymax: Math.exp(maior) * 1.15,
+          altura: 300,
+          rotX: 'número de sítios excitados n (energia E = nμ)',
+          rotY: 'microestados Ω(n)',
+          marcasX: G.marcasInteiras(0, N),
+          formataY: function (v) { return F.fmt(v, 0); }
+        });
+        for (var k = 0; k <= N; k++) {
+          G.barras(ax, [{ x: k, y: Math.exp(lnOmega(k, N, q)) }],
+                   k === 0 ? G.COR.azul : G.COR.vinho, 0.72);
+        }
+        /* para comparar: a binomial sem a degenerescência, que é o caso q=2 */
+        if (q > 2) {
+          ax.ct.save();
+          ax.ct.strokeStyle = G.COR.ambar;
+          ax.ct.lineWidth = 2;
+          ax.ct.setLineDash([5, 4]);
+          ax.ct.beginPath();
+          for (var j = 0; j <= N; j++) {
+            var yb = Math.exp(F.lnBinom(N, j));
+            if (j === 0) ax.ct.moveTo(ax.X(j), ax.Y(yb));
+            else ax.ct.lineTo(ax.X(j), ax.Y(yb));
+          }
+          ax.ct.stroke();
+          ax.ct.restore();
+          G.legenda(ax, [
+            { cor: G.COR.vinho, texto: 'Ω(n) = C(N,n)(q−1)ⁿ' },
+            { cor: G.COR.ambar, texto: 'só C(N,n): o caso q = 2' }
+          ]);
+        }
+      } else if (est.vista === 'termo') {
+        var ax2 = G.eixos(cv, {
+          xmin: 0, xmax: 4, ymin: 0, ymax: Math.max(1.05, Math.log(q) * 1.12),
+          altura: 300,
+          rotX: 'temperatura kT/μ', rotY: 'por sítio',
+          marcasX: G.marcasLineares(0, 4, 8, 0),
+          formataY: function (v) { return F.fmt(v, 1); }
+        });
+        G.curva(ax2, function (t) { return t <= 0 ? 0 : u(1 / t, q); },
+                G.COR.azul, 2.8);
+        G.curva(ax2, function (t) { return t <= 0 ? 0 : entropia(1 / t, q); },
+                G.COR.vinho, 2.8);
+        G.curva(ax2, function () { return (q - 1) / q; }, G.COR.azul, 1.4, [5, 4]);
+        G.curva(ax2, function () { return Math.log(q); }, G.COR.vinho, 1.4, [5, 4]);
+        G.legenda(ax2, [
+          { cor: G.COR.azul, texto: 'u/μ → (q−1)/q' },
+          { cor: G.COR.vinho, texto: 's/k → ln q' }
+        ]);
+      } else {
+        var ax3 = G.eixos(cv, {
+          xmin: 0, xmax: 2.2, ymin: 0, ymax: 2.3, altura: 300,
+          rotX: 'temperatura kT/μ', rotY: 'calor específico c/k',
+          marcasX: G.marcasLineares(0, 2.2, 11, 1),
+          formataY: function (v) { return F.fmt(v, 1); }
+        });
+        [2, 3, 4, 6, 10].forEach(function (qq) {
+          var cor = qq === q ? G.COR.vinho : G.COR.grade;
+          G.curva(ax3, function (t) { return t <= 0 ? 0 : calor(1 / t, qq); },
+                  cor, qq === q ? 3 : 1.4);
+        });
+        G.legenda(ax3, [
+          { cor: G.COR.vinho, texto: 'q = ' + q },
+          { cor: G.COR.grade, texto: 'q = 2, 3, 4, 6, 10' }
+        ]);
+      }
+
+      /* o pico de Schottky, achado pela raiz da derivada de c em x = μ/kT */
+      var xp = F.bissecao(function (x) {
+        var h = 1e-5;
+        return calor(x + h, q) - calor(x - h, q);
+      }, 0.5, 12, 1e-10);
+      var tp = xp ? 1 / xp : NaN;
+
+      mostrar({
+        tot: F.fmt(Math.pow(q, N), 0),
+        niv: '2 (0 e μ)',
+        uinf: F.fmt((q - 1) / q, 4),
+        sinf: F.fmt(Math.log(q), 4),
+        tp: F.fmt(tp, 4),
+        cp: F.fmt(calor(xp, q), 4)
+      });
+
+      nota.innerHTML = est.vista === 'contagem'
+        ? '<p>Cada sítio tem \\(q\\) estados: um fundamental, de energia zero, e '
+          + '\\(q-1\\) excitados, todos de energia \\(\\mu\\). No caso \\(q=3\\) dos '
+          + 'slides, com \\(\\sigma=0,\\pm1\\) e '
+          + '\\(\\hat{H}=\\mu\\sum_i\\sigma_i^2\\), os dois estados \\(\\sigma=\\pm1\\) '
+          + 'têm a mesma energia porque \\(\\sigma^2\\) não distingue o sinal.</p>'
+          + '<p>Contar é escolher <em>quais</em> \\(n\\) sítios estão excitados, o que dá '
+          + '\\(\\binom{N}{n}\\), e depois <em>qual</em> dos \\(q-1\\) estados cada um '
+          + 'ocupa, o que dá \\((q-1)^n\\):</p>'
+          + '<p>\\[\\Omega(n)=\\binom{N}{n}\\left(q-1\\right)^{n}'
+          + '=\\frac{N!}{n!\\left(N-n\\right)!}\\left(q-1\\right)^{n}.\\]</p>'
+          + '<p>A curva tracejada é o que se teria sem a degenerescência, isto é, o '
+          + 'sistema de dois níveis da seção 11. O fator \\((q-1)^n\\) <b>inclina</b> a '
+          + 'distribuição para a direita: o máximo deixa de estar em \\(n=N/2\\) e vai '
+          + 'para \\(n=N(q-1)/q\\), porque há mais maneiras de estar excitado do que de '
+          + 'estar no fundamental. Toda a diferença entre Potts e dois níveis é essa '
+          + 'inclinação.</p>'
+        : est.vista === 'termo'
+        ? '<p>Da entropia \\(s=\\kB\\ln\\Omega\\) com Stirling, e de '
+          + '\\(\\partial s/\\partial u=1/T\\), sai</p>'
+          + '<p>\\[\\frac{\\mu}{\\kB T}=\\ln\\frac{\\left(q-1\\right)\\left(1-u/\\mu\\right)}'
+          + '{u/\\mu}\\quad\\Longrightarrow\\quad'
+          + '\\boxed{\\;u=\\frac{\\left(q-1\\right)\\mu}{e^{\\mu/\\kB T}+q-1}\\;}\\]</p>'
+          + '<p>que para \\(q=3\\) é o \\(u=2\\mu/(2+e^{\\mu/\\kB T})\\) dos slides. Vale a '
+          + 'pena conferir pelo outro caminho: no ensemble canônico, '
+          + '\\(z=1+(q-1)e^{-\\beta\\mu}\\) e \\(u=-\\partial\\ln z/\\partial\\beta\\) dão a '
+          + 'mesma expressão em três linhas, e as duas entropias coincidem até a última '
+          + 'casa da máquina. Os ensembles concordam, como têm de concordar.</p>'
+          + '<p>Os dois patamares são o conteúdo físico. Em temperatura alta todos os '
+          + '\\(q\\) estados ficam igualmente prováveis, de modo que '
+          + '\\(s\\to\\kB\\ln q\\) (a entropia de \\(q\\) possibilidades equiprováveis) e '
+          + '\\(u\\to\\mu(q-1)/q\\) (a fração de estados que custam \\(\\mu\\)). Em '
+          + 'temperatura zero só o fundamental sobrevive, \\(s\\to0\\), que é a terceira '
+          + 'lei aparecendo sozinha.</p>'
+        : '<p>O calor específico é</p>'
+          + '<p>\\[\\frac{c}{\\kB}=\\left(q-1\\right)'
+          + '\\left(\\frac{\\mu}{\\kB T}\\right)^2'
+          + '\\frac{e^{\\mu/\\kB T}}{\\left(e^{\\mu/\\kB T}+q-1\\right)^2},\\]</p>'
+          + '<p>a <b>anomalia de Schottky</b>: um pico e nada mais. Não há calor '
+          + 'específico em temperatura baixa, porque não há energia suficiente para '
+          + 'excitar ninguém, nem em temperatura alta, porque os níveis já estão '
+          + 'saturados e aquecer mais não muda as ocupações. Só na faixa '
+          + '\\(\\kB T\\sim\\mu\\) o sistema absorve calor.</p>'
+          + '<p>Aumentar \\(q\\) faz duas coisas ao pico: ele <b>sobe</b>, porque há mais '
+          + 'entropia a liberar, e <b>desloca-se para a esquerda</b>, porque a '
+          + 'degenerescência favorece a excitação e ela acontece mais cedo. Para '
+          + '\\(q=2\\) o pico vale 0,4392 em \\(\\kB T/\\mu=0{,}4168\\), que é o número da '
+          + 'seção 11; para \\(q=10\\) vale 2,0584 em 0,2859.</p>'
+          + '<p>Esse perfil é assinatura experimental de nível discreto, e aparece em '
+          + 'sais paramagnéticos, em defeitos de cristais e em sistemas de dois níveis de '
+          + 'vidros a baixa temperatura. Encontrar um pico de Schottky num calorímetro é '
+          + 'encontrar um conjunto de níveis separados por \\(\\mu\\approx\\kB T_{\\rm '
+          + 'pico}/0{,}42\\).</p>';
+      tipografar(nota);
+      desN.parentNode.style.display = est.vista === 'contagem' ? '' : 'none';
+    }
+
+    registrarRedesenho(desenhar);
+    tipografar(corpo);
+  };
+
   /* ---------- inicialização ---------- */
   document.addEventListener('DOMContentLoaded', function () {
     Array.prototype.forEach.call(document.querySelectorAll('[data-widget]'), function (n) {

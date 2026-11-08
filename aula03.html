@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Módulo 3: Caminhante aleatório e estados microscópicos | Física Estatística</title>
 <link rel="icon" type="image/png" href="assets/img/favicon.png">
-<link rel="stylesheet" href="assets/css/estilo.css?v=202611072214">
-<script src="assets/js/comum.js?v=202611072214"></script>
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611072217">
+<script src="assets/js/comum.js?v=202611072217"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
 <body>
@@ -49,12 +49,13 @@
     <li><a href="#s10">10. O ensemble microcanônico</a></li>
     <li><a href="#s11">11. Sistema de dois níveis</a></li>
     <li><a href="#s12">12. Temperaturas negativas e o laser</a></li>
-    <li><a href="#s13">13. O sólido de Einstein</a></li>
-    <li><a href="#s14">14. O paramagneto e a lei de Curie</a></li>
-    <li><a href="#s15">15. Equilíbrio térmico</a></li>
-    <li><a href="#s16">16. Equilíbrio mecânico e químico</a></li>
-    <li><a href="#s17">17. Exercícios resolvidos</a></li>
-    <li><a href="#s18">18. Exercícios propostos</a></li>
+    <li><a href="#s13">13. O modelo de Potts</a></li>
+    <li><a href="#s14">14. O sólido de Einstein</a></li>
+    <li><a href="#s15">15. O paramagneto e a lei de Curie</a></li>
+    <li><a href="#s16">16. Equilíbrio térmico</a></li>
+    <li><a href="#s17">17. Equilíbrio mecânico e químico</a></li>
+    <li><a href="#s18">18. Exercícios resolvidos</a></li>
+    <li><a href="#s19">19. Exercícios propostos</a></li>
   </ol>
 </aside>
 
@@ -697,7 +698,84 @@
   </div>
 
   <!-- ================================================== -->
-  <h2 id="s13">13. O sólido de Einstein</h2>
+  <h2 id="s13">13. O modelo de Potts</h2>
+
+  <p>O sistema de dois níveis foi resolvido inteiro com uma binomial. Vale perguntar o que
+  muda quando cada sítio tem mais de dois estados para escolher, e a resposta é instrutiva:
+  muda um fator, e esse fator reorganiza tudo.</p>
+
+  <p>O <strong>modelo de Potts</strong> permite que o spin de cada sítio assuma \(q\)
+  valores. Ele leva o nome de Renfrey Potts, matemático australiano que o descreveu em 1951,
+  no fim de sua tese de doutorado, e é hoje um dos modelos mais estudados em transições de
+  fase. Aqui tomamos a versão <em>sem interação</em>, que é a que cabe no microcanônico
+  elementar; a versão com acoplamento entre vizinhos fica para o Módulo 9.</p>
+
+  <p>Comece pelo caso \(q=3\), com \(\sigma_i=0,\pm1\) e hamiltoniana</p>
+
+  <p>\[\hat H=\mu\sum_{i=1}^{N}\sigma_i^2.\]</p>
+
+  <p>São \(3^N\) configurações distintas, mas <strong>nem todas têm energias distintas</strong>:
+  como \(\sigma^2\) não distingue \(+1\) de \(-1\), os dois estados \(\sigma=\pm1\) custam a
+  mesma energia \(\mu\). Há portanto só dois níveis, 0 e \(\mu\), e o segundo é duplamente
+  degenerado.</p>
+
+  <p>Chamando \(n_0\) o número de sítios com \(\sigma=0\) e \(n_\pm=n_++n_-\) o número dos
+  excitados, temos \(N=n_0+n_\pm\) e \(E=\mu n_\pm\). As configurações com dados
+  \(n_-,n_0,n_+\) são</p>
+
+  <p>\[\Omega\left(n_-,n_0,n_+\right)=\frac{N!}{n_-!\,n_0!\,n_+!},\]</p>
+
+  <p>mas a energia não distingue \(n_+\) de \(n_-\), e o que interessa é somar sobre todas as
+  repartições de \(n_\pm\) entre os dois sinais. Essa soma é um binômio de Newton e vale
+  \(2^{n_\pm}\):</p>
+
+  <p>\[\Omega\left(n_0,N\right)=\frac{N!}{n_0!\left(N-n_0\right)!}\,2^{N-n_0}
+  \qquad\Longrightarrow\qquad
+  \Omega\left(E,N\right)=\frac{N!}{\left(\frac{E}{\mu}\right)!\left(N-\frac{E}{\mu}\right)!}
+  \,2^{E/\mu}.\]</p>
+
+  <div data-widget="potts"></div>
+
+  <p>A entropia sai de \(S=\kB\ln\Omega\) com Stirling. Dividindo por \(N\) e deixando
+  \(N\to\infty\), os termos em \(\ln N\) se cancelam e sobra, com \(u=E/N\),</p>
+
+  <p>\[\frac{s}{\kB}\approx\frac{u}{\mu}\ln 2
+  -\frac{u}{\mu}\ln\frac{u}{\mu}
+  -\left(1-\frac{u}{\mu}\right)\ln\left(1-\frac{u}{\mu}\right).\]</p>
+
+  <p>Derivando, \(\partial s/\partial u=1/T\) dá</p>
+
+  <p>\[\frac{\mu}{\kB T}\approx\ln\frac{2\left(1-u/\mu\right)}{u/\mu}
+  \qquad\Longrightarrow\qquad
+  \boxed{\;u=\frac{2\mu}{2+e^{\mu/\kB T}}\;}\]</p>
+
+  <p>e em geral, para \(q\) estados com um fundamental e \(q-1\) excitados degenerados,</p>
+
+  <p>\[u=\frac{\left(q-1\right)\mu}{e^{\mu/\kB T}+q-1},\qquad
+  \frac{s}{\kB}\xrightarrow[T\to\infty]{}\ln q,\qquad
+  \frac{u}{\mu}\xrightarrow[T\to\infty]{}\frac{q-1}{q}.\]</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">A degenerescência é o modelo inteiro</span>
+    <p>Compare com a seção 11 e veja que a única novidade é o fator \(\left(q-1\right)^n\) na
+    contagem. Ele não cria nenhum nível novo: o espectro continua sendo dois níveis, 0 e
+    \(\mu\). O que ele faz é dizer que há \(q-1\) maneiras de estar excitado e uma só de
+    estar no fundamental, e essa assimetria de <em>contagem</em> tem três consequências
+    mensuráveis.</p>
+    <p>A entropia de alta temperatura vai a \(\kB\ln q\) em vez de \(\kB\ln2\), que é a
+    entropia de \(q\) possibilidades equiprováveis. A energia satura em \(\mu(q-1)/q\) em vez
+    de \(\mu/2\), que é a fração de estados que custam \(\mu\). E o pico de Schottky
+    <em>desloca-se para temperaturas mais baixas</em>, porque com mais destinos disponíveis
+    a excitação compensa mais cedo: de \(\kB T/\mu=0{,}4168\) em \(q=2\) para \(0{,}2859\) em
+    \(q=10\).</p>
+    <p>Vale notar que a mesma conta sai do canônico em três linhas, com
+    \(z=1+\left(q-1\right)e^{-\beta\mu}\), e que as duas entropias coincidem até a última
+    casa decimal disponível na máquina. É um bom teste da equivalência dos ensembles num
+    caso em que as duas contas são curtas o bastante para fazer à mão.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s14">14. O sólido de Einstein</h2>
 
   <p>Em 1906 Einstein propôs o modelo mais simples possível para um sólido: \(N\) osciladores
   harmônicos quânticos, independentes, todos de mesma frequência \(\omega\). A energia total é</p>
@@ -769,7 +847,7 @@
   </div>
 
   <!-- ================================================== -->
-  <h2 id="s14">14. O paramagneto e a lei de Curie</h2>
+  <h2 id="s15">15. O paramagneto e a lei de Curie</h2>
 
   <p>Considere \(N\) spins que não interagem entre si, cada um com momento magnético de
   módulo \(\mu_0\), num campo externo \(\vec B\). A energia de um spin é
@@ -827,7 +905,7 @@
   </div>
 
   <!-- ================================================== -->
-  <h2 id="s15">15. Equilíbrio térmico</h2>
+  <h2 id="s16">16. Equilíbrio térmico</h2>
 
   <p>Falta a pergunta mais importante do módulo: <em>por que</em> dois corpos em contato
   acabam na mesma temperatura? A resposta não usa nenhuma lei nova.</p>
@@ -866,7 +944,7 @@
   <div data-widget="equilibrio"></div>
 
   <!-- ================================================== -->
-  <h2 id="s16">16. Equilíbrio mecânico e químico</h2>
+  <h2 id="s17">17. Equilíbrio mecânico e químico</h2>
 
   <p>O argumento se repete palavra por palavra, mudando apenas o que a parede deixa passar.</p>
 
@@ -907,7 +985,7 @@
   </div>
 
   <!-- ================================================== -->
-  <h2 id="s17">17. Exercícios resolvidos</h2>
+  <h2 id="s18">18. Exercícios resolvidos</h2>
 
   <div class="bloco ex">
     <span class="rotulo">Exercício resolvido 3.1: o caminhante assimétrico</span>
@@ -991,7 +1069,7 @@
   </div>
 
   <!-- ================================================== -->
-  <h2 id="s18">18. Exercícios propostos</h2>
+  <h2 id="s19">19. Exercícios propostos</h2>
 
   <div class="bloco def">
     <span class="rotulo">Para resolver</span>
@@ -1048,6 +1126,6 @@
   Laboratório de Física Computacional Aplicada (LFCA) · Universidade Regional do Cariri</p>
 </footer>
 
-<script src="assets/js/widgets.js?v=202611072214"></script>
+<script src="assets/js/widgets.js?v=202611072217"></script>
 </body>
 </html>
