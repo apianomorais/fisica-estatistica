@@ -62,7 +62,7 @@
 <main class="conteudo">
 
   <p class="chapeu">Módulo 2 · Fundamentos</p>
-  <h1>Métodos estatísticos</h1>
+  <h1>Métodos estatísticos e Mecânica Clássica</h1>
   <p class="subtitulo">Duas ferramentas precisam estar afiadas antes de contar microestados:
   a linguagem das probabilidades, que diz o que é uma média e quanto ela flutua, e a mecânica
   de Hamilton, que transforma o estado de um sistema num único ponto num espaço. Juntas, elas
@@ -85,11 +85,11 @@
   <!-- ================================================== -->
   <h2 id="s1">1. Da contagem à probabilidade</h2>
 
-  <p>Comece pelo caso mais simples possível. Lance dois dados honestos e anote a soma. O
+  <p>Começaremos pelo caso mais simples possível. Lance dois dados honestos e anote a soma. O
   resultado é um inteiro entre 2 e 12, e à primeira vista nada mais se pode dizer: o valor da
   próxima jogada é imprevisível.</p>
 
-  <p>Mas repita. Com dez lançamentos a contagem é errática. Com cem, um padrão começa a se
+  <p>Agora, repita. Com dez lançamentos a contagem é errática. Com cem, um padrão começa a se
   formar. Com dez mil, o histograma assenta sobre uma forma triangular com pico em 7, e
   repetir o experimento não muda mais essa forma. Dividindo cada contagem pelo total, obtém-se
   a <strong>densidade de probabilidade</strong>.</p>
@@ -98,7 +98,7 @@
 
   <div class="bloco fisica">
     <span class="rotulo">Duas maneiras de chegar à mesma distribuição</span>
-    <p>O widget obtém a distribuição por <em>frequência</em>: conta e divide. Mas aqui é
+    <p>O widget obtém a distribuição por <em>frequência</em>, onde ele conta e divide. Mas aqui é
     possível obtê-la também por <em>enumeração</em>, sem lançar nada. Há \(6\times 6=36\)
     configurações possíveis, todas igualmente prováveis a priori, e basta contar quantas dão
     cada soma: uma dá 2, duas dão 3, três dão 4, e assim por diante até seis darem 7.</p>
@@ -209,7 +209,7 @@
   <h2 id="s5">5. Variáveis contínuas</h2>
 
   <p>Quando \(x\) varia continuamente, perguntar a probabilidade de um valor exato não faz
-  sentido: ela é zero. O que tem sentido é a probabilidade de cair num intervalo, e o objeto
+  sentido, pois ela é zero. O que tem sentido é a probabilidade de cair num intervalo, e o objeto
   natural passa a ser a densidade \(\wp(x)\), definida de modo que \(\wp(x)\,dx\) seja a
   probabilidade de encontrar a variável entre \(x\) e \(x+dx\). As somas viram integrais:</p>
 
@@ -228,8 +228,8 @@
   </table>
   </div>
 
-  <p>Repare que \(\wp(x)\) agora tem <strong>dimensão</strong>: inverso da dimensão de \(x\),
-  para que \(\wp\,dx\) seja um número puro. Essa observação parece burocrática e não é. No
+  <p>Repare que \(\wp(x)\) agora tem <strong>dimensão</strong>, que é o inverso da dimensão de \(x\),
+  para que \(\wp\,dx\) seja um número puro. Essa observação parece burocrática, mas não é. No
   espaço de fase, mais adiante, a densidade terá dimensão de inverso de
   \((\text{posição}\times\text{momento})^f\), e perguntar qual é a unidade natural dessa
   quantidade leva diretamente à constante de Planck.</p>
@@ -243,8 +243,8 @@
   <!-- ================================================== -->
   <h2 id="s6">6. Coordenadas generalizadas</h2>
 
-  <p>Na mecânica clássica o estado de um sistema é dado pelas posições e velocidades de suas
-  partes. Nada obriga a usar coordenadas cartesianas: para um pêndulo, o ângulo \(\theta\) com
+  <p>Na Mecânica Clássica o estado de um sistema é dado pelas posições e velocidades de suas
+  partes. Nada obriga a usar coordenadas cartesianas. Por exemplo: para um pêndulo, o ângulo \(\theta\) com
   a vertical basta; para um corpo rígido, convém dar as três cartesianas do centro de massa
   mais os três ângulos de orientação; para duas partículas que interagem, as coordenadas do
   centro de massa, a distância entre elas e os ângulos da linha que as une.</p>
@@ -271,7 +271,7 @@
   <!-- ================================================== -->
   <h2 id="s7">7. O princípio de Hamilton</h2>
 
-  <p>Aqui a mecânica muda de forma. Em vez de perguntar que força age sobre a partícula agora,
+  <p>Em vez de perguntar que força age sobre a partícula agora,
   pergunta-se qual é, entre todos os caminhos que levam da configuração inicial em \(t_1\) à
   final em \(t_2\), aquele que a natureza escolhe. A resposta é o <strong>princípio de
   Hamilton</strong>:</p>
@@ -364,7 +364,7 @@
 
   <div class="bloco fisica">
     <span class="rotulo">Então para que trocar de formalismo</span>
-    <p>Por três razões, e as três importam aqui. A formulação lagrangiana <strong>não depende
+    <p>Por três razões. A formulação lagrangiana <strong>não depende
     da escolha de coordenadas</strong>, o que permite usar ângulos e distâncias sem precisar
     decompor forças. Ela liga <strong>simetrias a leis de conservação</strong> pelo teorema de
     Noether: se \(L\) não depende de \(q_i\), o momento \(p_i\) se conserva. E, decisivamente
@@ -490,18 +490,18 @@
 
   <div class="bloco fisica">
     <span class="rotulo">Por que inventar um ensemble</span>
-    <p>Parece um artifício, e a motivação é honesta: <strong>não sabemos</strong> o estado
+    <p>Parece um artifício, pois <strong>não sabemos</strong> o estado
     microscópico do gás à nossa frente, e nunca saberemos. O que sabemos são as poucas
     grandezas macroscópicas que medimos. O ensemble é a maneira de ser explícito sobre essa
     ignorância: em vez de inventar um microestado, consideramos todos os compatíveis com o que
-    se sabe e tomamos médias. A física estatística é, nesse sentido exato, a arte de calcular
+    se sabe e tomamos médias. A Física Estatística é, nesse sentido exato, a arte de calcular
     com informação incompleta sem mentir sobre o quanto falta.</p>
   </div>
 
   <!-- ================================================== -->
   <h2 id="s13">13. O teorema de Liouville</h2>
 
-  <p>A pergunta agora é como \(\rho\) evolui. Considere um hipervolume fixo no espaço de fase
+  <p>Considere um hipervolume fixo no espaço de fase
   e conte os pontos que entram e saem. Pelas duas faces perpendiculares ao eixo \(q_1\), o
   fluxo de entrada por unidade de tempo é \(\rho\,\dot q_1\,\delta q_2\cdots\delta p_f\) e o de
   saída é o mesmo produto avaliado em \(q_1+\delta q_1\), isto é</p>
@@ -601,7 +601,7 @@
   </div>
 
   <p>No ensemble de superfície a densidade não é uniforme sobre a superfície de energia, e a
-  razão é geométrica: onde a superfície \(H=E\) está mais "apertada", isto é, onde o gradiente
+  razão disso é geométrica, onde a superfície \(H=E\) está mais "apertada", isto é, onde o gradiente
   \(|\nabla E|\) é grande, os pontos atravessam depressa e se acumulam menos. O fator
   \(1/v_p\), com \(v_p\) a velocidade dos pontos representativos no espaço de fase, corrige
   exatamente isso.</p>
@@ -624,7 +624,7 @@
   <!-- ================================================== -->
   <h2 id="s15">15. Equiprobabilidade e ergodicidade</h2>
 
-  <p>Falta um ingrediente que nenhuma dedução fornece, e que precisa ser postulado.</p>
+  <p>Falta um ingrediente que nenhuma dedução fornece, e que ainda precisa ser postulado.</p>
 
   <div class="bloco def">
     <span class="rotulo">Hipótese de igual probabilidade a priori</span>
