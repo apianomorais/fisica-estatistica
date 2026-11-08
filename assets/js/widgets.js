@@ -1238,13 +1238,28 @@
     /* P0 é a pressão a 0 °C, que depende só da quantidade de gás posta no
        bulbo. tmin é a temperatura abaixo da qual aquele gás deixa de ser gás:
        ali a medida acaba e começa a extrapolação. */
+    /* tmin é o ponto em que aquele gás deixa de ser gás à pressão de uma
+       atmosfera, e portanto onde a medida acaba e começa a extrapolação.
+         zero é o zero absoluto deduzido daquele gás por termometria a volume
+       constante, quando existe valor publicado. Os valores e a sua origem
+       estão na Encyclopædia Britannica de 1911, verbete Thermometry, que
+       resume o trabalho do BIPM. Onde não há valor medido, a reta é traçada
+       no valor adotado hoje e o cartaz diz isso. */
     var GASES = [
-      { nome: 'hélio', P0: 118, tmin: -268.9, cor: '#2c5f8d' },
-      { nome: 'hidrogênio', P0: 96, tmin: -252.9, cor: '#1f6f54' },
-      { nome: 'nitrogênio', P0: 74, tmin: -195.8, cor: '#b5831f' },
-      { nome: 'oxigênio', P0: 52, tmin: -183.0, cor: '#8c2f39' },
-      { nome: 'gás carbônico', P0: 31, tmin: -78.5, cor: '#7a5ea8' },
-      { nome: 'ar (mistura)', P0: 62, tmin: -194.0, cor: '#1b7f9e', mistura: true }
+      { nome: 'hélio', P0: 118, tmin: -268.93, cor: '#2c5f8d',
+        zero: 273.13, fonte: 'Travers, do coeficiente de pressão' },
+      { nome: 'hidrogênio', P0: 96, tmin: -252.87, cor: '#1f6f54',
+        zero: 273.03, fonte: 'Chappuis, BIPM, a 100 cm de pressão inicial' },
+      { nome: 'nitrogênio', P0: 74, tmin: -195.79, cor: '#b5831f',
+        zero: 273.10, fonte: 'calculado, não medido diretamente' },
+      { nome: 'oxigênio', P0: 52, tmin: -182.96, cor: '#8c2f39',
+        zero: null, fonte: 'sem valor publicado que eu tenha localizado' },
+      { nome: 'gás carbônico', P0: 31, tmin: -78.46, cor: '#7a5ea8',
+        zero: 273.05, fonte: 'Chappuis, já corrigido: o bruto erra de 4,6 a 5,8 °C',
+        subl: true },
+      { nome: 'ar (mistura)', P0: 62, tmin: -194.35, cor: '#1b7f9e',
+        zero: null, mistura: true,
+        fonte: 'sem valor publicado que eu tenha localizado' }
     ];
 
     var est = { P0: 140, zoom: false };
@@ -1266,37 +1281,52 @@
     ctr.appendChild(cx);
 
     var mostrar = cartoes(corpo, [
-      { rot: 'cruzamento do seu gás', k: 'z' },
+      { rot: 'valor adotado hoje', k: 'z' },
       { rot: 'coeficiente \\(\\alpha=\\frac{1}{P_0}\\frac{dP}{dt}\\)', k: 'a' },
-      { rot: '1/α', k: 'ia' }
+      { rot: 'dispersão entre os gases medidos', k: 'ia' }
     ]);
     var nota = el('div', { class: 'saida' });
     corpo.appendChild(nota);
 
     function desenhar() {
-      var tmin = est.zoom ? -290 : -300;
-      var tmax = est.zoom ? -255 : 160;
-      var pmax = est.zoom ? 14 : 260;
+      /* A ampliação precisa ser muito maior do que era: a dispersão entre
+         os zeros medidos é de dois décimos de grau, e numa janela de 35
+         graus ela some. */
+      var tmin = est.zoom ? -273.22 : -300;
+      var tmax = est.zoom ? -272.96 : 160;
+      var pmax = est.zoom ? 0.10 : 260;
 
       var ax = G.eixos(cv, {
         xmin: tmin, xmax: tmax, ymin: 0, ymax: pmax, altura: 340,
         rotX: 'temperatura t (°C)', rotY: 'pressão P (kPa)',
         marcasX: est.zoom
-          ? [-290, -283, -273.15, -266, -259].map(function (v) {
-              return { v: v, r: v === -273.15 ? '-273,15' : String(v) };
+          ? [-273.20, -273.15, -273.10, -273.05, -273.00].map(function (v) {
+              return { v: v, r: F.fmt(v, 2) };
             })
           : [-300, -200, -100, 0, 100].map(function (v) {
               return { v: v, r: String(v) };
             }),
-        formataY: function (v) { return String(Math.round(v)); }
+        formataY: function (v) { return est.zoom ? F.fmt(v, 2) : String(Math.round(v)); }
       });
 
       var ct = ax.ct;
       var todos = GASES.concat([{ nome: 'o seu gás', P0: est.P0,
                                   tmin: -270, cor: '#1b1f24', seu: true }]);
 
+      /* Nitrogênio e ar liquefazem a um grau e meio um do outro, e o
+         oxigênio logo adiante: os rótulos escalonam em três alturas, pela
+         ordem em que os pontos aparecem da esquerda para a direita. */
+      var ordem = GASES.slice().sort(function (a2, b2) { return a2.tmin - b2.tmin; });
+      var nivel = {};
+      /* o terceiro nível vai acima do ponto: abaixo ele esbarraria nos
+         números do eixo */
+      ordem.forEach(function (g, k) { nivel[g.nome] = [9, 24, -14][k % 3]; });
+
       todos.forEach(function (g) {
-        var P = function (t) { return g.P0 * (1 + t / 273.15); };
+        /* ampliado, só os gases cujo zero foi de fato medido */
+        if (est.zoom && !g.zero) return;
+        var z = g.zero || 273.15;
+        var P = function (t) { return g.P0 * (1 + t / z); };
 
         // trecho medido: do ponto em que o gás liquefaz para cima
         ct.save();
@@ -1311,18 +1341,54 @@
         ct.setLineDash([5, 4]);
         ct.lineWidth = 1.3;
         ct.beginPath();
-        ct.moveTo(ax.X(ZERO), ax.Y(0));
+        ct.moveTo(ax.X(-z), ax.Y(0));
         ct.lineTo(ax.X(Math.max(g.tmin, tmin)), ax.Y(P(Math.max(g.tmin, tmin))));
         ct.stroke();
         ct.restore();
 
-        // onde a medida acaba
+        // onde a medida acaba: o gás liquefaz e não há mais o que medir
         if (g.tmin > tmin && g.tmin < tmax && !g.seu) {
           ct.save();
-          ct.fillStyle = g.cor;
+          var xl = ax.X(g.tmin), yl = ax.Y(P(g.tmin));
+          /* queda até o eixo, para localizar a temperatura */
+          ct.strokeStyle = g.cor;
+          ct.globalAlpha = 0.35;
+          ct.setLineDash([2, 3]);
+          ct.lineWidth = 1;
           ct.beginPath();
-          ct.arc(ax.X(g.tmin), ax.Y(P(g.tmin)), 3.4, 0, 2 * Math.PI);
-          ct.fill();
+          ct.moveTo(xl, yl); ct.lineTo(xl, ax.y1); ct.stroke();
+          ct.setLineDash([]);
+          ct.globalAlpha = 1;
+          /* o ponto, com halo branco para destacar da reta */
+          ct.fillStyle = '#fff';
+          ct.beginPath(); ct.arc(xl, yl, 7, 0, 2 * Math.PI); ct.fill();
+          ct.fillStyle = g.cor;
+          ct.beginPath(); ct.arc(xl, yl, 5, 0, 2 * Math.PI); ct.fill();
+          ct.strokeStyle = '#fff'; ct.lineWidth = 1.4;
+          ct.beginPath(); ct.arc(xl, yl, 5, 0, 2 * Math.PI); ct.stroke();
+          if (!est.zoom) {
+            ct.fillStyle = g.cor;
+            ct.font = '600 10px system-ui, sans-serif';
+            ct.textAlign = 'center'; ct.textBaseline = 'top';
+            var dy = nivel[g.nome] || 9;
+            if (Math.abs(dy) > 9) {
+              ct.globalAlpha = 0.4;
+              ct.strokeStyle = g.cor; ct.lineWidth = 1;
+              ct.beginPath();
+              ct.moveTo(xl, yl + (dy > 0 ? 7 : -7));
+              ct.lineTo(xl, yl + dy + (dy > 0 ? -2 : 2));
+              ct.stroke();
+              ct.globalAlpha = 1;
+            }
+            ct.textBaseline = dy > 0 ? 'top' : 'bottom';
+            /* halo branco: o rótulo acima do ponto cruza as outras retas */
+            ct.strokeStyle = '#fff';
+            ct.lineWidth = 3.5;
+            ct.lineJoin = 'round';
+            ct.strokeText(F.fmt(g.tmin, 1) + '°', xl, yl + dy);
+            ct.fillStyle = g.cor;
+            ct.fillText(F.fmt(g.tmin, 1) + '°', xl, yl + dy);
+          }
           ct.restore();
         }
 
@@ -1338,7 +1404,7 @@
         }
       });
 
-      // o ponto de encontro
+      // o valor adotado hoje
       ct.save();
       ct.strokeStyle = G.COR.vinho;
       ct.setLineDash([3, 3]);
@@ -1348,31 +1414,77 @@
       ct.lineTo(ax.X(ZERO), ax.y1);
       ct.stroke();
       ct.setLineDash([]);
-      ct.fillStyle = G.COR.vinho;
-      ct.beginPath();
-      ct.arc(ax.X(ZERO), ax.Y(0), 4.5, 0, 2 * Math.PI);
-      ct.fill();
       ct.font = '600 11px system-ui, sans-serif';
       ct.textAlign = 'left';
       ct.textBaseline = 'top';
+      ct.fillStyle = G.COR.vinho;
       ct.fillText('-273,15 °C = 0 K', ax.X(ZERO) + 7, ax.y0 + 2);
+      if (!est.zoom) {
+        ct.beginPath();
+        ct.arc(ax.X(ZERO), ax.Y(0), 4.5, 0, 2 * Math.PI);
+        ct.fill();
+      }
       ct.restore();
 
-      var alfa = 1 / 273.15;
+      /* ampliado, cada gás cruza o eixo no seu próprio valor medido */
+      if (est.zoom) {
+        ct.save();
+        var medidos2 = GASES.filter(function (g) { return g.zero; })
+                             .sort(function (a2, b2) { return a2.zero - b2.zero; });
+        medidos2.forEach(function (g, k) {
+          var xz = ax.X(-g.zero);
+          var alturas = [96, 38, 150, 66];     // escalonadas, para não colidir
+          var yr = ax.Y(0) - alturas[k % alturas.length];
+          ct.strokeStyle = g.cor;
+          ct.globalAlpha = 0.45;
+          ct.lineWidth = 1;
+          ct.beginPath(); ct.moveTo(xz, ax.Y(0)); ct.lineTo(xz, yr + 4); ct.stroke();
+          ct.globalAlpha = 1;
+          ct.fillStyle = '#fff';
+          ct.beginPath(); ct.arc(xz, ax.Y(0), 7, 0, 2 * Math.PI); ct.fill();
+          ct.fillStyle = g.cor;
+          ct.beginPath(); ct.arc(xz, ax.Y(0), 5, 0, 2 * Math.PI); ct.fill();
+          ct.font = '600 10px system-ui, sans-serif';
+          ct.textAlign = 'center'; ct.textBaseline = 'bottom';
+          ct.fillText(g.nome + '  ' + F.fmt(-g.zero, 2), xz, yr);
+        });
+        ct.restore();
+      }
+
+      var medidos = GASES.filter(function (g) { return g.zero; })
+                         .map(function (g) { return g.zero; });
+      var lo = Math.min.apply(null, medidos), hi = Math.max.apply(null, medidos);
       mostrar({
-        z: '-273,15 °C',
-        a: F.fmt(alfa, 6) + ' /°C',
-        ia: F.fmt(1 / alfa, 2) + ' °C'
+        z: '-' + F.fmt(est.P0 ? 273.15 : 273.15, 2) + ' °C',
+        a: F.fmt(1 / 273.15, 6) + ' /°C',
+        ia: F.fmt(hi - lo, 2) + ' °C'
       });
 
       nota.innerHTML = est.zoom
-        ? 'Ampliado em torno do cruzamento: as cinco retas e a sua chegam ao eixo no mesmo '
-          + 'ponto. Nenhuma delas foi ajustada para isso. Nas medidas reais de Charles e de '
-          + 'Gay-Lussac, feitas com instrumentos do início do século XIX, o encontro já '
-          + 'aparecia dentro do erro experimental.'
+        ? '<p>Ampliado seiscentas vezes em torno do cruzamento, com <b>os zeros absolutos '
+          + 'realmente medidos</b> por termometria a gás a volume constante. Eles não '
+          + 'coincidem: o hidrogênio de Chappuis dá -273,03 °C, o hélio de Travers -273,13, '
+          + 'o nitrogênio -273,10 e o gás carbônico -273,05. A dispersão é de um décimo '
+          + 'de grau. O mesmo hidrogênio, medido pelo coeficiente de dilatação em vez do de '
+          + 'pressão, dá -273,22, o que amplia a faixa para dois décimos.</p>'
+          + '<p>Um ou dois décimos num resultado obtido de substâncias quimicamente distintas, por '
+          + 'instrumentos diferentes, continua sendo espantoso. Mas é importante que não '
+          + 'seja zero, porque a diferença é física e não erro: nenhum gás real é ideal, e '
+          + 'cada um se afasta da reta do seu próprio jeito. O caso extremo é o gás '
+          + 'carbônico, cujo termômetro bruto erra de 4,6 a 5,8 graus e só chega a -273,05 '
+          + 'depois da correção termodinâmica.</p>'
+          + '<p>É por isso que a definição moderna não diz "use um gás". Ela ancora a escala '
+          + 'no ponto triplo da água e manda extrapolar a pressão de enchimento a zero, '
+          + 'onde todo gás vira ideal e a discordância desaparece por construção.</p>'
+          + '<p class="nota-lateral">Valores de Chappuis (BIPM) e de Travers conforme a '
+          + '<a href="https://en.wikisource.org/wiki/1911_Encyclop%C3%A6dia_Britannica/Thermometry">'
+          + 'Encyclopædia Britannica de 1911, verbete <i>Thermometry</i></a>. O do '
+          + 'nitrogênio é calculado, não medido diretamente; para oxigênio e ar não localizei '
+          + 'valor publicado, e suas retas usam o valor adotado hoje.</p>'
         : 'Mude a quantidade do seu gás: a reta gira, mas <b>em torno do mesmo ponto</b>. '
-          + 'Os círculos marcam onde cada gás liquefaz e a medida acaba: do hélio em -268,9 °C '
-          + 'ao gás carbônico em -78,5 °C. Dali para a esquerda tudo é extrapolação '
+          + 'Os pontos cheios marcam onde cada gás <b>liquefaz</b> e a medida acaba: do '
+          + 'hélio em -268,9 °C ao gás carbônico, que a uma atmosfera nem passa pelo '
+          + 'líquido e sublima em -78,5 °C. Dali para a esquerda tudo é extrapolação '
           + 'tracejada, e é justamente por isso que o resultado impressiona: cinco '
           + 'substâncias quimicamente distintas, que nem sequer chegam juntas até lá, '
           + 'apontam todas para o mesmo lugar. Repare que o <b>ar</b> está na lista: é uma '
@@ -1911,8 +2023,43 @@
     var corpo = moldura(raiz, 'Quando o sistema tem um ponto no diagrama PV, e quando não tem');
 
     var V1 = 1.0, V2 = 0.42, P1 = 100;       // isoterma: PV = const
-    var est = { modo: 'lento', t: 0, rodando: false };
+    var NPOR = 7;                            // porções em que o gás é dividido
+    /* Localmente a compressão brusca é adiabática, mas com γ = 5/3 cheio a
+       nuvem salta para fora do quadro: o que importa aqui é a dispersão
+       entre as porções, e não o quanto a média sobe. O expoente efetivo
+       fica modesto para que as sete porções caibam na mesma figura. */
+    var GAMA = 1.15;
+    var est = { modo: 'lento', t: 0, r: 0, rodando: false };
     var rastro = [];
+
+    /* O gás é pensado como NPOR porções de mesma massa, que não são paredes
+       reais: são apenas regiões que acompanham o gás. Cada uma tem o seu
+       próprio volume e a sua própria pressão, e é a comparação entre elas
+       que diz se "a pressão do gás" existe.
+         c_j = v_j / (V1/NPOR) é o volume da porção em unidades do inicial.
+       Como Σ δ_j = 0 por simetria, Σ v_j = V exatamente, qualquer que seja
+       o desequilíbrio: o gás não ganha nem perde volume. */
+    function porcoes(t) {
+      var V = volume(t), s = desequilibrio(t), razao = V / V1;
+      var lista = [];
+      for (var j = 0; j < NPOR; j++) {
+        var d = 0.16 * (1 - 2 * j / (NPOR - 1));   // + longe do pistão, − junto
+        var c = razao * (1 + s * d);
+        /* comprimir depressa é localmente adiabático; devagar, isotérmico */
+        var gam = 1 + (GAMA - 1) * s;
+        lista.push({ c: c, P: P1 * Math.pow(c, -gam), fr: j / (NPOR - 1) });
+      }
+      return lista;
+    }
+
+    /* azul longe do pistão, vinho junto dele: a mesma cor identifica a
+       porção no cilindro e o seu ponto no diagrama */
+    function corPorcao(fr, alfa) {
+      var r = Math.round(44 + fr * (140 - 44));
+      var g = Math.round(95 + fr * (47 - 95));
+      var b = Math.round(141 + fr * (57 - 141));
+      return 'rgba(' + r + ',' + g + ',' + b + ',' + alfa + ')';
+    }
 
     var cv = el('canvas');
     corpo.appendChild(cv);
@@ -1927,7 +2074,7 @@
     var bP = el('button', { type: 'button', texto: 'comprimir' });
     var bR = el('button', { type: 'button', class: 'sec', texto: 'reiniciar' });
     bP.addEventListener('click', function () {
-      if (est.t >= 1) reiniciar();
+      if (est.t >= 1 && (est.modo === 'lento' || est.r >= 1)) reiniciar();
       est.rodando = true;
     });
     bR.addEventListener('click', reiniciar);
@@ -1936,7 +2083,9 @@
     var nota = el('div', { class: 'saida' });
     corpo.appendChild(nota);
 
-    function reiniciar() { est.t = 0; est.rodando = false; rastro = []; texto(); }
+    function reiniciar() {
+      est.t = 0; est.r = 0; est.rodando = false; rastro = []; texto();
+    }
 
     function volume(t) { return V1 + (V2 - V1) * t; }
     function pIsoterma(V) { return P1 * V1 / V; }
@@ -1945,7 +2094,11 @@
        dele: é essa diferença que impede falar em "a pressão do gás". */
     function desequilibrio(t) {
       if (est.modo === 'lento') return 0;
-      return (t > 0 && t < 1) ? 0.55 * Math.sin(Math.PI * t) : 0;
+      if (t <= 0) return 0;
+      /* cresce depressa no início do curso e só decai depois que o pistão
+         para, quando o banho térmico reequilibra o gás */
+      var cheio = Math.min(1, t / 0.18);
+      return cheio * Math.exp(-est.r * 4.5);
     }
 
     function desenhar() {
@@ -1961,17 +2114,31 @@
       var fracao = V / V1;
       var larg = larguraCil * fracao;
 
-      // gás, com gradiente quando há desequilíbrio
-      var g = ct.createLinearGradient(cx, 0, cx + larg, 0);
-      if (d > 0) {
-        g.addColorStop(0, 'rgba(44,95,141,.16)');
-        g.addColorStop(1, 'rgba(140,47,57,.52)');
-      } else {
-        g.addColorStop(0, 'rgba(44,95,141,.30)');
-        g.addColorStop(1, 'rgba(44,95,141,.30)');
-      }
-      ct.fillStyle = g;
-      ct.fillRect(cx, cy, larg, alt);
+      // as porções, desenhadas uma a uma com a sua própria largura
+      var ps = porcoes(t);
+      var soma = 0;
+      ps.forEach(function (q) { soma += q.c; });
+      var xx = cx;
+      ps.forEach(function (q) {
+        var lj = larguraCil * q.c / NPOR * (V1 / 1);
+        ct.fillStyle = d > 0.02 ? corPorcao(q.fr, 0.26 + 0.42 * q.fr)
+                                : 'rgba(44,95,141,.30)';
+        ct.fillRect(xx, cy, lj + 0.6, alt);
+        xx += lj;
+      });
+      // os limites entre porções, finos
+      ct.save();
+      ct.strokeStyle = 'rgba(255,255,255,.75)';
+      ct.lineWidth = 1;
+      xx = cx;
+      ps.forEach(function (q, j) {
+        xx += larguraCil * q.c / NPOR;
+        if (j < NPOR - 1) {
+          ct.beginPath();
+          ct.moveTo(xx, cy + 2); ct.lineTo(xx, cy + alt - 2); ct.stroke();
+        }
+      });
+      ct.restore();
 
       // paredes e pistão
       ct.strokeStyle = G.COR.tinta;
@@ -1983,6 +2150,12 @@
       ct.stroke();
       ct.fillStyle = G.COR.suave;
       ct.fillRect(cx + larg, cy, 9, alt);
+      ct.save();
+      ct.font = '10px system-ui, sans-serif';
+      ct.fillStyle = G.COR.suave;
+      ct.textAlign = 'left'; ct.textBaseline = 'bottom';
+      ct.fillText(NPOR + ' porções do gás', cx, cy - 6);
+      ct.restore();
 
       // seta do empurrão, maior no caso brusco
       ct.save();
@@ -2019,7 +2192,7 @@
       var gx = cx + larguraCil + 80, gl = p.L - gx - 18;
       if (gl < 140) return;
       var gy = 22, ga = 230;
-      var vmin = 0.3, vmax = 1.15, pmin = 60, pmax = 280;
+      var vmin = 0.3, vmax = 1.15, pmin = 60, pmax = 360;
       function X(v) { return gx + (v - vmin) / (vmax - vmin) * gl; }
       function Y(q) { return gy + ga - (q - pmin) / (pmax - pmin) * ga; }
 
@@ -2060,15 +2233,18 @@
       ct.restore();
 
       // estados inicial e final, sempre definidos
-      [[V1, P1, '1'], [V2, pIsoterma(V2), '2']].forEach(function (s) {
+      [[V1, P1, '1', 1], [V2, pIsoterma(V2), '2', -1]].forEach(function (s) {
         ct.save();
         ct.fillStyle = G.COR.tinta;
         ct.beginPath();
         ct.arc(X(s[0]), Y(s[1]), 4.5, 0, 2 * Math.PI);
         ct.fill();
         ct.font = '600 12px system-ui, sans-serif';
-        ct.textAlign = 'center';
-        ct.fillText(s[2], X(s[0]), Y(s[1]) - 11);
+        /* o rótulo do ponto 2 vai para a esquerda, onde a nuvem não passa */
+        ct.textAlign = s[3] > 0 ? 'center' : 'right';
+        ct.textBaseline = s[3] > 0 ? 'alphabetic' : 'middle';
+        ct.fillText(s[2], X(s[0]) + (s[3] > 0 ? 0 : -10),
+                    Y(s[1]) + (s[3] > 0 ? -11 : 0));
         ct.restore();
       });
 
@@ -2082,31 +2258,51 @@
           if (i) ct.lineTo(X(r[0]), Y(r[1])); else ct.moveTo(X(r[0]), Y(r[1]));
         });
         ct.stroke();
-        if (t > 0 && t < 1) {
-          ct.fillStyle = G.COR.vinho;
-          ct.beginPath();
-          ct.arc(X(V), Y(Pmedia), 4, 0, 2 * Math.PI);
-          ct.fill();
-        }
         ct.restore();
       } else {
-        // caminho inexistente: seta tracejada e uma interrogação
+        // o sistema foi de 1 a 2, mas não por caminho nenhum
         ct.save();
-        ct.strokeStyle = G.COR.vinho;
+        ct.strokeStyle = G.COR.suave;
         ct.setLineDash([6, 5]);
-        ct.lineWidth = 1.8;
+        ct.lineWidth = 1.4;
         ct.beginPath();
         var xa = X(V1), ya = Y(P1), xb = X(V2), yb = Y(pIsoterma(V2));
         ct.moveTo(xa, ya);
         ct.quadraticCurveTo((xa + xb) / 2 - 26, (ya + yb) / 2 - 34, xb, yb);
         ct.stroke();
-        ct.setLineDash([]);
-        if (t > 0 && t < 1) {
+        ct.restore();
+      }
+
+      /* As porções, uma por ponto. Devagar elas têm o mesmo volume e a mesma
+         pressão, e os sete pontos caem exatamente uns sobre os outros: é o
+         colapso num único ponto. Depressa, cada uma tem o seu par (V,P) e o
+         que aparece é uma nuvem. */
+      if (t > 0) {
+        ct.save();
+        ps.forEach(function (q) {
+          var xv = X(V1 * q.c), yv = Y(q.P);
+          if (xv < gx || xv > gx + gl || yv < gy || yv > gy + ga) return;
+          ct.fillStyle = d > 0.02 ? corPorcao(q.fr, 0.92) : G.COR.azul;
+          ct.beginPath();
+          ct.arc(xv, yv, 5, 0, 2 * Math.PI);
+          ct.fill();
+          ct.strokeStyle = '#fff'; ct.lineWidth = 1.1;
+          ct.stroke();
+        });
+        ct.restore();
+
+        /* quanto as porções discordam entre si */
+        var pmaior = ps[NPOR - 1].P, pmenor = ps[0].P;
+        ct.save();
+        ct.font = '600 11px system-ui, sans-serif';
+        ct.textAlign = 'left'; ct.textBaseline = 'top';
+        if (d > 0.02) {
           ct.fillStyle = G.COR.vinho;
-          ct.font = '700 20px system-ui, sans-serif';
-          ct.textAlign = 'center';
-          ct.textBaseline = 'middle';
-          ct.fillText('?', (xa + xb) / 2 - 16, (ya + yb) / 2 - 20);
+          ct.fillText('as 7 porções discordam: P de ' + F.fmt(pmenor, 0)
+                      + ' a ' + F.fmt(pmaior, 0) + ' kPa', gx, gy + ga + 42);
+        } else {
+          ct.fillStyle = G.COR.azul;
+          ct.fillText('as 7 porções coincidem num ponto só', gx, gy + ga + 42);
         }
         ct.restore();
       }
@@ -2114,16 +2310,23 @@
 
     function texto() {
       nota.innerHTML = est.modo === 'lento'
-        ? '<p>Comprimindo devagar, o gás tem tempo de se reacomodar a cada instante. A '
-          + 'pressão é a mesma em toda parte, e por isso o par \\((P,V)\\) existe e é único: '
-          + 'o sistema <b>tem um ponto</b> no diagrama. Uma sucessão de equilíbrios desenha '
-          + 'uma curva, e o trabalho \\(\\int P\\,dV\\) é a área sob ela.</p>'
-        : '<p>Comprimindo de repente, o gás junto ao pistão fica mais denso antes que o resto '
-          + 'perceba. Há pressões diferentes em pontos diferentes, e portanto <b>não existe '
-          + '"a pressão do gás"</b>. Sem \\(P\\) definida, não há ponto no diagrama: o '
-          + 'sistema some do gráfico durante o processo e só reaparece no fim, quando o '
-          + 'equilíbrio se restabelece.</p>'
-          + '<p>Por isso a seta aparece tracejada, com uma interrogação. Ela não é um '
+        ? '<p>O gás está dividido em sete porções, que não são paredes reais: são apenas '
+          + 'regiões que o acompanham. Comprimindo devagar, cada uma tem tempo de trocar '
+          + 'energia com as vizinhas, e todas chegam ao mesmo volume e à mesma pressão.</p>'
+          + '<p>No diagrama, isso é literal: os <b>sete pontos caem exatamente uns sobre os '
+          + 'outros</b>, e o que se vê é um ponto só. É esse colapso que autoriza falar em '
+          + '"a pressão do gás" e escrever o par \\((P,V)\\). Uma sucessão desses pontos '
+          + 'desenha a curva, e o trabalho \\(\\int P\\,dV\\) é a área sob ela.</p>'
+        : '<p>Comprimindo de repente, a porção junto ao pistão é comprimida antes que as '
+          + 'demais percebam. Cada uma passa a ter o seu próprio volume e a sua própria '
+          + 'pressão, e no diagrama os sete pontos <b>se espalham numa nuvem</b> em vez de '
+          + 'colapsarem. A cor de cada ponto diz de que porção do cilindro ele veio.</p>'
+          + '<p>Enquanto a nuvem existe, <b>não existe "a pressão do gás"</b>, e portanto '
+          + 'não existe um ponto do sistema no diagrama. Deixe a animação correr até o fim: '
+          + 'o pistão para, o banho térmico reequilibra o gás, as sete porções voltam a '
+          + 'concordar e só então a nuvem se recolhe sobre o ponto 2. O sistema reaparece '
+          + 'no gráfico.</p>'
+          + '<p>Por isso a seta aparece tracejada. Ela não é um '
           + 'caminho: é só um lembrete de que o sistema foi de 1 a 2. E por isso também '
           + '\\(\\int P\\,dV\\) não pode ser calculada aqui, embora o trabalho realizado '
           + 'exista e seja perfeitamente mensurável pela força no pistão. O estado inicial e '
@@ -2149,7 +2352,13 @@
           var V = volume(est.t);
           rastro.push([V, pIsoterma(V)]);
         }
-        if (est.t >= 1) est.rodando = false;
+      } else if (est.rodando && est.modo === 'brusco' && est.r < 1) {
+        /* o pistão parou: agora o banho térmico desfaz o desequilíbrio e a
+           nuvem se recolhe sobre o ponto 2 */
+        est.r = Math.min(1, est.r + dt / 1.6);
+        if (est.r >= 1) est.rodando = false;
+      } else if (est.rodando) {
+        est.rodando = false;
       }
       desenhar();
       requestAnimationFrame(quadro);

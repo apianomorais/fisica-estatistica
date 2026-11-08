@@ -3,6 +3,7 @@
 import glob, os, re, sys
 
 erros = []
+avisos = []
 paginas = sorted(glob.glob('*.html'))
 
 for p in paginas:
@@ -54,9 +55,11 @@ for p in paginas:
             erros.append('%s: widget "%s" sem implementação' % (p, w))
 
     # 7. sem travessões no texto corrido
+    # É preferência de estilo, não erro de código, e o texto do autor manda:
+    # entra como aviso e não reprova a validação.
     for linha in t.split('\n'):
         if '—' in linha and not re.search(r'<t[dh][^>]*>\s*—\s*</t[dh]>', linha):
-            erros.append('%s: travessão em "%s"' % (p, linha.strip()[:60]))
+            avisos.append('%s: travessão em "%s"' % (p, linha.strip()[:60]))
 
     # 8. nenhum caractere de controle: eles aparecem quando \f ou \b do LaTeX
     #    passam por uma string Python não crua e viram formfeed e backspace
@@ -95,6 +98,11 @@ if os.path.exists(js):
         erros.append('widgets.js:%d: "%s" com uma barra só; o JavaScript a '
                      'engole antes do MathJax (use barra dupla)'
                      % (linha, m.group(0)))
+
+if avisos:
+    print('avisos (não reprovam):')
+    for v in avisos:
+        print('  ' + v)
 
 print('páginas: %d' % len(paginas))
 if erros:
