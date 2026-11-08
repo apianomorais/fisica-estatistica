@@ -5737,18 +5737,24 @@
     /* ---- N = 3: esfera contra octaedro, em projeção isométrica ---- */
     function tres(p) {
       var ct = p.ct, L = p.L, A = p.A;
-      var R = Math.min(L, A) * 0.30;
-      var cxa = L * 0.29, cxb = L * 0.71, cy = A / 2 - 6;
+      /* Lado a lado só cabe em tela larga; numa estreita os dois sólidos
+         se sobrepõem, e então vão um sobre o outro. */
+      var estreito = L < 620;
+      var R = estreito ? Math.min(L * 0.26, A * 0.20) : Math.min(L, A) * 0.30;
+      var cxa = estreito ? L / 2 : L * 0.29;
+      var cxb = estreito ? L / 2 : L * 0.71;
+      var cya = estreito ? A * 0.26 : A / 2 - 6;
+      var cyb = estreito ? A * 0.70 : A / 2 - 6;
       var co = Math.cos(Math.PI / 6), si = Math.sin(Math.PI / 6);
 
-      function proj(cx, v) {
+      function proj(cx, cy, v) {
         return { x: cx + R * (v[0] - v[1]) * co,
                  y: cy + R * ((v[0] + v[1]) * si - v[2]) * 0.86 };
       }
-      function eixos3(cx) {
+      function eixos3(cx, cy) {
         ct.strokeStyle = G.COR.grade; ct.lineWidth = 1;
         [[1.5, 0, 0], [0, 1.5, 0], [0, 0, 1.5]].forEach(function (v, k) {
-          var a = proj(cx, [0, 0, 0]), b = proj(cx, v);
+          var a = proj(cx, cy, [0, 0, 0]), b = proj(cx, cy, v);
           ct.beginPath(); ct.moveTo(a.x, a.y); ct.lineTo(b.x, b.y); ct.stroke();
           ct.fillStyle = G.COR.suave;
           ct.font = '600 11px system-ui, sans-serif';
@@ -5758,18 +5764,18 @@
       }
 
       /* esfera */
-      eixos3(cxa);
+      eixos3(cxa, cya);
       ct.fillStyle = 'rgba(44,95,141,.16)';
-      ct.beginPath(); ct.arc(cxa, cy, R, 0, 2 * Math.PI); ct.fill();
+      ct.beginPath(); ct.arc(cxa, cya, R, 0, 2 * Math.PI); ct.fill();
       ct.strokeStyle = G.COR.azul; ct.lineWidth = 2.4;
-      ct.beginPath(); ct.arc(cxa, cy, R, 0, 2 * Math.PI); ct.stroke();
+      ct.beginPath(); ct.arc(cxa, cya, R, 0, 2 * Math.PI); ct.stroke();
       ct.lineWidth = 1.1;
       ct.strokeStyle = 'rgba(44,95,141,.5)';
-      ct.beginPath(); ct.ellipse(cxa, cy, R, R * 0.36, 0, 0, 2 * Math.PI); ct.stroke();
-      ct.beginPath(); ct.ellipse(cxa, cy, R * 0.36, R, 0, 0, 2 * Math.PI); ct.stroke();
+      ct.beginPath(); ct.ellipse(cxa, cya, R, R * 0.36, 0, 0, 2 * Math.PI); ct.stroke();
+      ct.beginPath(); ct.ellipse(cxa, cya, R * 0.36, R, 0, 0, 2 * Math.PI); ct.stroke();
 
       /* octaedro: as faces com soma de sinais positiva estão de frente */
-      eixos3(cxb);
+      eixos3(cxb, cyb);
       var V = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]];
       var faces = [];
       [1, -1].forEach(function (a) {
@@ -5782,8 +5788,8 @@
       /* primeiro as de trás, tracejadas */
       faces.forEach(function (f) {
         if (f.frente) return;
-        var pts = [proj(cxb, [f.s[0], 0, 0]), proj(cxb, [0, f.s[1], 0]),
-                   proj(cxb, [0, 0, f.s[2]])];
+        var pts = [proj(cxb, cyb, [f.s[0], 0, 0]), proj(cxb, cyb, [0, f.s[1], 0]),
+                   proj(cxb, cyb, [0, 0, f.s[2]])];
         ct.save();
         ct.setLineDash([4, 4]);
         ct.strokeStyle = 'rgba(181,131,31,.55)'; ct.lineWidth = 1.2;
@@ -5795,8 +5801,8 @@
       });
       faces.forEach(function (f) {
         if (!f.frente) return;
-        var pts = [proj(cxb, [f.s[0], 0, 0]), proj(cxb, [0, f.s[1], 0]),
-                   proj(cxb, [0, 0, f.s[2]])];
+        var pts = [proj(cxb, cyb, [f.s[0], 0, 0]), proj(cxb, cyb, [0, f.s[1], 0]),
+                   proj(cxb, cyb, [0, 0, f.s[2]])];
         ct.fillStyle = 'rgba(181,131,31,' + (f.s[0] + f.s[1] + f.s[2] === 3 ? '.30' : '.17') + ')';
         ct.strokeStyle = G.COR.ambar; ct.lineWidth = 2;
         ct.beginPath();
@@ -5808,12 +5814,11 @@
       ct.font = '600 12px system-ui, sans-serif';
       ct.textAlign = 'center'; ct.textBaseline = 'top';
       ct.fillStyle = G.COR.azul;
-      ct.fillText('esfera: Σp² = 2mE', cxa, A - 40);
+      ct.fillText('esfera: Σp² = 2mE  ·  volume 4πp³/3',
+                  cxa, estreito ? cya + R * 0.98 : A - 40);
       ct.fillStyle = G.COR.ambar;
-      ct.fillText('octaedro: Σ|p| = E/c', cxb, A - 40);
-      ct.fillStyle = G.COR.tinta;
-      ct.font = '12px system-ui, sans-serif';
-      ct.fillText('volume 4πp³/3   ·   volume 4p³/3', (cxa + cxb) / 2, A - 20);
+      ct.fillText('octaedro: Σ|p| = E/c  ·  volume 4p³/3',
+                  cxb, estreito ? cyb + R * 1.15 : A - 40);
     }
 
     function desenhar() {
@@ -5832,6 +5837,8 @@
         ]);
       } else {
         var p = G.preparar(cv, 320);
+        /* empilhado precisa de mais altura */
+        if (est.vista === 'tres' && p.L < 620) p = G.preparar(cv, 500);
         if (est.vista === 'duas') duas(p); else tres(p);
       }
 
@@ -5928,10 +5935,15 @@
       var dkReal = F.C.e * campo * tau / F.C.hbar;
       var vd = F.C.e * campo * tau / F.C.me;
 
+      /* Numa tela estreita não cabem a esfera e a legenda lado a lado: a
+         legenda desce para baixo da figura e o quadro fica mais alto. */
       var p = G.preparar(cv, 320);
+      var estreito = p.L < 560;
+      if (estreito) p = G.preparar(cv, 430);
       var ct = p.ct, L = p.L, A = p.A;
-      var R = Math.min(L * 0.28, A * 0.34);
-      var cx = L * 0.42, cy = A / 2 - 4;
+      var R = estreito ? Math.min(L * 0.33, 118) : Math.min(L * 0.28, A * 0.34);
+      var cx = estreito ? L / 2 : L * 0.42;
+      var cy = estreito ? R + 46 : A / 2 - 4;
       /* O deslocamento desenhado é o real multiplicado pela ampliação do
          deslizante, e não um valor inventado: com ampliação 1 e campo de
          10^8 V/m a figura já mostra o deslocamento em escala verdadeira.
@@ -5994,21 +6006,27 @@
 
       ct.font = '600 11px system-ui, sans-serif';
       ct.fillStyle = G.COR.suave;
-      ct.textAlign = 'left'; ct.textBaseline = 'top';
-      ct.fillText('kₓ, na direção do campo', cx - R * 1.66, cy + 7);
+      ct.textAlign = estreito ? 'center' : 'left';
+      ct.textBaseline = 'top';
+      ct.fillText('kₓ, na direção do campo',
+                  estreito ? cx : cx - R * 1.6,
+                  estreito ? cy + R + 12 : cy + 7);
 
-      /* legenda à direita */
-      var lx = Math.min(L - 16, cx + R * 1.75 + 14), ly = cy - 40;
+      /* legenda: à direita quando há espaço, embaixo quando não há */
+      var itens = [['rgba(31,111,84,.75)', 'passaram a ser ocupados'],
+                   ['rgba(140,47,57,.65)', 'ficaram vazios'],
+                   [G.COR.azul, 'esfera sob campo'],
+                   [G.COR.suave, 'esfera em equilíbrio']];
+      var lx = estreito ? 14 : Math.min(L - 16, cx + R * 1.75 + 14);
+      var ly = estreito ? cy + R + 46 : cy - 40;
       ct.font = '11px system-ui, sans-serif';
       ct.textAlign = 'left'; ct.textBaseline = 'middle';
-      [['rgba(31,111,84,.75)', 'passaram a ser ocupados'],
-       ['rgba(140,47,57,.65)', 'ficaram vazios'],
-       [G.COR.azul, 'esfera sob campo'],
-       [G.COR.suave, 'esfera em equilíbrio']].forEach(function (it, k) {
+      itens.forEach(function (it, k) {
+        var X = lx, Y = ly + k * 18;
         ct.fillStyle = it[0];
-        ct.fillRect(lx, ly + k * 18 - 5, 11, 10);
+        ct.fillRect(X, Y - 5, 11, 10);
         ct.fillStyle = G.COR.tinta;
-        ct.fillText(it[1], lx + 17, ly + k * 18);
+        ct.fillText(it[1], X + 17, Y);
       });
 
       mostrar({
@@ -7071,10 +7089,16 @@
 
     function desenhar(med) {
       if (est.vista === 'rede') {
+        /* Lado a lado em tela larga; em tela estreita a série temporal
+           desce para baixo da rede, em vez de desaparecer. */
         var p = G.preparar(cv, 340);
+        var largo = p.L > 640;
+        if (!largo) p = G.preparar(cv, 500);
         var ct = p.ct, Lp = p.L, A = p.A;
-        var lado = Math.min(A - 30, Lp * 0.52);
-        var ox = (Lp - lado) / 2 - (Lp > 640 ? Lp * 0.17 : 0), oy = (A - lado) / 2;
+        var lado = largo ? Math.min(A - 30, Lp * 0.52)
+                         : Math.min(Lp - 24, A * 0.60);
+        var ox = largo ? (Lp - lado) / 2 - Lp * 0.17 : (Lp - lado) / 2;
+        var oy = largo ? (A - lado) / 2 : 6;
         var img = ct.createImageData(L, L);
         for (var i = 0; i < N; i++) {
           var c = s[i] > 0 ? [140, 47, 57] : [237, 240, 243];
@@ -7096,10 +7120,12 @@
         ct.textAlign = 'center'; ct.textBaseline = 'top';
         ct.fillText(L + ' × ' + L + ' spins, contorno periódico',
                     ox + lado / 2, oy + lado + 8);
-        /* a série temporal da magnetização, ao lado */
-        if (Lp > 640) {
-          var gx0 = ox + lado + 34, gx1 = Lp - 16;
-          var gy0 = oy + 10, gy1 = oy + lado - 10;
+        /* a série temporal da magnetização, ao lado ou abaixo */
+        {
+          var gx0 = largo ? ox + lado + 34 : 16;
+          var gx1 = largo ? Lp - 16 : Lp - 16;
+          var gy0 = largo ? oy + 10 : oy + lado + 48;
+          var gy1 = largo ? oy + lado - 10 : A - 16;
           ct.strokeStyle = G.COR.grade; ct.lineWidth = 1;
           ct.beginPath();
           ct.moveTo(gx0, (gy0 + gy1) / 2); ct.lineTo(gx1, (gy0 + gy1) / 2);
@@ -7302,9 +7328,13 @@
 
     function desenhar() {
       var p = G.preparar(cv, 340);
+      var largo = p.L > 640;
+      if (!largo) p = G.preparar(cv, 500);
       var ct = p.ct, Lp = p.L, A = p.A;
-      var lado = Math.min(A - 8, Lp * 0.52);
-      var ox = (Lp - lado) / 2 - (Lp > 640 ? Lp * 0.17 : 0), oy = (A - lado) / 2;
+      var lado = largo ? Math.min(A - 30, Lp * 0.52)
+                       : Math.min(Lp - 24, A * 0.60);
+      var ox = largo ? (Lp - lado) / 2 - Lp * 0.17 : (Lp - lado) / 2;
+      var oy = largo ? (A - lado) / 2 : 6;
       if (!desenhar.aux) {
         desenhar.aux = document.createElement('canvas');
         desenhar.aux.width = L; desenhar.aux.height = L;
@@ -7331,9 +7361,11 @@
       ct.fillText('ψ > 0 em vinho, ψ < 0 em azul', ox + lado / 2, oy + lado + 8);
 
       /* ℓ(t) em escala log-log, onde a lei √t é uma reta de inclinação 1/2 */
-      if (Lp > 640 && serie.length > 3) {
-        var gx0 = ox + lado + 34, gx1 = Lp - 16;
-        var gy0 = oy + 16, gy1 = oy + lado - 10;
+      if (serie.length > 3) {
+        var gx0 = largo ? ox + lado + 34 : 16;
+        var gx1 = Lp - 16;
+        var gy0 = largo ? oy + 16 : oy + lado + 50;
+        var gy1 = largo ? oy + lado - 10 : A - 16;
         ct.strokeStyle = G.COR.grade; ct.lineWidth = 1;
         ct.strokeRect(gx0 + 0.5, gy0 + 0.5, gx1 - gx0 - 1, gy1 - gy0 - 1);
         var teto = L / 3;
