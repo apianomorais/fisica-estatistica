@@ -4698,7 +4698,7 @@
       { nome: 'Al', rot: 'alumínio', n: 18.1e28, gama: 1.35, thetaD: 428 }
     ];
 
-    var est = { i: 0, logt: -2, vista: 'dist' };
+    var est = { i: 0, logT: 2.477, vista: 'dist' };
 
     var ctr0 = el('div', { class: 'controles' });
     corpo.appendChild(ctr0);
@@ -4712,9 +4712,12 @@
 
     var ctr = el('div', { class: 'controles' });
     corpo.appendChild(ctr);
-    deslizante(ctr, 'temperatura T/T<sub>F</sub>', -3, 0.4, 0.02, -2,
-      function (v) { est.logt = v; desenhar(); },
-      function (v) { return F.fmt(Math.pow(10, v), 4); });
+    deslizante(ctr, 'temperatura', 1, 5.4, 0.02, 2.477,
+      function (v) { est.logT = v; desenhar(); },
+      function (v) {
+        var T = Math.pow(10, v);
+        return T < 1e4 ? F.fmt(T, 0) + ' K' : F.fmt(T / 1000, 1) + ' mil K';
+      });
     opcoes(ctr, METAIS.map(function (m) { return { rot: m.rot, v: m.nome }; }), 0,
       function (v) {
         METAIS.forEach(function (m, k) { if (m.nome === v) est.i = k; });
@@ -4723,7 +4726,7 @@
 
     var mostrar = cartoes(corpo, [
       { rot: 'ε<sub>F</sub>', k: 'ef' }, { rot: 'T<sub>F</sub>', k: 'tf' },
-      { rot: 'T equivalente', k: 'teq' }, { rot: 'μ/ε<sub>F</sub>', k: 'mu' },
+      { rot: 'T/T<sub>F</sub>', k: 'teq' }, { rot: 'μ/ε<sub>F</sub>', k: 'mu' },
       { rot: 'pressão a T = 0', k: 'p' }, { rot: 'v<sub>F</sub>', k: 'vf' }
     ]);
     var tabela = el('div', { class: 'tabela-rolavel' });
@@ -4778,30 +4781,49 @@
     function desenhar() {
       var M = METAIS[est.i];
       var eF = energiaFermi(M.n), TF = eF / F.C.kB;
-      var t = Math.pow(10, est.logt), m = muReduzido(t);
+      var T = Math.pow(10, est.logT);
+      var t = T / TF, m = muReduzido(t);
 
       if (est.vista === 'dist') {
-        /* a folga de 28% no topo é para a legenda não cair sobre a
-           curva tracejada da densidade de estados */
-        var xmax = 2.6, ymax = 1.5 * Math.sqrt(xmax) * 1.28;
-        var ocup = function (x) {
-          if (x <= 0) return 0;
-          var y = (x - m) / t;
-          return 1.5 * Math.sqrt(x) / (y > 700 ? Infinity : Math.exp(y) + 1);
+        /* Eixos absolutos, e não reduzidos: é o que faz a escolha do metal
+           mudar a figura. O sódio tem o degrau em 3,2 eV e o alumínio em
+           11,7 eV, e as alturas diferem porque as densidades diferem.
+           dn/dε = (8√2 π m^{3/2}/h³)√ε, aqui em 10²⁸ m⁻³ por eV. */
+        var CDE = 8 * Math.SQRT2 * Math.PI * Math.pow(F.C.me, 1.5)
+                  / Math.pow(F.C.h, 3) * Math.pow(F.C.e, 1.5) / 1e28;
+        var xmax = 20, ymax = 3.5;
+        var dens = function (eV) { return eV <= 0 ? 0 : CDE * Math.sqrt(eV); };
+        var ocup = function (eV) {
+          if (eV <= 0) return 0;
+          var y = (eV / (eF / F.C.e) - m) / t;
+          return dens(eV) / (y > 700 ? Infinity : Math.exp(y) + 1);
         };
         var ax = G.eixos(cv, {
           xmin: 0, xmax: xmax, ymin: 0, ymax: ymax, altura: 310,
-          rotX: 'energia em unidades da energia de Fermi',
-          rotY: 'elétrons por intervalo de energia',
-          marcasX: G.marcasLineares(0, xmax, 13, 1),
-          formataY: function () { return ''; }
+          rotX: 'energia do estado ε (eV)',
+          rotY: 'elétrons por eV (10²⁸ m⁻³)',
+          marcasX: G.marcasLineares(0, xmax, 10, 0),
+          formataY: function (v) { return F.fmt(v, 1); }
         });
         G.area(ax, ocup, 0, xmax, 'rgba(44,95,141,.24)');
-        G.curva(ax, function (x) { return x <= 0 ? 0 : 1.5 * Math.sqrt(x); },
-                G.COR.suave, 1.6, [5, 4]);
-        G.curva(ax, ocup, G.COR.azul, 2.6);
-        G.vertical(ax, 1, G.COR.tinta, 'energia de Fermi', true);
-        if (Math.abs(m - 1) > 0.02) G.vertical(ax, m, G.COR.vinho, 'μ', true);
+        G.curva(ax, dens, G.COR.suave, 1.6, [5, 4]);
+        /* as pontas dos outros metais, para comparar */
+        ax.ct.save();
+        ax.ct.font = '600 10px system-ui, sans-serif';
+        ax.ct.textAlign = 'center';
+        ax.ct.textBaseline = 'bottom';
+        METAIS.forEach(function (q, k) {
+          if (k === est.i) return;
+          var E = energiaFermi(q.n) / F.C.e;
+          ax.ct.fillStyle = 'rgba(120,128,138,.85)';
+          ax.ct.beginPath();
+          ax.ct.arc(ax.X(E), ax.Y(dens(E)), 2.6, 0, 2 * Math.PI);
+          ax.ct.fill();
+          ax.ct.fillText(q.nome, ax.X(E), ax.Y(dens(E)) - 5);
+        });
+        ax.ct.restore();
+        G.curva(ax, ocup, G.COR.azul, 2.8);
+        G.vertical(ax, eF / F.C.e, G.COR.tinta, 'ε de Fermi', true);
         G.legenda(ax, [
           { cor: G.COR.suave, texto: 'densidade de estados g(ε) ∝ √ε' },
           { cor: G.COR.azul, texto: 'n̄(ε) g(ε): o que está ocupado' }
@@ -4855,7 +4877,7 @@
       mostrar({
         ef: F.fmt(eF / F.C.e, 3) + ' eV',
         tf: F.fmt(TF, 0) + ' K',
-        teq: F.fmt(t * TF, 1) + ' K',
+        teq: F.fmt(t, 4),
         mu: F.fmt(m, 4),
         p: F.fmt(0.4 * M.n * eF / 1e9, 1) + ' GPa',
         vf: F.fmt(Math.sqrt(2 * eF / F.C.me) / 1e6, 3) + '×10⁶ m/s'
@@ -5190,7 +5212,8 @@
     corpo.appendChild(ctr0);
     opcoes(ctr0, [
       { rot: 'Fração condensada', v: 'fracao' },
-      { rot: 'Distribuição de momento', v: 'momento' }
+      { rot: 'Distribuição de momento', v: 'momento' },
+      { rot: 'O critério nλ³', v: 'criterio' }
     ], 0, function (v) { est.vista = v; desenhar(); });
 
     var cv = el('canvas');
@@ -5216,6 +5239,14 @@
     var nota = el('div', { class: 'saida' });
     corpo.appendChild(nota);
 
+    /* escolhe a potência de dez em que o momento desse sistema é legível */
+    function escalaP(p) {
+      if (p < 1e-30) return { f: 1e-33, rot: '10⁻³³ kg·m/s' };
+      if (p < 1e-27) return { f: 1e-30, rot: '10⁻³⁰ kg·m/s' };
+      if (p < 1e-24) return { f: 1e-27, rot: '10⁻²⁷ kg·m/s' };
+      return { f: 1e-24, rot: '10⁻²⁴ kg·m/s' };
+    }
+
     function Tc(n, m) {
       return 2 * Math.PI * F.C.hbar * F.C.hbar / (m * F.C.kB)
              * Math.pow(n / ZETA32, 2 / 3);
@@ -5224,35 +5255,105 @@
       return F.C.h / Math.sqrt(2 * Math.PI * m * F.C.kB * T);
     }
     function fracao(r) { return r >= 1 ? 0 : 1 - Math.pow(r, 1.5); }
+    /* as temperaturas aqui vão de 10⁻⁷ K a 10⁵ K: cada faixa, a sua unidade */
+    function cartaoT(x) {
+      if (x === 0) return '0';
+      if (x < 1e-6) return F.fmt(x * 1e9, 1) + ' nK';
+      if (x < 1e-3) return F.fmt(x * 1e6, 2) + ' μK';
+      if (x < 1) return F.fmt(x * 1e3, 2) + ' mK';
+      return F.fmt(x, 3) + ' K';
+    }
 
     function desenhar() {
       var S = SISTEMAS[est.i];
       var tc = Tc(S.n, S.m), T = est.r * tc, f0 = fracao(est.r);
 
       if (est.vista === 'fracao') {
+        /* Em T/T_c a curva é universal e não distingue os sistemas. Em
+           temperatura absoluta, e em escala logarítmica, cada um ocupa a
+           sua faixa: o rubídio em centenas de nanokelvin, o hélio em
+           kelvin, os elétrons do cobre em dezenas de milhares. */
+        var lc = Math.log10(tc);
+        var xa = lc - 1.6, xb = lc + 0.5;
         var ax = G.eixos(cv, {
-          xmin: 0, xmax: 1.6, ymin: 0, ymax: 1.05, altura: 300,
-          rotX: 'T / T_c', rotY: 'fração de partículas',
-          marcasX: G.marcasLineares(0, 1.6, 8, 1),
+          xmin: xa, xmax: xb, ymin: 0, ymax: 1.08, altura: 300,
+          rotX: 'log₁₀ da temperatura (K)', rotY: 'fração de partículas',
+          marcasX: G.marcasLineares(xa, xb, 7, 1),
           formataY: function (v) { return F.fmt(v, 1); }
         });
-        G.area(ax, fracao, 0, 1, 'rgba(44,95,141,.20)');
-        G.curva(ax, function (r) { return 1 - fracao(r); }, G.COR.ambar, 2, [6, 4]);
-        G.curva(ax, fracao, G.COR.azul, 2.8);
-        G.vertical(ax, 1, G.COR.tinta, 'T_c', true);
-        if (est.r > 0.01) {
-          G.vertical(ax, est.r, G.COR.vinho,
+        var fT = function (lg) { return fracao(Math.pow(10, lg) / tc); };
+        G.area(ax, fT, xa, lc, 'rgba(44,95,141,.20)');
+        G.curva(ax, function (lg) { return 1 - fT(lg); }, G.COR.ambar, 2, [6, 4]);
+        G.curva(ax, fT, G.COR.azul, 2.8);
+        G.vertical(ax, lc, G.COR.tinta, 'T_c = ' + cartaoT(tc), true);
+        if (est.r > 0.02) {
+          G.vertical(ax, Math.log10(T), G.COR.vinho,
                      'n̄₀/N = ' + F.fmt(f0, 3), true);
         }
+        /* onde ficam os outros sistemas, na mesma escala */
+        ax.ct.save();
+        ax.ct.font = '600 10px system-ui, sans-serif';
+        ax.ct.textAlign = 'center'; ax.ct.textBaseline = 'top';
+        SISTEMAS.forEach(function (q, k) {
+          if (k === est.i) return;
+          var l2 = Math.log10(Tc(q.n, q.m));
+          if (l2 < xa || l2 > xb) return;
+          ax.ct.fillStyle = 'rgba(120,128,138,.9)';
+          ax.ct.fillRect(ax.X(l2) - 0.5, ax.y0, 1, ax.y1 - ax.y0);
+          ax.ct.fillText(q.rot.split(' ')[0], ax.X(l2), ax.y0 + 2);
+        });
+        ax.ct.restore();
         G.legenda(ax, [
           { cor: G.COR.azul, texto: 'no estado p = 0' },
           { cor: G.COR.ambar, texto: 'nos estados p > 0' }
+        ]);
+      } else if (est.vista === 'criterio') {
+        /* nλ_T³ contra T, para os quatro sistemas de uma vez: a condensação
+           começa onde a curva cruza ζ(3/2), e é esse cruzamento que separa
+           um condensado de rubídio de um gás de elétrons degenerado. */
+        var ax6 = G.eixos(cv, {
+          xmin: -8, xmax: 6, ymin: -6, ymax: 14, altura: 310,
+          rotX: 'log₁₀ da temperatura (K)', rotY: 'log₁₀(n λ_T³)',
+          marcasX: G.marcasLineares(-8, 6, 7, 0),
+          formataY: function (v) { return F.fmt(v, 0); }
+        });
+        G.curva(ax6, function () { return Math.log10(ZETA32); },
+                G.COR.tinta, 1.8, [6, 4]);
+        SISTEMAS.forEach(function (q, k) {
+          G.curva(ax6, function (lg) {
+            var TT = Math.pow(10, lg);
+            var y = Math.log10(q.n * Math.pow(lambdaT(TT, q.m), 3));
+            /* abaixo do piso a reta sairia correndo rente ao eixo: corta-se */
+            return y < -6 ? NaN : y;
+          }, k === est.i ? G.COR.vinho : G.COR.grade, k === est.i ? 3 : 1.4);
+        });
+        ax6.ct.save();
+        ax6.ct.font = '600 10px system-ui, sans-serif';
+        ax6.ct.textAlign = 'left'; ax6.ct.textBaseline = 'middle';
+        SISTEMAS.forEach(function (q, k) {
+          var l2 = Math.log10(Tc(q.n, q.m));
+          if (l2 < -8 || l2 > 6) return;
+          ax6.ct.fillStyle = k === est.i ? G.COR.vinho : 'rgba(120,128,138,.9)';
+          ax6.ct.beginPath();
+          ax6.ct.arc(ax6.X(l2), ax6.Y(Math.log10(ZETA32)),
+                     k === est.i ? 5 : 3, 0, 2 * Math.PI);
+          ax6.ct.fill();
+          ax6.ct.fillText(q.rot.split(' ')[0], ax6.X(l2) + 7,
+                          ax6.Y(Math.log10(ZETA32)) - 9 - 11 * k);
+        });
+        ax6.ct.restore();
+        G.legenda(ax6, [
+          { cor: G.COR.vinho, texto: SISTEMAS[est.i].rot },
+          { cor: G.COR.tinta, texto: 'limiar ζ(3/2) = 2,612' }
         ]);
       } else {
         /* A nuvem térmica é uma maxwelliana em p com área 1−f₀; o condensado
            é um pico estreito em p = 0 com área f₀. A largura do pico aqui é
            escolhida para ser visível, não medida: num experimento real ela é
            fixada pelo tamanho da armadilha. */
+        /* a largura térmica é √(2 m kT), que difere por mil entre o
+           rubídio e o hélio: é o que põe o sistema no eixo */
+        var pTc = Math.sqrt(2 * S.m * F.C.kB * tc);
         var s = Math.max(0.08, Math.sqrt(Math.max(est.r, 0.02)));
         var pmax = 3.2;
         var termica = function (p) {
@@ -5271,9 +5372,11 @@
         }
         var ax2 = G.eixos(cv, {
           xmin: 0, xmax: pmax, ymin: 0, ymax: ymax * 1.1 || 1, altura: 300,
-          rotX: 'momento, em unidades de √(2m kT_c)',
+          rotX: 'momento p (' + escalaP(pTc).rot + ')',
           rotY: 'átomos por intervalo de momento',
-          marcasX: G.marcasLineares(0, pmax, 8, 1),
+          marcasX: G.marcasLineares(0, pmax, 8, 1).map(function (mm) {
+            return { v: mm.v, r: F.fmt(mm.v * pTc / escalaP(pTc).f, 1) };
+          }),
           formataY: function () { return ''; }
         });
         G.area(ax2, function (p) { return termica(p) + cond(p); }, 0, pmax,
@@ -5299,7 +5402,24 @@
         f0: F.fmt(f0, 3)
       });
 
-      nota.innerHTML = est.vista === 'fracao'
+      nota.innerHTML = est.vista === 'criterio'
+        ? '<p>Esta é a tabela do Módulo 6 transformada em figura. O eixo vertical é '
+          + '\\(n\\lambda_T^3\\), a razão entre o volume que uma partícula ocupa '
+          + 'quanticamente e o volume que ela tem disponível, e ele cresce como '
+          + '\\(T^{-3/2}\\) porque \\(\\lambda_T\\propto T^{-1/2}\\). Cada sistema é '
+          + 'uma reta, e a sua posição é fixada só por \\(n\\) e pela massa.</p>'
+          + '<p>A condensação começa onde a reta cruza o limiar '
+          + '\\(\\zeta(3/2)=2{,}612\\), e é esse cruzamento que define \\(T_c\\). '
+          + 'Doze ordens de grandeza em temperatura separam o rubídio do gás de elétrons '
+          + 'do cobre, e a razão está nas duas variáveis: o rubídio é cem mil vezes menos '
+          + 'denso que o ar e tem um átomo pesado, ao passo que os elétrons são leves e '
+          + 'estão a \\(8{,}5\\times10^{28}\\) por metro cúbico.</p>'
+          + '<p>O detalhe que importa: <b>os elétrons do cobre cruzam o limiar a dezenas '
+          + 'de milhares de kelvin</b>, de modo que à temperatura ambiente eles estão '
+          + 'milhares de vezes acima dele. São mais degenerados que qualquer condensado '
+          + 'jamais produzido, e ainda assim não condensam, porque são férmions. A reta é '
+          + 'a mesma; o que muda é a simetria da função de onda.</p>'
+        : est.vista === 'fracao'
         ? '<p>Abaixo de \\(T_c\\) a fração no estado de momento nulo é '
           + '\\(\\bar n_0/N=1-(T/T_c)^{3/2}\\), e ela não vem de nenhuma interação: vem de os '
           + 'estados excitados não conseguirem mais acomodar todas as partículas. A integral '
