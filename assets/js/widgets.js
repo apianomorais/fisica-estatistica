@@ -4212,7 +4212,8 @@
       { rot: 'Energia contra momento', v: 'disp' },
       { rot: 'Camada no espaço dos momentos', v: 'mom' },
       { rot: 'Distribuição de energia', v: 'ene' },
-      { rot: 'A curva exata', v: 'exata' }
+      { rot: 'A curva exata', v: 'exata' },
+      { rot: 'A adiabática', v: 'adiab' }
     ], 0, function (v) { est.vista = v; desenhar(); });
 
     var cv = el('canvas');
@@ -4269,6 +4270,15 @@
       var x = 1 / th;
       return x * (1 / x - 1
         + (F.besselKe(1, x) + F.besselKe(3, x)) / (2 * F.besselKe(2, x)));
+    }
+
+    /* A adiabática, da seção 15: impor dS = 0 na entropia de Jüttner deixa
+         x·R(x) + ln[V K₂(x)/x] = const,  R = (K₁+K₃)/2K₂,
+       de onde o volume sai explicitamente, sem resolver equação nenhuma.
+       Trabalha-se com e^x K₂ para que x grande não estoure. */
+    function lnVolume(x) {
+      var R = (F.besselKe(1, x) + F.besselKe(3, x)) / (2 * F.besselKe(2, x));
+      return -x * R - Math.log(F.besselKe(2, x)) + x + Math.log(x);
     }
 
     function desenhar() {
@@ -4379,6 +4389,64 @@
           { cor: G.COR.azul, texto: '3/2' },
           { cor: G.COR.ambar, texto: '3' }
         ]);
+      } else if (est.vista === 'adiab') {
+        /* A adiabática em P-V quase não se dobra: o expoente passa de 4/3 a
+           5/3, e numa escala log isso é uma curvatura imperceptível. O que
+           vale a pena traçar é a própria inclinação local. */
+        var ax5 = G.eixos(cv, {
+          xmin: -6, xmax: 4, ymin: 1.28, ymax: 1.82, altura: 310,
+          rotX: 'log₁₀(V/V\u2080) ao longo da adiabática',
+          rotY: 'inclinação local −d ln P / d ln V',
+          marcasX: G.marcasLineares(-6, 4, 10, 0),
+          formataY: function (v) { return F.fmt(v, 2); }
+        });
+        G.curva(ax5, function () { return 4 / 3; }, G.COR.ambar, 1.8, [6, 4]);
+        G.curva(ax5, function () { return 5 / 3; }, G.COR.azul, 1.8, [6, 4]);
+
+        /* lnV é monótona decrescente em x (comprimir aquece), de modo que
+           cada volume corresponde a um único x: a bisseção o encontra. */
+        var lv0 = lnVolume(1);
+        function xDoVolume(lv) {
+          return F.bissecao(function (xx) {
+            return lnVolume(xx) - lv0 - lv * Math.LN10;
+          }, 1e-4, 1e4, 1e-12);
+        }
+
+        /* a curva: γ = 1 + kB/c_V, com c_V vindo da energia de Bessel */
+        G.curva(ax5, function (lv) {
+          var xx = xDoVolume(lv);
+          if (!xx) return NaN;
+          var t = 1 / xx, h = t * 1e-4;
+          var c = ((t + h) * besselMedia(t + h)
+                 - (t - h) * besselMedia(t - h)) / (2 * h);
+          return 1 + 1 / c;
+        }, G.COR.vinho, 3);
+
+        /* os pontos: a inclinação medida na própria adiabática, por
+           diferença finita em ln P e ln V. Nenhum c_V entra aqui. */
+        ax5.ct.save();
+        ax5.ct.fillStyle = G.COR.verde;
+        for (var j = -5.5; j <= 3.51; j += 0.5) {
+          var xa = xDoVolume(j - 0.05), xb = xDoVolume(j + 0.05);
+          if (!xa || !xb) continue;
+          var dlnV = lnVolume(xb) - lnVolume(xa);
+          var dlnP = (-Math.log(xb) - lnVolume(xb))
+                   - (-Math.log(xa) - lnVolume(xa));
+          ax5.ct.beginPath();
+          ax5.ct.arc(ax5.X(j), ax5.Y(-dlnP / dlnV), 3.2, 0, 2 * Math.PI);
+          ax5.ct.fill();
+        }
+        ax5.ct.restore();
+
+        var lvAqui = (lnVolume(1 / th) - lv0) / Math.LN10;
+        if (lvAqui > -6 && lvAqui < 4) {
+          G.vertical(ax5, lvAqui, G.COR.tinta, 'aqui', true);
+        }
+        G.legenda(ax5, [
+          { cor: G.COR.vinho, texto: 'γ = 1 + k/c_V, do calor específico' },
+          { cor: G.COR.verde, texto: 'inclinação medida na adiabática' },
+          { cor: G.COR.ambar, texto: '4/3 e 5/3' }
+        ]);
       } else {
         var ax3 = G.eixos(cv, {
           xmin: 0, xmax: 10, ymin: 0, ymax: 0.62, altura: 300,
@@ -4437,6 +4505,23 @@
           + '\\(e^{-pc/\\kB T}\\), que tem cauda muito mais longa. Mais partículas sobrevivem '
           + 'com momento alto, e cada uma delas custa mais energia: é a composição dos dois '
           + 'efeitos que dobra \\(U\\).</p>'
+        : est.vista === 'adiab'
+        ? '<p>Esta é a adiabática da seção 15. Impor \\(dS=0\\) na entropia do gás de '
+          + 'Jüttner deixa um invariante em forma fechada, '
+          + '\\(xR(x)+\\ln\\!\\left[VK_2(x)/x\\right]=\\text{const}\\), e é ele que a '
+          + 'curva vinho traça.</p>'
+          + '<p>Em escala logarítmica, uma lei de potência \\(PV^\\gamma=\\) const é uma '
+          + 'reta de inclinação \\(-\\gamma\\). A adiabática exata não é uma reta: ela '
+          + 'encosta na tracejada âmbar à esquerda, onde o gás é quente e '
+          + 'ultrarrelativístico, e vai se deitando até encostar na azul à direita, onde '
+          + 'expandiu, esfriou e virou um gás comum. O expoente adiabático é uma função da '
+          + 'temperatura, não uma constante do gás.</p>'
+          + '<p>A inclinação local vale \\(\\gamma=1+\\kB/c_V\\), que para um gás ideal '
+          + 'com \\(PV=N\\kB T\\) é identidade exata, mesmo com \\(c_V\\) dependendo da '
+          + 'temperatura: de \\(N c_V\\,dT=-P\\,dV\\) sai '
+          + '\\(c_V\\,d\\ln T=-\\kB\\,d\\ln V\\). O cartão de \\(\\gamma\\) acima, '
+          + 'calculado do calor específico, bate com a inclinação desta curva em cinco '
+          + 'casas decimais em toda a faixa, e são dois caminhos independentes.</p>'
         : est.vista === 'exata'
         ? '<p>Esta é a curva da seção 14, traçada pela solução exata '
           + '\\(\\med{\\epsilon}=mc^2\\left[\\frac1x-1+\\frac{K_1(x)+K_3(x)}{2K_2(x)}\\right]\\), '

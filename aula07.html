@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Módulo 7: Gases clássicos | Física Estatística</title>
 <link rel="icon" type="image/png" href="assets/img/favicon.png">
-<link rel="stylesheet" href="assets/css/estilo.css?v=202611072217">
-<script src="assets/js/comum.js?v=202611072217"></script>
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611072223">
+<script src="assets/js/comum.js?v=202611072223"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
 <body>
@@ -51,8 +51,10 @@
     <li><a href="#s12">12. O gás ultrarrelativístico</a></li>
     <li><a href="#s13">13. Do losango ao hiper-octaedro</a></li>
     <li><a href="#s14">14. O gás relativístico exato</a></li>
-    <li><a href="#s15">15. Exercícios resolvidos</a></li>
-    <li><a href="#s16">16. Exercícios propostos</a></li>
+    <li><a href="#s15">15. A adiabática relativística</a></li>
+    <li><a href="#s16">16. O gás relativístico com interação</a></li>
+    <li><a href="#s17">17. Exercícios resolvidos</a></li>
+    <li><a href="#s18">18. Exercícios propostos</a></li>
   </ol>
 </aside>
 
@@ -686,7 +688,159 @@
   </div>
 
   <!-- ================================================== -->
-  <h2 id="s15">15. Exercícios resolvidos</h2>
+  <h2 id="s15">15. A adiabática relativística</h2>
+
+  <p>Com \(Z_1\) em mãos, a entropia sai por derivação, e com ela uma pergunta concreta: o
+  que substitui \(TV^{\gamma-1}=\) const quando o gás está na faixa relativística, onde
+  \(\gamma\) não é constante?</p>
+
+  <p>Da energia livre \(F=-\kB T\ln Z_N\), com \(Z_N=Z_1^N/N!\) e Stirling,</p>
+
+  <p>\[F=-N\kB T\ln\left[\frac{4\pi m^3c^3}{h^3x}\frac{V}{N}e^{x+1}K_2(x)\right],
+  \qquad x\equiv\beta mc^2=\frac{mc^2}{\kB T}.\]</p>
+
+  <p>Para derivar em \(T\) convém trocar a variável: como \(T=mc^2/\kB x\), vale
+  \(\partial/\partial T=-\left(\kB x^2/mc^2\right)\partial/\partial x\). Escrevendo
+  \(F=-\left(Nmc^2/x\right)L\) com \(L\) o logaritmo acima, a conta devolve
+  \(S=N\kB\left(L-xL'\right)\), e usando
+  \(L'=1+K_2'/K_2-1/x\) junto com a identidade
+  \(K_2'(x)=-\frac12\left[K_1(x)+K_3(x)\right]\):</p>
+
+  <p>\[\frac{S}{N\kB}=\ln\left[\frac{4\pi m^3c^3}{h^3}\frac{V}{Nx}K_2(x)\right]+2+xR(x),
+  \qquad R(x)\equiv\frac{K_1(x)+K_3(x)}{2K_2(x)}.\]</p>
+
+  <p>Numa expansão adiabática \(S\) é constante, e tudo o que não depende de \(x\) nem de
+  \(V\) pode ir para o outro lado. Sobra</p>
+
+  <p>\[\boxed{\;x\,R(x)+\ln\frac{V\,K_2(x)}{x}=\text{const}\;}\]</p>
+
+  <p>ou, em termos mais reconhecíveis, usando \(R=u/mc^2+1-1/x\) para eliminar as funções de
+  Bessel do primeiro termo,</p>
+
+  <p>\[\frac{mc^2}{\kB T}\left(1+\frac{u}{mc^2}\right)
+  +\ln\left[VT\,K_2\!\left(\frac{mc^2}{\kB T}\right)\right]=\text{const}.\]</p>
+
+  <p>Esta é a adiabática do gás relativístico. Vale a pena conferir que ela contém as duas
+  que já conhecemos.</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>Limite</th><th>Assintótica usada</th><th>O invariante vira</th>
+      <th>Isto é</th></tr></thead>
+    <tbody>
+      <tr><td>\(x\gg1\): gás frio</td>
+          <td>\(K_2\approx\sqrt{\pi/2x}\,e^{-x}\), \(xR\to x+\frac12\)</td>
+          <td>\(\ln\left(Vx^{-3/2}\right)\)</td>
+          <td>\(TV^{2/3}=\) const, isto é \(\gamma=5/3\)</td></tr>
+      <tr><td>\(x\ll1\): gás quente</td>
+          <td>\(K_2\approx2/x^2\), \(xR\to x+2\)</td>
+          <td>\(\ln\left(Vx^{-3}\right)\)</td>
+          <td>\(VT^{3}=\) const, isto é \(\gamma=4/3\)</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Os dois \(x\) soltos se cancelam contra o \(-x\) que vem de \(\ln K_2\), e sobra a lei
+  de potência limpa em cada caso. Entre os dois limites a adiabática não é lei de potência
+  nenhuma: ela muda de inclinação, e é isso que a quinta vista do widget da seção 12
+  mostra.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">O expoente que não é constante</span>
+    <p>A inclinação local da adiabática é
+    \(\gamma=-\,d\ln P/d\ln V=1+\kB/c_V\), e essa relação é <em>exata</em> para qualquer gás
+    ideal, mesmo com \(c_V\) dependendo da temperatura: de \(Nc_V\,dT=-P\,dV\) e
+    \(PV=N\kB T\) sai \(c_V\,d\ln T=-\kB\,d\ln V\) e pronto.</p>
+    <p>Isso dá uma verificação independente. O calor específico, obtido no widget
+    derivando a energia de Bessel, e a inclinação desta adiabática, obtida integrando
+    \(dS=0\), são contas completamente distintas, e concordam em cinco casas decimais em
+    toda a faixa:</p>
+    <div class="tabela-rolavel">
+    <table>
+      <thead><tr><th>\(\kB T/mc^2\)</th><th>\(c_V/\kB\)</th>
+        <th>\(1+\kB/c_V\)</th><th>inclinação da adiabática</th></tr></thead>
+      <tbody>
+        <tr><td>0,01</td><td>1,53694</td><td>1,65064</td><td>1,65064</td></tr>
+        <tr><td>0,1</td><td>1,82335</td><td>1,54844</td><td>1,54844</td></tr>
+        <tr><td>1</td><td>2,75145</td><td>1,36344</td><td>1,36344</td></tr>
+        <tr><td>10</td><td>2,99516</td><td>1,33387</td><td>1,33387</td></tr>
+        <tr><td>100</td><td>2,99995</td><td>1,33334</td><td>1,33334</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p>Em cosmologia isto não é adorno. O universo em expansão é precisamente um gás que se
+    resfria adiabaticamente, e a passagem de \(\gamma=4/3\) para \(5/3\) de cada espécie de
+    partícula, à medida que \(\kB T\) cai abaixo de sua \(mc^2\), é o que organiza a história
+    térmica: cada espécie, ao se tornar não relativística, deixa de contribuir como radiação
+    e passa a contribuir como matéria.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s16">16. O gás relativístico com interação</h2>
+
+  <p>Falta juntar as duas metades deste módulo. As seções 2 a 11 trataram da interação
+  supondo partículas não relativísticas; as seções 12 a 15 trataram da relatividade supondo
+  o gás ideal. O que acontece quando as duas coisas valem ao mesmo tempo?</p>
+
+  <p>Quase nada, e a razão é estrutural. A função de partição de \(N\) partículas fatora
+  como</p>
+
+  <p>\[Z_N=\frac{Z_1^N}{N!}\,\frac{Z_N^{\rm conf}}{V^N},\]</p>
+
+  <p>e o ponto é que <strong>a relatividade mora inteiramente em \(Z_1\)</strong>. A
+  integral configuracional \(Z_N^{\rm conf}=\int\prod e^{-\beta u(r_{ij})}d^3r_i\) é uma
+  integral sobre <em>posições</em>: ela não sabe qual é a relação entre energia e momento,
+  porque momento nenhum aparece nela. Tudo o que foi feito com a função de Mayer e a
+  expansão em aglomerados sobrevive sem uma única alteração.</p>
+
+  <p>Juntando a expansão da seção 4 com o \(Z_1\) de Bessel da seção 14,</p>
+
+  <p>\[Z_N\approx\frac{1}{N!}\left[\frac{4\pi m^2c}{h^3\beta}\,V\,
+  e^{\beta mc^2}K_2\!\left(\beta mc^2\right)\right]^{N}
+  \left[1+\frac12\rho_N^2S_2(\beta)+\dots\right],\]</p>
+
+  <p>e a energia livre, com Stirling e \(\ln(1+y)\approx y\) para \(|y|\ll1\),</p>
+
+  <p>\[F\approx-\frac{N}{\beta}\ln\left[\frac{4\pi m^2c}{h^3\beta}\frac{V}{N}
+  e^{\beta mc^2+1}K_2\!\left(\beta mc^2\right)\right]-\frac{N^2}{\beta V}B_2(\beta).\]</p>
+
+  <p>O primeiro termo é a parte cinética, relativística e sem interação; o segundo é a
+  correção de interação, e é <em>idêntico</em> ao do caso não relativístico. Derivando em
+  \(V\):</p>
+
+  <p>\[P=-\dpar{F}{V}{T}
+  \approx\frac{N\kB T}{V}\left[1+\frac{N}{V}B_2(\beta)\right],\]</p>
+
+  <p>que é literalmente a equação do virial da seção 5. E derivando \(\ln Z_N\) em
+  \(\beta\), com \(B_2=b-\beta a\) do modelo de caroço duro mais atração da seção 6, de
+  modo que \(dB_2/d\beta=-a\):</p>
+
+  <p>\[U=Nmc^2\left[\frac{1}{x}-1
+  +\frac{K_1(x)+K_3(x)}{2K_2(x)}\right]-a\frac{N^2}{V}.\]</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">A interação e a cinemática não conversam</span>
+    <p>O resultado merece ser dito de forma explícita: <strong>\(B_2\) não depende da
+    relação de dispersão</strong>. O segundo coeficiente do virial de um gás de partículas
+    ultrarrelativísticas, com \(\epsilon=pc\), é exatamente o mesmo que o de um gás de
+    partículas lentas de mesmo potencial \(u(r)\), à mesma temperatura. A temperatura de
+    Boyle de um gás não muda se ele for aquecido até o regime relativístico, desde que
+    \(u(r)\) não mude.</p>
+    <p>A razão vale a pena guardar, porque é um padrão que reaparece. A função de partição
+    de um gás clássico sempre fatora em uma parte de momentos e uma parte de posições,
+    porque a hamiltoniana é uma soma \(\sum\epsilon(p_i)+\sum u(r_{ij})\) sem termos
+    cruzados. A cinemática entra pela primeira, a interação pela segunda, e as duas não se
+    comunicam. Foi essa mesma fatoração que deixou o comprimento de onda térmico sair de
+    graça no Módulo 6, e é ela que permite usar a mesma \(B_2(T)\) medida num gás frio para
+    descrever um gás quente.</p>
+    <p>A fatoração quebra em dois lugares, ambos fora do alcance deste módulo. Quebra na
+    estatística quântica, onde a indistinguibilidade correlaciona posições e momentos, que é
+    o assunto do Módulo 8; e quebra num potencial que dependa da velocidade, como a
+    interação magnética entre cargas em movimento.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s17">17. Exercícios resolvidos</h2>
 
   <div class="bloco ex">
     <span class="rotulo">Exercício resolvido 7.1: as constantes do argônio</span>
@@ -750,7 +904,7 @@
   </div>
 
   <!-- ================================================== -->
-  <h2 id="s16">16. Exercícios propostos</h2>
+  <h2 id="s18">18. Exercícios propostos</h2>
 
   <div class="bloco def">
     <span class="rotulo">Para resolver</span>
@@ -803,6 +957,6 @@
   Laboratório de Física Computacional Aplicada (LFCA) · Universidade Regional do Cariri</p>
 </footer>
 
-<script src="assets/js/widgets.js?v=202611072217"></script>
+<script src="assets/js/widgets.js?v=202611072223"></script>
 </body>
 </html>
