@@ -40,23 +40,25 @@
   <h4>Neste módulo</h4>
   <ol>
     <li><a href="#s1">1. Por que o magnetismo é quântico</a></li>
-    <li><a href="#s2">2. Dois elétrons: singleto e tripleto</a></li>
-    <li><a href="#s3">3. A integral de troca</a></li>
-    <li><a href="#s4">4. O hamiltoniano de Heisenberg</a></li>
-    <li><a href="#s5">5. Regras de Hund</a></li>
-    <li><a href="#s6">6. O campo médio de Weiss</a></li>
-    <li><a href="#s7">7. O parâmetro de Weiss</a></li>
-    <li><a href="#s8">8. A equação de autoconsistência</a></li>
-    <li><a href="#s9">9. A lei de Curie-Weiss</a></li>
-    <li><a href="#s10">10. Magnetização espontânea</a></li>
-    <li><a href="#s11">11. Expoentes críticos</a></li>
-    <li><a href="#s12">12. A energia livre de Landau</a></li>
-    <li><a href="#s13">13. Histerese e domínios</a></li>
-    <li><a href="#s14">14. Ginzburg-Landau</a></li>
-    <li><a href="#s15">15. O modelo de Ising</a></li>
-    <li><a href="#s16">16. O que o campo médio erra</a></li>
-    <li><a href="#s17">17. Exercícios resolvidos</a></li>
-    <li><a href="#s18">18. Exercícios propostos</a></li>
+    <li><a href="#s2">2. Pauli: o paramagnetismo do mar de Fermi</a></li>
+    <li><a href="#s3">3. Landau: o diamagnetismo das órbitas quantizadas</a></li>
+    <li><a href="#s4">4. Dois elétrons: singleto e tripleto</a></li>
+    <li><a href="#s5">5. A integral de troca</a></li>
+    <li><a href="#s6">6. O hamiltoniano de Heisenberg</a></li>
+    <li><a href="#s7">7. Regras de Hund</a></li>
+    <li><a href="#s8">8. O campo médio de Weiss</a></li>
+    <li><a href="#s9">9. O parâmetro de Weiss</a></li>
+    <li><a href="#s10">10. A equação de autoconsistência</a></li>
+    <li><a href="#s11">11. A lei de Curie-Weiss</a></li>
+    <li><a href="#s12">12. Magnetização espontânea</a></li>
+    <li><a href="#s13">13. Expoentes críticos</a></li>
+    <li><a href="#s14">14. A energia livre de Landau</a></li>
+    <li><a href="#s15">15. Histerese e domínios</a></li>
+    <li><a href="#s16">16. Ginzburg-Landau</a></li>
+    <li><a href="#s17">17. O modelo de Ising</a></li>
+    <li><a href="#s18">18. O que o campo médio erra</a></li>
+    <li><a href="#s19">19. Exercícios resolvidos</a></li>
+    <li><a href="#s20">20. Exercícios propostos</a></li>
   </ol>
 </aside>
 
@@ -72,6 +74,8 @@
   <div class="bloco def">
     <span class="rotulo">Objetivos</span>
     <ul>
+      <li>Obter as susceptibilidades de Pauli e de Landau, e ver nelas por onde a
+      quantização escapa do teorema de Bohr-van Leeuwen;</li>
       <li>Deduzir a integral de troca a partir da antissimetria da função de onda;</li>
       <li>Escrever o hamiltoniano de Heisenberg e justificar por que só o spin aparece;</li>
       <li>Fazer a aproximação de campo médio e obter o parâmetro de Weiss;</li>
@@ -128,7 +132,136 @@
   forte.</p>
 
   <!-- ================================================== -->
-  <h2 id="s2">2. Dois elétrons: singleto e tripleto</h2>
+  <!-- ================================================== -->
+  <h2 id="s2">2. Pauli: o paramagnetismo do mar de Fermi</h2>
+
+  <p>Antes de chegar à interação de troca, vale gastar duas seções com o caso mais simples
+  de magnetismo quântico que existe, o do gás de elétrons livres. Ele não tem interação
+  nenhuma entre os spins, de modo que não dá ferromagnetismo, mas mostra, com conta curta,
+  por onde a quantização entra para salvar o que Bohr e van Leeuwen haviam proibido.</p>
+
+  <p>Ligue um campo \(B\) num gás de elétrons degenerado. Cada elétron tem energia
+  magnética \(\mp\mu_B B\) conforme o spin esteja a favor ou contra o campo, e o efeito
+  sobre as bandas é puramente geométrico: a sub-banda de spin a favor desce em bloco por
+  \(\mu_B B\) e a de spin contra sobe por \(\mu_B B\). As duas, porém, têm de compartilhar
+  o mesmo nível de Fermi, porque elétrons passam de uma para a outra até que o custo de
+  mudar seja zero. O resultado é um desbalanço de população.</p>
+
+  <p>Se \(g(E_F)\) é a densidade de estados por unidade de volume no nível de Fermi,
+  contando os dois spins, cada sub-banda tem \(g/2\). O número transferido por unidade de
+  volume é a área do retângulo de altura \(g(E_F)/2\) e largura \(\mu_B B\), e ele conta
+  duas vezes, uma por sub-banda:</p>
+
+  <p>\[n_\uparrow-n_\downarrow=2\cdot\frac{g(E_F)}{2}\,\mu_B B=g(E_F)\,\mu_B B .\]</p>
+
+  <p>Cada elétron transferido contribui com \(\mu_B\) para a magnetização, de modo que
+  \(M=\mu_B^2\,g(E_F)\,B\) e a susceptibilidade vale</p>
+
+  <p>\[\boxed{\;\chi_{\rm Pauli}=\mu_0\,\mu_B^2\,g(E_F)=\frac{3}{2}\,
+  \frac{\mu_0 n\mu_B^2}{\kB T_F}\;}\]</p>
+
+  <p>na última forma usando \(g(E_F)=3n/2E_F\) do gás livre. Olhe o que sumiu: a
+  temperatura. A susceptibilidade de Pauli é praticamente constante, enquanto a lei de
+  Curie, que o mesmo gás daria se fosse clássico e distinguível, vai com \(1/T\).</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Por que o 1/T desaparece</span>
+    <p>A conta de Curie supõe que todos os \(n\) momentos podem escolher livremente a
+    direção. No mar de Fermi, quase nenhum pode: um elétron no fundo da banda que quisesse
+    virar o spin teria de ir para um estado já ocupado, o que o princípio de exclusão
+    proíbe. Só os que estão a menos de \(\kB T\) do nível de Fermi têm estados vazios por
+    perto, e eles são uma fração \(\sim T/T_F\) do total.</p>
+    <p>A susceptibilidade fica, então, a de Curie vezes essa fração, e o \(1/T\) de uma
+    cancela o \(T\) da outra:</p>
+    <p>\[\chi_{\rm Pauli}\sim\frac{\mu_0 n\mu_B^2}{\kB T}\cdot\frac{T}{T_F}
+    =\frac{\mu_0 n\mu_B^2}{\kB T_F}.\]</p>
+    <p>É o mesmo argumento de fração ativa que no Módulo 8 explicou por que o calor
+    específico eletrônico é linear em \(T\) e não \(3\kB/2\). Vale a pena guardar o padrão:
+    toda vez que o mar de Fermi entra, aparece um fator \(T/T_F\) que corta a resposta
+    clássica.</p>
+  </div>
+
+  <p>Números, para o sódio, com \(n=2{,}65\times10^{28}\ \mathrm{m^{-3}}\) e
+  \(E_F=3{,}24\ \mathrm{eV}\), ou seja \(T_F\approx3{,}8\times10^{4}\ \mathrm{K}\):</p>
+
+  <p>\[\chi_{\rm Pauli}\approx8{,}3\times10^{-6},\qquad
+  \chi_{\rm Curie}(300\ \mathrm{K})\approx6{,}9\times10^{-4},\]</p>
+
+  <p>uma razão de \(0{,}012\), que é exatamente \(\tfrac32\,T/T_F\) com \(T=300\) K. O
+  metal é paramagnético, mas oitenta vezes mais fraco do que a conta clássica previa, e
+  essa discrepância foi, historicamente, um dos primeiros indícios de que os elétrons de
+  condução obedecem à estatística de Fermi e não à de Boltzmann.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s3">3. Landau: o diamagnetismo das órbitas quantizadas</h2>
+
+  <p>O spin não é a única coisa que o campo mexe. O movimento orbital também responde, e é
+  justamente aí que o teorema de Bohr-van Leeuwen parecia mais seguro: foi a integral sobre
+  os momentos, contínua, que matou a magnetização clássica. A saída é que num campo
+  magnético o movimento transversal <em>não</em> é contínuo.</p>
+
+  <p>Num campo uniforme \(B\hat z\), a energia de um elétron livre é</p>
+
+  <p>\[E_{\nu,k_z}=\left(\nu+\tfrac12\right)\hbar\omega_c+\frac{\hbar^2k_z^2}{2m},
+  \qquad \omega_c=\frac{eB}{m},\qquad \nu=0,1,2,\dots\]</p>
+
+  <p>O movimento ao longo do campo continua livre, como manda a força de Lorentz, que não
+  tem componente nessa direção. O movimento no plano perpendicular, que classicamente seria
+  um círculo de qualquer raio, vira uma escada de <strong>níveis de Landau</strong>
+  igualmente espaçados, cada um com degenerescência \(eB/h\) por unidade de área. É a
+  escada que quebra o argumento clássico: somar sobre níveis discretos não é a mesma coisa
+  que integrar sobre um contínuo, e a translação \(\vec p\to\vec p-q\vec A\) deixa de ser
+  inofensiva.</p>
+
+  <p>O cálculo da energia livre dessa escada, que não faremos aqui linha a linha, dá um
+  resultado de uma elegância difícil de acreditar quando se vê pela primeira vez:</p>
+
+  <p>\[\boxed{\;\chi_{\rm Landau}=-\frac{1}{3}\,\chi_{\rm Pauli}\;}\]</p>
+
+  <p>para elétrons livres de massa \(m\). O sinal é negativo, como tem de ser: a resposta
+  orbital é <em>diamagnética</em>, ela se opõe ao campo que a criou, que é a lei de Lenz
+  aparecendo onde menos se espera. E o fator \(1/3\) não é aproximação nenhuma, é exato
+  nesse modelo.</p>
+
+  <div class="bloco def">
+    <span class="rotulo">O saldo, e por que o bismuto é diferente</span>
+    <p>Somando as duas contribuições, o gás de elétrons livres é paramagnético, com
+    \(\chi=\tfrac23\chi_{\rm Pauli}\). Num metal de verdade, porém, os elétrons não têm a
+    massa do elétron livre, e sim uma <strong>massa efetiva</strong> \(m^\ast\) que a rede
+    cristalina impõe. O spin não sabe disso, de modo que \(\chi_{\rm Pauli}\) não muda,
+    mas a frequência de cíclotron vai com \(1/m^\ast\), e o termo de Landau ganha um fator
+    \((m/m^\ast)^2\):</p>
+    <p>\[\frac{\chi_{\rm Landau}}{\chi_{\rm Pauli}}=-\frac13\left(\frac{m}{m^\ast}\right)^2 .\]</p>
+    <p>No bismuto a massa efetiva é cerca de cem vezes menor que a do elétron livre, o
+    fator explode, e o diamagnetismo de Landau domina com folga. É por isso que o bismuto é
+    o diamagneto de bancada preferido, aquele que levita sobre um ímã de neodímio numa
+    demonstração de dois minutos.</p>
+  </div>
+
+  <div class="bloco ex">
+    <span class="rotulo">Quando a escada aparece sozinha</span>
+    <p>Os níveis de Landau não são artifício de cálculo: em campo alto e temperatura baixa
+    eles aparecem um a um nas medidas. À medida que \(B\) cresce, os níveis sobem e cruzam o
+    nível de Fermi um de cada vez, e toda propriedade que dependa de \(g(E_F)\) passa a
+    oscilar periodicamente em \(1/B\). Na magnetização isso se chama efeito de Haas-van
+    Alphen, na resistividade, efeito Shubnikov-de Haas, e as duas são hoje a maneira
+    padrão de medir a forma da superfície de Fermi de um metal.</p>
+    <p>No limite de duas dimensões, com a escada inteiramente resolvida, a mesma
+    degenerescência \(eB/h\) por unidade de área produz os platôs do efeito Hall quântico,
+    em que a condutância vale \(\nu e^2/h\) com precisão de nove casas. A constante que sai
+    daí define hoje o ohm.</p>
+  </div>
+
+  <p>Repare no que estas duas seções fizeram com o teorema do início do módulo. O
+  magnetismo clássico era nulo por uma razão técnica, a invariância da integral gaussiana
+  sob translação. A mecânica quântica quebra essa invariância de dois jeitos independentes:
+  pelo spin, que é discreto por natureza e dá o termo de Pauli, e pela quantização das
+  órbitas, que dá o termo de Landau. Nenhum dos dois, porém, produz ferromagnetismo: para
+  um ímã permanente é preciso algo que faça os spins preferirem o alinhamento mútuo, e é
+  isso que a próxima seção vai buscar.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s4">4. Dois elétrons: singleto e tripleto</h2>
 
   <p>Tome dois elétrons com funções de onda orbitais \(\phi_\alpha\) e \(\phi_\beta\). Pelo
   postulado de simetrização do Módulo 8, a função de onda total tem de ser antissimétrica, e
@@ -166,7 +299,7 @@
   entra numa conta que não o contém.</p>
 
   <!-- ================================================== -->
-  <h2 id="s3">3. A integral de troca</h2>
+  <h2 id="s5">5. A integral de troca</h2>
 
   <p>Seja o hamiltoniano de duas partículas, que <strong>não depende do spin</strong>:</p>
 
@@ -231,7 +364,7 @@
   </div>
 
   <!-- ================================================== -->
-  <h2 id="s4">4. O hamiltoniano de Heisenberg</h2>
+  <h2 id="s6">6. O hamiltoniano de Heisenberg</h2>
 
   <p>A observação de Dirac foi que a diferença de energia entre singleto e tripleto pode ser
   escrita como um operador que atua só nos spins, embora nenhum spin apareça no hamiltoniano
@@ -271,7 +404,7 @@
   física matemática. O resto do módulo é sobre como contornar isso.</p>
 
   <!-- ================================================== -->
-  <h2 id="s5">5. Regras de Hund</h2>
+  <h2 id="s7">7. Regras de Hund</h2>
 
   <p>Uma pergunta incômoda: por que o hamiltoniano acima contém só o spin \(\hat S\), e não o
   momento angular total \(\hat J=\hat L+\hat S\)?</p>
@@ -300,13 +433,13 @@
     </ol>
   </div>
 
-  <p>A primeira regra é a seção 3 aplicada dentro de um átomo: spins paralelos obrigam a
+  <p>A primeira regra é a seção 5 aplicada dentro de um átomo: spins paralelos obrigam a
   parte orbital a ser antissimétrica, os elétrons se evitam, e a repulsão de Coulomb entre
   eles diminui. Hund descobriu a regra empiricamente em 1925, espectroscopicamente, um ano
   antes de haver explicação para ela.</p>
 
   <!-- ================================================== -->
-  <h2 id="s6">6. O campo médio de Weiss</h2>
+  <h2 id="s8">8. O campo médio de Weiss</h2>
 
   <p>O modelo de Heisenberg é insolúvel porque cada spin está acoplado a \(\nu\) vizinhos,
   que estão acoplados aos vizinhos deles, e assim por diante. A aproximação de Weiss corta
@@ -329,7 +462,7 @@
 
   <div class="bloco fisica">
     <span class="rotulo">O que se perde</span>
-    <p>Vale registrar desde já o preço, porque a seção 16 vai cobrá-lo. Ao substituir os
+    <p>Vale registrar desde já o preço, porque a seção 18 vai cobrá-lo. Ao substituir os
     vizinhos pela sua média, apagam-se as <strong>flutuações</strong> e as
     <strong>correlações</strong>. O spin passa a sentir um ambiente liso, sempre igual, e
     nunca fica sabendo que o vizinho da direita acabou de virar.</p>
@@ -339,7 +472,7 @@
   </div>
 
   <!-- ================================================== -->
-  <h2 id="s7">7. O parâmetro de Weiss</h2>
+  <h2 id="s9">9. O parâmetro de Weiss</h2>
 
   <p>Escreva o campo efetivo em termos da magnetização, que é o momento magnético por unidade
   de volume:</p>
@@ -362,7 +495,7 @@
   <p>\[\vec B_{\rm efe}=\mu_0\left(\vec{\Hm}+\lambda\Mg\right)=\mu_0\vec{\Hm}_{\rm efe}.\]</p>
 
   <!-- ================================================== -->
-  <h2 id="s8">8. A equação de autoconsistência</h2>
+  <h2 id="s10">10. A equação de autoconsistência</h2>
 
   <p>Tome agora o caso mais simples: um meio uniaxial, contribuição orbital nula, \(S=1/2\)
   e portanto \(g\approx2\). Os autovalores de energia de um spin são</p>
@@ -402,7 +535,7 @@
   <div data-widget="weiss"></div>
 
   <!-- ================================================== -->
-  <h2 id="s9">9. A lei de Curie-Weiss</h2>
+  <h2 id="s11">11. A lei de Curie-Weiss</h2>
 
   <p>Em temperatura alta o argumento é pequeno e vale \(\tanh x\approx x\):</p>
 
@@ -432,7 +565,7 @@
   ferromagnético, paramagnético puro ou antiferromagnético.</p>
 
   <!-- ================================================== -->
-  <h2 id="s10">10. Magnetização espontânea</h2>
+  <h2 id="s12">12. Magnetização espontânea</h2>
 
   <p>Quando \(T\to T_C^+\), a susceptibilidade diverge: um campo infinitesimal produz uma
   magnetização finita. Abaixo de \(T_C\) a situação é mais drástica, e aparece magnetização
@@ -454,7 +587,7 @@
   latente.</p>
 
   <!-- ================================================== -->
-  <h2 id="s11">11. Expoentes críticos</h2>
+  <h2 id="s13">13. Expoentes críticos</h2>
 
   <p>Logo abaixo de \(T_C\), \(m_s\ll1\) e dá para expandir:</p>
 
@@ -488,11 +621,11 @@
   </div>
 
   <p>O \(\delta=3\) sai direto: em \(T=T_C\) o termo linear se cancela e sobra
-  \(\mathfrak{H}\approx m^3/3\). Guarde os quatro números; a seção 16 os compara com a
+  \(\mathfrak{H}\approx m^3/3\). Guarde os quatro números; a seção 18 os compara com a
   realidade.</p>
 
   <!-- ================================================== -->
-  <h2 id="s12">12. A energia livre de Landau</h2>
+  <h2 id="s14">14. A energia livre de Landau</h2>
 
   <p>Há um modo de obter tudo isso sem passar pela tangente hiperbólica, e ele é mais geral.
   Invertendo a equação de autoconsistência e expandindo
@@ -532,7 +665,7 @@
   </div>
 
   <!-- ================================================== -->
-  <h2 id="s13">13. Histerese e domínios</h2>
+  <h2 id="s15">15. Histerese e domínios</h2>
 
   <p>A curva \(\mathfrak{H}(m)=\operatorname{arctgh}(m)-mT_C/T\) tem, abaixo de \(T_C\), a
   forma de um S deitado: um mesmo campo admite três magnetizações. Quem leu o Módulo 7
@@ -570,7 +703,7 @@
   não em alinhar spins um a um.</p>
 
   <!-- ================================================== -->
-  <h2 id="s14">14. Ginzburg-Landau</h2>
+  <h2 id="s16">16. Ginzburg-Landau</h2>
 
   <p>Para falar de domínios é preciso deixar o parâmetro de ordem variar no espaço. Ginzburg
   e Landau acrescentaram à energia livre um termo que cobra pela variação:</p>
@@ -598,7 +731,7 @@
   de escolher entre estados equivalentes.</p>
 
   <!-- ================================================== -->
-  <h2 id="s15">15. O modelo de Ising</h2>
+  <h2 id="s17">17. O modelo de Ising</h2>
 
   <p>O campo médio diz o que acontece com um spin num ambiente liso. Para saber o que
   acontece de verdade é preciso simular, e o modelo mínimo para isso é o de
@@ -651,7 +784,7 @@
   sobre essa curva.</p>
 
   <!-- ================================================== -->
-  <h2 id="s16">16. O que o campo médio erra</h2>
+  <h2 id="s18">18. O que o campo médio erra</h2>
 
   <p>Chegou a hora da prestação de contas. O campo médio acerta a existência da transição, a
   forma geral da curva de magnetização e a lei de Curie-Weiss, que é verificada
@@ -715,7 +848,7 @@
   </div>
 
   <!-- ================================================== -->
-  <h2 id="s17">17. Exercícios resolvidos</h2>
+  <h2 id="s19">19. Exercícios resolvidos</h2>
 
   <div class="bloco ex">
     <span class="rotulo">Exercício resolvido 9.1: o campo molecular do ferro</span>
@@ -790,7 +923,7 @@
     aproximação erra menos de 5% apenas para \(T/T_C>0{,}87\), isto é, nos últimos 13% antes
     da transição. É o preço de cortar a série no termo cúbico: ela é uma expansão em
     \(m_s\), e \(m_s\) só é pequeno bem perto de \(T_C\). Deslize a curva tracejada no widget
-    da seção 8 para ver onde ela descola.</p>
+    da seção 10 para ver onde ela descola.</p>
     </div>
     </details>
   </div>
@@ -828,7 +961,7 @@
   </div>
 
   <!-- ================================================== -->
-  <h2 id="s18">18. Exercícios propostos</h2>
+  <h2 id="s20">20. Exercícios propostos</h2>
 
   <div class="bloco ex">
     <span class="rotulo">Para resolver</span>
@@ -842,10 +975,10 @@
       \(\hbar^2/4\) no tripleto e \(-3\hbar^2/4\) no singleto. Use
       \(\hat S^2=\left(\hat s_1+\hat s_2\right)^2\) e os autovalores \(S(S+1)\hbar^2\).</li>
 
-      <li><b>9.3</b> Generalize a seção 8 para spin \(S\) qualquer e mostre que a equação de
+      <li><b>9.3</b> Generalize a seção 10 para spin \(S\) qualquer e mostre que a equação de
       autoconsistência vira \(m=B_S\left(S\mathfrak{H}_{\rm efe}\right)\) com \(B_S\) a
       função de Brillouin do Módulo 3. Obtenha \(T_C\) em função de \(S\) e verifique que
-      \(S=1/2\) devolve o resultado da seção 8.</li>
+      \(S=1/2\) devolve o resultado da seção 10.</li>
 
       <li><b>9.4</b> Mostre que o expoente \(\delta\) do campo médio vale 3, partindo de
       \(\mathfrak{H}=\left(1-T_C/T\right)m+m^3/3\) em \(T=T_C\).</li>
