@@ -22,6 +22,7 @@ TITULOS = {
     7: ("Gases clássicos", "Gases clássicos"),
     8: ("Gases quânticos", "Gases quânticos"),
     9: ("Magnetismo", "Magnetismo"),
+    10: ("Supercondutividade", "Supercondutividade"),
 }
 
 UNIDADES = [
@@ -29,7 +30,7 @@ UNIDADES = [
     ("Estados microscópicos e entropia", "Microestados", [3, 4]),
     ("Ensembles", "Ensembles", [5]),
     ("Gases", "Gases", [6, 7, 8]),
-    ("Magnetismo", "Magnetismo", [9]),
+    ("Magnetismo e supercondutividade", "Magnetismo", [9, 10]),
 ]
 
 # o que vai no chapéu de cada página, logo acima do título

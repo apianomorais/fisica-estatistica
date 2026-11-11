@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Módulo 10: Supercondutividade | Física Estatística</title>
+<link rel="icon" type="image/png" href="assets/img/favicon.png">
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611102312">
+<script src="assets/js/comum.js?v=202611102312"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+</head>
+<body>
+
+<header class="topo">
+  <div class="topo-interno">
+    <a class="marca" href="index.html">Física Estatística <span>· LFCA/URCA</span></a>
+    <nav class="menu">
+      <a href="index.html">Início</a>
+      <span class="grupo">Fundamentos</span>
+      <a href="aula01.html" class="num" title="Módulo 1: Revisão de termodinâmica">1</a>
+      <a href="aula02.html" class="num" title="Módulo 2: Métodos estatísticos">2</a>
+      <span class="grupo">Microestados</span>
+      <a href="aula03.html" class="num" title="Módulo 3: Caminhante aleatório e estados microscópicos">3</a>
+      <a href="aula04.html" class="num" title="Módulo 4: Movimento browniano">4</a>
+      <span class="grupo">Ensembles</span>
+      <a href="aula05.html" class="num" title="Módulo 5: Ensembles canônico e grã-canônico">5</a>
+      <span class="grupo">Gases</span>
+      <a href="aula06.html" class="num" title="Módulo 6: Gás ideal">6</a>
+      <a href="aula07.html" class="num" title="Módulo 7: Gases clássicos">7</a>
+      <a href="aula08.html" class="num" title="Módulo 8: Gases quânticos">8</a>
+      <span class="grupo">Magnetismo</span>
+      <a href="aula09.html" class="num" title="Módulo 9: Magnetismo">9</a>
+      <a href="aula10.html" class="num ativo" title="Módulo 10: Supercondutividade">10</a>
+    </nav>
+  </div>
+</header>
+
+<div class="envoltorio">
+
+<aside class="lateral">
+  <h4>Neste módulo</h4>
+  <ol>
+    <li><a href="#s1">1. O que Onnes viu</a></li>
+    <li><a href="#s2">2. Meissner: mais do que resistência nula</a></li>
+    <li><a href="#s3">3. As equações de London</a></li>
+    <li><a href="#s4">4. A termodinâmica da transição</a></li>
+    <li><a href="#s5">5. Comprimento de coerência e os dois tipos</a></li>
+    <li><a href="#s6">6. Ginzburg-Landau</a></li>
+    <li><a href="#s7">7. Quantização do fluxo e vórtices</a></li>
+    <li><a href="#s8">8. As pistas de que algo se emparelha</a></li>
+    <li><a href="#s9">9. O par de Cooper</a></li>
+    <li><a href="#s10">10. Esboço de BCS</a></li>
+    <li><a href="#s11">11. O que ficou de fora</a></li>
+    <li><a href="#s12">12. Exercícios resolvidos</a></li>
+    <li><a href="#s13">13. Exercícios propostos</a></li>
+  </ol>
+</aside>
+
+<main class="conteudo">
+
+  <p class="chapeu">Módulo 10 · Magnetismo e supercondutividade</p>
+  <h1>Supercondutividade</h1>
+  <p class="subtitulo">Um metal que, abaixo de certa temperatura, deixa de resistir à
+  corrente e passa a expulsar o campo magnético de dentro de si. O primeiro fato é
+  espetacular e o segundo é mais profundo, porque não decorre dele. Este módulo mostra como
+  a mesma energia livre de Landau do módulo anterior descreve a transição, e termina no
+  mecanismo que explica tudo: elétrons que se emparelham.</p>
+
+  <div class="bloco def">
+    <span class="rotulo">Objetivos</span>
+    <ul>
+      <li>Distinguir condutor perfeito de supercondutor pelo efeito Meissner;</li>
+      <li>Deduzir a equação de London e o comprimento de penetração;</li>
+      <li>Obter o campo crítico pela energia livre de Gibbs e prever o salto no calor
+      específico;</li>
+      <li>Comparar os dois comprimentos e entender a origem dos tipos I e II;</li>
+      <li>Escrever a energia livre de Ginzburg-Landau e ler nela o quantum de fluxo;</li>
+      <li>Resolver o problema de dois elétrons de Cooper e ver que não há limiar;</li>
+      <li>Reconhecer os resultados de BCS e conferir \(2\Delta/\kB T_c=3{,}53\) nos dados.</li>
+    </ul>
+  </div>
+
+  <hr class="linha">
+
+  <!-- ================================================== -->
+  <h2 id="s1">1. O que Onnes viu</h2>
+
+  <p>Em 1911, três anos depois de ser o primeiro a liquefazer o hélio, Kamerlingh Onnes
+  mediu a resistência do mercúrio a quatro graus acima do zero absoluto e viu que ela não
+  caía suavemente: ela sumia. Abaixo de \(T_c=4{,}15\) K o valor despencava para menos do
+  que o aparelho conseguia distinguir de zero, num intervalo de poucos centésimos de
+  kelvin.</p>
+
+  <p>A pergunta imediata é se a resistência é pequena ou é nula, e ela se responde
+  deixando uma corrente circular num anel supercondutor fechado e medindo o campo que ela
+  produz. Experimentos desse tipo acompanharam a corrente por anos sem detectar queda, o
+  que coloca um limite superior na resistividade cerca de \(10^{17}\) vezes menor que a do
+  cobre. Para efeitos de física, é zero.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Por que isso é um problema de física estatística</span>
+    <p>A tentação é tratar o assunto como eletrodinâmica de materiais, e boa parte dele é.
+    Mas o que acontece em \(T_c\) é uma <strong>transição de fase</strong>, com calor
+    específico que salta, com parâmetro de ordem que nasce do nada e com simetria
+    quebrada, exatamente como no ferromagneto do módulo anterior. A diferença é qual
+    simetria se quebra, e nisso está quase tudo o que há de interessante.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s2">2. Meissner: mais do que resistência nula</h2>
+
+  <p>Suponha, por um momento, que supercondutor seja apenas um condutor perfeito. Dentro de
+  um condutor perfeito o campo elétrico tem de ser nulo, senão a corrente cresceria sem
+  limite, e pela lei de Faraday \(\nabla\times\vec E=-\partial\vec B/\partial t\) isso dá
+  \(\partial\vec B/\partial t=0\). Note bem o que essa previsão diz: o campo interno fica
+  <em>congelado no valor que tinha</em> quando a amostra passou a conduzir perfeitamente.
+  Resfriar com campo ligado deveria aprisionar o campo lá dentro para sempre.</p>
+
+  <p>Meissner e Ochsenfeld mediram isso em 1933 e acharam o contrário. Resfriando a amostra
+  <em>já</em> dentro do campo, o campo é <strong>expulso</strong> ao cruzar \(T_c\): o
+  estado final tem \(\vec B=0\) no interior, não importa por qual caminho se chegou nele.
+  O supercondutor não é um condutor perfeito, é um diamagneto perfeito, com
+  \(\chi=-1\).</p>
+
+  <p>Essa distinção é o que torna o estado supercondutor um <em>estado termodinâmico</em>,
+  e não um acidente de história: estado de equilíbrio não guarda memória do caminho. Se
+  guardasse, não haveria energia livre para minimizar e nada do que vem a seguir
+  funcionaria.</p>
+
+  <p class="nota-lateral">A expulsão do campo é o que faz o ímã levitar sobre a pastilha
+  resfriada em nitrogênio líquido, a demonstração mais vista de física da matéria
+  condensada. <a href="https://apianomorais.github.io/eletromagnetismo/cap06.html">A
+  linguagem de \(\vec M\), \(\vec H\) e corrente ligada que descreve isso está no capítulo
+  6 do curso de Eletromagnetismo</a>: o diamagneto perfeito é o caso extremo em que a
+  corrente de superfície cancela exatamente o campo aplicado.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s3">3. As equações de London</h2>
+
+  <p>Os irmãos Fritz e Heinz London propuseram, em 1935, a descrição mais econômica
+  possível do que foi medido. Comece supondo que uma fração dos elétrons, de densidade
+  \(n_s\), não sofre espalhamento nenhum. Para esses, a segunda lei de Newton dá
+  \(m\,d\vec v/dt=-e\vec E\), e com \(\vec J_s=-n_s e\vec v\),</p>
+
+  <p>\[\frac{\partial \vec J_s}{\partial t}=\frac{n_s e^2}{m}\vec E
+  \qquad\text{(primeira equação de London).}\]</p>
+
+  <p>Essa equação sozinha dá o condutor perfeito, com o campo congelado. Para obter a
+  expulsão, os London fizeram o passo audacioso: em vez da relação entre a derivada
+  temporal e \(\vec E\), postularam a relação entre o rotacional da corrente e o próprio
+  campo,</p>
+
+  <p>\[\nabla\times\vec J_s=-\frac{n_s e^2}{m}\vec B
+  \qquad\text{(segunda equação de London).}\]</p>
+
+  <p>Combine com a lei de Ampère \(\nabla\times\vec B=\mu_0\vec J_s\) em regime estacionário
+  e use \(\nabla\cdot\vec B=0\):</p>
+
+  <p>\[\nabla^2\vec B=\frac{1}{\lambda_L^2}\vec B,\qquad
+  \boxed{\;\lambda_L=\sqrt{\frac{m}{\mu_0 n_s e^2}}\;}\]</p>
+
+  <p>A solução que não explode é exponencial decrescente. Num supercondutor que ocupa
+  \(x&gt;0\), com campo \(B_0\) aplicado paralelamente à superfície,</p>
+
+  <p>\[B(x)=B_0\,e^{-x/\lambda_L}.\]</p>
+
+  <p>O campo não é expulso de uma vez na superfície matemática: ele entra e morre numa
+  casca de espessura \(\lambda_L\), e é nessa casca que corre a supercorrente que faz a
+  blindagem. Com \(n_s\sim10^{29}\ \mathrm{m^{-3}}\), típico de um metal, \(\lambda_L\)
+  fica em torno de <strong>13 nm</strong>, algumas dezenas de camadas atômicas. Medidas
+  dão valores um pouco maiores, entre 16 e 50 nm, porque nem todos os elétrons de condução
+  participam e porque a teoria é local demais, mas a ordem de grandeza está certa.</p>
+
+  <div data-widget="london"></div>
+
+  <p class="legenda">O perfil dentro de uma placa de espessura \(d\). Enquanto
+  \(d\gg\lambda_L\) o miolo fica blindado e o diamagnetismo é completo. Quando a placa fica
+  fina demais, as duas caudas se encontram, o campo nunca chega a zero no centro e o filme
+  deixa de expulsar o campo: é por isso que filmes finos suportam campos críticos muito
+  maiores que o material em bloco.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s4">4. A termodinâmica da transição</h2>
+
+  <p>Expulsar campo custa energia, e esse custo é o que limita o estado supercondutor.
+  Trabalhando com a energia livre de Gibbs por unidade de volume, a diferença entre as duas
+  fases na presença de um campo aplicado \(B_a\) é</p>
+
+  <p>\[g_s(T,B_a)=g_s(T,0)+\frac{B_a^2}{2\mu_0},\qquad g_n(T,B_a)\approx g_n(T,0),\]</p>
+
+  <p>porque o supercondutor paga o preço de manter \(\vec B=0\) por dentro, enquanto o
+  metal normal deixa o campo passar sem custo apreciável. A fase supercondutora deixa de
+  ser favorável quando a conta empata, e isso define o <strong>campo crítico</strong>:</p>
+
+  <p>\[\frac{B_c^2(T)}{2\mu_0}=g_n(T,0)-g_s(T,0)\equiv
+  \text{energia de condensação}.\]</p>
+
+  <p>Experimentalmente \(B_c(T)\approx B_c(0)\left[1-(T/T_c)^2\right]\), com \(B_c(0)\) da
+  ordem de \(10^{-2}\) T no alumínio e \(8\times10^{-2}\) T no chumbo. Derivando a relação
+  acima em \(T\) saem duas consequências que valem como exercício de termodinâmica pura:</p>
+
+  <div class="bloco def">
+    <span class="rotulo">O que a derivada diz</span>
+    <p>A entropia da diferença é \(s_n-s_s=-\dfrac{B_c}{\mu_0}\dfrac{dB_c}{dT}\), que é
+    positiva porque \(B_c\) decresce com \(T\). <strong>O estado supercondutor é o mais
+    ordenado</strong>, como era de esperar de uma fase condensada.</p>
+    <p>Em \(T=T_c\) temos \(B_c=0\) e portanto \(s_n=s_s\): <strong>não há calor
+    latente</strong>, a transição em campo nulo é de segunda ordem. Já em \(T&lt;T_c\), com
+    campo aplicado, \(s_n\neq s_s\) e a transição passa a ser de primeira ordem, com calor
+    latente. A mesma transição muda de ordem conforme o caminho, o que é um ótimo
+    contraexemplo contra a ideia de que a ordem é propriedade só da substância.</p>
+    <p>Derivando outra vez sai o salto no calor específico em \(T_c\), e a experiência o
+    confirma com o valor que a teoria BCS prevê: \(\Delta C/\gamma T_c=1{,}43\).</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s5">5. Comprimento de coerência e os dois tipos</h2>
+
+  <p>Além de \(\lambda_L\), que diz onde o campo morre, há um segundo comprimento, que diz
+  em que distância a própria supercondutividade consegue mudar. Pippard notou que o estado
+  condensado não pode ser ligado e desligado ponto a ponto: ele tem uma rigidez espacial,
+  com escala</p>
+
+  <p>\[\xi\sim\frac{\hbar v_F}{\pi\Delta},\]</p>
+
+  <p>onde \(\Delta\) é a energia que mais adiante chamaremos de gap. No alumínio isso dá
+  alguns micrômetros; no nióbio, algumas dezenas de nanômetros.</p>
+
+  <p>A razão entre os dois decide o comportamento do material em campo. Pense na fronteira
+  entre uma região normal e uma supercondutora. Numa espessura \(\lambda_L\) o material já
+  expulsou o campo e portanto já começou a economizar energia magnética; numa espessura
+  \(\xi\) ele ainda não atingiu a condensação plena e portanto ainda não recolheu toda a
+  energia de condensação. A parede tem, então, uma energia de superfície de sinal
+  determinado por \(\kappa=\lambda_L/\xi\):</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Os dois tipos</span>
+    <p><strong>Tipo I</strong> (\(\kappa&lt;1/\sqrt2\)): a parede custa energia positiva, de
+    modo que o material evita criar interfaces. Ou expulsa o campo inteiro, ou desiste de
+    vez em \(B_c\). São os metais puros, com campos críticos pequenos.</p>
+    <p><strong>Tipo II</strong> (\(\kappa&gt;1/\sqrt2\)): a parede tem energia
+    <em>negativa</em>, e o material passa a querer o máximo de interface. Acima de
+    \(B_{c1}\) ele deixa o campo entrar em filetes finos, cada um cercado por uma corrente
+    circulante, e só perde a supercondutividade em \(B_{c2}\), que pode valer dezenas de
+    tesla. São as ligas e os cupratos, e são eles que servem para fazer ímãs.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s6">6. Ginzburg-Landau</h2>
+
+  <p>Aqui a física estatística entra com força, e com um ferramental que já está montado.
+  No Módulo 9 a energia livre de Landau foi escrita como uma expansão em potências do
+  parâmetro de ordem. Ginzburg e Landau, em 1950, fizeram o mesmo para o supercondutor,
+  com duas diferenças decisivas: o parâmetro de ordem é <strong>complexo</strong>,
+  \(\psi=|\psi|e^{i\theta}\), e o gradiente tem de ser o acoplado ao campo, como manda a
+  mecânica quântica:</p>
+
+  <p>\[f=f_n+a(T)|\psi|^2+\frac{b}{2}|\psi|^4
+  +\frac{1}{2m^\ast}\left|\left(-i\hbar\nabla-q^\ast\vec A\right)\psi\right|^2
+  +\frac{B^2}{2\mu_0},\]</p>
+
+  <p>com \(a(T)=a_0(T-T_c)\), exatamente como no ferromagneto. Minimizando em relação a
+  \(|\psi|\) com campo nulo sai \(|\psi|^2=-a/b\propto(T_c-T)\), isto é, parâmetro de ordem
+  que cresce como \((T_c-T)^{1/2}\): o mesmo expoente \(\beta=1/2\) de campo médio que o
+  módulo anterior obteve para a magnetização.</p>
+
+  <p>Minimizando em relação a \(\vec A\) sai a corrente, e o termo que contém o gradiente da
+  fase é o coração de tudo:</p>
+
+  <p>\[\vec J_s=\frac{q^\ast|\psi|^2}{m^\ast}
+  \left(\hbar\nabla\theta-q^\ast\vec A\right).\]</p>
+
+  <p>Com \(|\psi|\) uniforme e \(\theta\) constante, essa expressão <em>é</em> a segunda
+  equação de London, agora deduzida em vez de postulada, e com
+  \(\lambda^2=m^\ast/\mu_0q^{\ast2}|\psi|^2\). O que era um palpite de 1935 virou
+  consequência de uma energia livre em 1950.</p>
+
+  <div class="bloco def">
+    <span class="rotulo">Qual simetria se quebra</span>
+    <p>No ferromagneto a simetria quebrada é a de rotação dos spins: o sistema escolhe uma
+    direção no espaço. Aqui o que se quebra é a invariância de <strong>fase</strong>: o
+    sistema escolhe um valor de \(\theta\), que não tem interpretação geométrica nenhuma e
+    nem por isso é menos real. Toda a fenomenologia que segue, da quantização do fluxo às
+    junções Josephson, é consequência de a fase ser uma variável física e coerente por
+    distâncias macroscópicas.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s7">7. Quantização do fluxo e vórtices</h2>
+
+  <p>Tome um anel supercondutor espesso e percorra um caminho fechado bem no miolo dele,
+  longe da superfície, onde \(\vec J_s=0\). Pela expressão da corrente, ali
+  \(\hbar\nabla\theta=q^\ast\vec A\). Integre ao longo do caminho: a integral de
+  \(\vec A\) é o fluxo enlaçado, e a de \(\nabla\theta\) tem de ser um múltiplo de
+  \(2\pi\), porque \(\psi\) é uma função de valor único e a fase só pode voltar ao mesmo
+  lugar dando voltas inteiras. Logo</p>
+
+  <p>\[\Phi=n\,\frac{h}{q^\ast},\qquad n\in\mathbb{Z}.\]</p>
+
+  <p>A medida, feita em 1961 por Deaver e Fairbank e, independentemente, por Doll e
+  Näbauer, deu o quantum valendo \(h/2e\), e não \(h/e\). O portador de carga tem carga
+  <strong>\(2e\)</strong>. Esta é a evidência mais direta de que os elétrons andam aos
+  pares, e ela é anterior à verificação de quase tudo o mais em BCS:</p>
+
+  <p>\[\Phi_0=\frac{h}{2e}=2{,}0678\times10^{-15}\ \mathrm{Wb}.\]</p>
+
+  <p>Num supercondutor de tipo II, cada filete de campo que entra acima de \(B_{c1}\) carrega
+  exatamente um \(\Phi_0\). São os vórtices de Abrikosov, que se arrumam numa rede
+  triangular e que, se puderem se mover, dissipam. Prender esses vórtices em defeitos é o
+  que faz um fio supercondutor comercial funcionar com corrente alta, e é por isso que a
+  metalurgia do nióbio-titânio importa tanto quanto a teoria.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s8">8. As pistas de que algo se emparelha</h2>
+
+  <p>Antes de 1957 havia três fatos experimentais apontando para o mesmo lugar, e vale a
+  pena vê-los como um detetive os veria.</p>
+
+  <div class="bloco ex">
+    <span class="rotulo">Os três indícios</span>
+    <p><strong>O efeito isotópico (1950).</strong> Trocando o isótopo do mercúrio,
+    \(T_c\) varia com \(M^{-1/2}\). A massa que aparece aí é a do <em>íon</em>, não a do
+    elétron, de modo que a rede cristalina participa do mecanismo. Para uma propriedade
+    puramente eletrônica isso seria inexplicável.</p>
+    <p><strong>O calor específico exponencial.</strong> Bem abaixo de \(T_c\), o calor
+    específico eletrônico não é linear em \(T\) como no metal normal: ele cai como
+    \(e^{-\Delta/\kB T}\). Esse formato é assinatura de um <strong>gap</strong> no espectro
+    de excitações, isto é, de uma energia mínima para criar a primeira excitação.</p>
+    <p><strong>A absorção de micro-ondas.</strong> O supercondutor é transparente a
+    radiação de frequência menor que \(2\Delta/h\) e começa a absorver acima disso. O fator
+    2 não é decorativo: quebrar o que quer que esteja ligado produz <em>duas</em>
+    excitações.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s9">9. O par de Cooper</h2>
+
+  <p>Em 1956 Cooper resolveu um problema de aparência modesta e consequências enormes. Tome
+  o mar de Fermi cheio e congelado, e acrescente apenas <em>dois</em> elétrons logo acima
+  dele, com uma interação atrativa fraca entre eles, válida só numa casca de espessura
+  \(\hbar\omega_D\) em torno de \(E_F\). Pergunta: existe estado ligado?</p>
+
+  <p>Escrevendo a função de onda do par como combinação dos estados disponíveis e levando à
+  equação de Schrödinger, a condição de autoconsistência fica</p>
+
+  <p>\[1=V\sum_{k}\frac{1}{2\varepsilon_k-E}
+  \;\longrightarrow\;1=N(0)V\int_0^{\hbar\omega_D}\frac{d\varepsilon}{2\varepsilon-E},\]</p>
+
+  <p>e a integral se faz na mão, dando</p>
+
+  <p>\[E=-2\hbar\omega_D\,e^{-2/N(0)V}\;&lt;\;0 .\]</p>
+
+  <p>Olhe o que esse resultado tem de extraordinário. A energia é <strong>negativa para
+  qualquer \(V&gt;0\)</strong>, por menor que seja: não existe limiar. Em três dimensões,
+  dois elétrons no vácuo só se ligam se a atração passar de certo valor, mas aqui a
+  presença do mar de Fermi, que restringe os estados disponíveis a uma casca fina e
+  portanto torna a densidade de estados efetivamente constante, muda o problema de
+  qualitativo. O mar de Fermi é instável.</p>
+
+  <p>Repare também na forma \(e^{-2/N(0)V}\): essa função não tem série de Taylor em torno
+  de \(V=0\). Nenhuma ordem de teoria de perturbação jamais produziria esse resultado, e é
+  exatamente por isso que o problema resistiu quarenta e seis anos.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">De onde vem a atração</span>
+    <p>Dois elétrons se repelem, e a repulsão é blindada mas não muda de sinal. A atração
+    vem da rede: um elétron passando atrai os íons positivos, que se deslocam e deixam,
+    atrás dele, uma região momentaneamente de carga positiva em excesso. A rede é lenta,
+    porque o íon é milhares de vezes mais pesado, de modo que essa deformação sobrevive por
+    um tempo \(\sim1/\omega_D\), tempo suficiente para um segundo elétron, já longe do
+    primeiro, ser atraído por ela. É uma atração <em>retardada</em>, mediada por fônons, e a
+    distância entre os parceiros é justamente \(\xi\), da ordem de centenas de distâncias
+    interatômicas. Os dois elétrons de um par de Cooper não são vizinhos: entre eles cabem
+    milhões de outros pares.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s10">10. Esboço de BCS</h2>
+
+  <p>Bardeen, Cooper e Schrieffer fecharam o problema em 1957 tratando todos os elétrons de
+  uma vez, e não apenas dois. O estado fundamental proposto é um produto sobre pares
+  \((\vec k\uparrow,-\vec k\downarrow)\), cada um com amplitude de estar ocupado ou vazio, e
+  a condição de mínimo leva à equação do gap, que em campo médio tem a mesma estrutura da
+  equação de autoconsistência de Weiss do módulo anterior:</p>
+
+  <p>\[1=N(0)V\int_0^{\hbar\omega_D}
+  \frac{\tanh\!\left(\sqrt{\varepsilon^2+\Delta^2}/2\kB T\right)}
+  {\sqrt{\varepsilon^2+\Delta^2}}\,d\varepsilon .\]</p>
+
+  <p>Compare com \(m=\tanh(mT_c/T)\) da seção 10 do Módulo 9: é a mesma ideia, uma
+  quantidade que aparece dos dois lados e só tem solução não nula abaixo de uma temperatura.
+  Resolvendo nos dois limites:</p>
+
+  <div class="bloco def">
+    <span class="rotulo">Os três resultados que se cobram</span>
+    <p>Em \(T=0\): \(\Delta(0)=2\hbar\omega_D\,e^{-1/N(0)V}\).</p>
+    <p>Em \(\Delta\to0\): \(\kB T_c=1{,}13\,\hbar\omega_D\,e^{-1/N(0)V}\), e a dependência
+    em \(\omega_D\propto M^{-1/2}\) <em>é</em> o efeito isotópico, que sai de graça.</p>
+    <p>Dividindo um pelo outro, a constante desconhecida \(N(0)V\) cancela e sobra um
+    número puro, sem parâmetro ajustável nenhum:</p>
+    <p>\[\boxed{\;\frac{2\Delta(0)}{\kB T_c}=3{,}53\;}\]</p>
+    <p>No alumínio, com \(T_c=1{,}18\) K, isso prevê \(\Delta=0{,}18\) meV; no chumbo, com
+    \(T_c=7{,}20\) K, prevê \(1{,}09\) meV. As medidas de tunelamento dão \(0{,}18\) e
+    \(1{,}4\) meV: o alumínio bate na mosca e o chumbo fica 25 % acima, por ser o que se
+    chama de acoplamento forte, em que a hipótese de interação fraca da dedução começa a
+    falhar.</p>
+  </div>
+
+  <p>O gap também explica a resistência nula, e de um jeito que vale enunciar com cuidado.
+  Resistência é espalhamento que muda o momento dos portadores. Para espalhar um par é
+  preciso quebrá-lo, e quebrá-lo custa \(2\Delta\). Se a energia disponível no
+  espalhamento, da ordem de \(\kB T\) ou do que a impureza possa entregar, é menor que
+  \(2\Delta\), simplesmente não há estado final para onde ir, e o espalhamento não ocorre.
+  Não é que a dissipação seja pequena: é que ela é proibida.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s11">11. O que ficou de fora</h2>
+
+  <p>Tudo o que foi dito acima vale para supercondutores ditos convencionais, aqueles em
+  que a cola é o fônon. Em 1986 Bednorz e Müller acharam supercondutividade num óxido de
+  cobre a 35 K, e em um ano o ítrio-bário-cobre-oxigênio passou de 90 K, acima do ponto de
+  ebulição do nitrogênio líquido, que custa menos que leite. Nesses materiais o par ainda é
+  um par, porque o fluxo continua quantizado em \(h/2e\), mas a cola quase certamente não é
+  o fônon, o estado normal não é um líquido de Fermi comum, e a simetria do par não é
+  esférica. Não há, até hoje, uma teoria aceita do mesmo calibre que BCS.</p>
+
+  <p>Há ainda os hidretos sob pressão, em que compostos ricos em hidrogênio sob centenas de
+  gigapascais exibem \(T_c\) próximas da temperatura ambiente, com um mecanismo que parece
+  ser o de BCS levado ao limite, já que o hidrogênio é leve e portanto \(\omega_D\) é
+  enorme. A pressão necessária, porém, é a do interior da Terra, o que mantém a aplicação
+  no terreno da curiosidade.</p>
+
+  <p>Para a disciplina, o que fica é o padrão: uma energia livre expandida em potências de
+  um parâmetro de ordem, uma equação de autoconsistência de campo médio, uma simetria que
+  se quebra e expoentes críticos que o campo médio acerta pela metade. É o mesmo esqueleto
+  do módulo anterior, vestido de outra roupa.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s12">12. Exercícios resolvidos</h2>
+
+  <div class="bloco ex">
+    <span class="rotulo">Exercício resolvido 10.1: a espessura em que o filme deixa de blindar</span>
+    <p><b>Uma placa supercondutora de espessura \(d\) é posta num campo \(B_0\) paralelo às
+    suas faces. Resolva a equação de London para o interior e ache o campo no plano médio.
+    Em que espessura o campo central chega a metade do aplicado?</b></p>
+    <details class="solucao"><summary>Ver solução</summary>
+    <div class="corpo-solucao">
+    <p>Com as faces em \(x=\pm d/2\), a equação \(d^2B/dx^2=B/\lambda^2\) tem solução par</p>
+    <p>\[B(x)=B_0\,\frac{\cosh(x/\lambda)}{\cosh(d/2\lambda)} .\]</p>
+    <p>No centro, \(B(0)/B_0=1/\cosh(d/2\lambda)\). Para que isso valha \(1/2\) é preciso
+    \(\cosh(d/2\lambda)=2\), ou seja \(d/2\lambda=\operatorname{arccosh}2=1{,}317\), o que
+    dá \(d=2{,}63\,\lambda\).</p>
+    <p>Com \(\lambda=40\) nm isso é \(d\approx105\) nm. <b>Interpretação:</b> uma placa de
+    um décimo de micrômetro já blinda mal. Abaixo disso o diamagnetismo é parcial, a
+    energia magnética que o filme teria de pagar é menor, e por isso o campo crítico de um
+    filme fino é muito maior que o do material em bloco: ele não precisa expulsar tudo.</p>
+    </div>
+    </details>
+  </div>
+
+  <div class="bloco ex">
+    <span class="rotulo">Exercício resolvido 10.2: lendo o gap no calor específico</span>
+    <p><b>Um supercondutor tem \(T_c=9{,}25\) K (nióbio). Estime o gap em \(T=0\) e a razão
+    entre o calor específico eletrônico em \(T_c/5\) e o valor que o metal normal teria na
+    mesma temperatura.</b></p>
+    <details class="solucao"><summary>Ver solução</summary>
+    <div class="corpo-solucao">
+    <p>Pela relação de BCS, \(\Delta(0)=1{,}764\,\kB T_c\), isto é</p>
+    <p>\[\Delta=1{,}764\times1{,}381\times10^{-23}\times9{,}25
+    =2{,}25\times10^{-22}\ \mathrm{J}=1{,}41\ \mathrm{meV}.\]</p>
+    <p>Em \(T=T_c/5=1{,}85\) K, o fator de Boltzmann do gap vale</p>
+    <p>\[e^{-\Delta/\kB T}=e^{-1{,}764\times5}=e^{-8{,}82}=1{,}5\times10^{-4}.\]</p>
+    <p>O calor específico normal, nessa temperatura, é \(\gamma T\), linear. O
+    supercondutor tem, além do fator exponencial, pré-fatores de ordem 1 a 10, de modo que
+    a razão fica na casa de \(10^{-3}\).</p>
+    <p><b>Interpretação.</b> A mil vezes menos, o calor específico eletrônico sumiu. É
+    assim que se mede um gap sem nenhum aparelho de alta frequência: basta um calorímetro e
+    um gráfico de \(\ln C\) contra \(1/T\), cuja inclinação dá \(\Delta/\kB\) diretamente.
+    Compare com o Módulo 8, em que a mesma curva, sem gap, dava a reta \(C=\gamma T\).</p>
+    </div>
+    </details>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s13">13. Exercícios propostos</h2>
+
+  <div class="bloco def">
+    <span class="rotulo">Para entregar</span>
+    <ol>
+      <li><b>10.1</b> Mostre, a partir da primeira equação de London e da lei de Faraday,
+      que um condutor perfeito conserva \(\vec B\) interno, e explique em uma frase por que
+      isso <em>não</em> é o efeito Meissner.</li>
+
+      <li><b>10.2</b> Calcule \(\lambda_L\) para \(n_s=1{,}5\times10^{28}\),
+      \(1{,}5\times10^{29}\) e \(1{,}5\times10^{30}\ \mathrm{m^{-3}}\) e comente a
+      dependência. Quanto valeria \(\lambda_L\) se apenas um elétron em mil participasse?</li>
+
+      <li><b>10.3</b> Use \(B_c(T)=B_c(0)[1-(T/T_c)^2]\) para obter \(s_n-s_s\) e mostre
+      que ela se anula em \(T=0\) e em \(T=T_c\). Explique o primeiro zero pela terceira
+      lei da termodinâmica.</li>
+
+      <li><b>10.4</b> A energia de condensação do alumínio é \(B_c^2(0)/2\mu_0\) com
+      \(B_c(0)=10{,}5\) mT. Compare-a com \(\kB T_c\) por elétron de condução
+      (\(n=1{,}8\times10^{29}\ \mathrm{m^{-3}}\), \(T_c=1{,}18\) K) e explique por que a
+      razão é tão pequena, lembrando qual fração dos elétrons está dentro do gap.</li>
+
+      <li><b>10.5</b> Deduza o quantum de fluxo repetindo o argumento da seção 7 para uma
+      carga \(q^\ast=e\) e compare com o valor medido. O que o resultado experimental
+      prova?</li>
+
+      <li><b>10.6</b> Resolva a integral do problema de Cooper e obtenha
+      \(E=-2\hbar\omega_D e^{-2/N(0)V}\). Em seguida calcule \(E\) para
+      \(N(0)V=0{,}2\) e \(0{,}3\), com \(\hbar\omega_D=30\) meV, e comente a sensibilidade
+      do resultado ao acoplamento.</li>
+
+      <li><b>10.7</b> Usando \(2\Delta/\kB T_c=3{,}53\), calcule a frequência mínima de
+      radiação capaz de quebrar pares no alumínio e no nióbio, e diga em que faixa do
+      espectro cada uma cai.</li>
+
+      <li><b>10.8</b> No widget da seção 3, ajuste \(d/\lambda\) até que o campo no centro
+      seja 90 % do aplicado e confira o resultado contra a fórmula do exercício resolvido
+      10.1.</li>
+    </ol>
+  </div>
+
+  <nav class="nav-aulas">
+    <a href="aula09.html"><small>Módulo anterior</small>← 9. Magnetismo</a>
+    <a class="prox" href="index.html"><small>Voltar</small>Página inicial →</a>
+  </nav>
+
+</main>
+</div>
+
+<footer class="rodape">
+  <img class="logo-rodape" src="assets/img/logo-lfca.png" alt="LFCA | URCA">
+  <p><strong>Prof. Apiano Morais</strong> · <a href="mailto:apiano.morais@urca.br">apiano.morais@urca.br</a><br>
+  Laboratório de Física Computacional Aplicada (LFCA) · Universidade Regional do Cariri</p>
+</footer>
+
+<script src="assets/js/widgets.js?v=202611102312"></script>
+</body>
+</html>

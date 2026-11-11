@@ -8114,6 +8114,81 @@
     window.addEventListener('resize', desenhar);
   };
 
+  /* =================================================================
+     A penetração de London numa placa supercondutora
+     O texto afirma duas coisas que só convencem desenhadas: que o campo
+     não para na superfície, e sim morre numa casca de espessura lambda;
+     e que uma placa fina deixa de blindar, porque as duas caudas se
+     encontram antes de chegar a zero.
+     ================================================================= */
+  REGISTRO.london = function (raiz) {
+    var corpo = moldura(raiz, 'Penetração de London numa placa');
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+
+    var lam = 40;    // comprimento de penetração, em nanômetros
+    var esp = 300;   // espessura da placa, em nanômetros
+
+    var controles = el('div', { class: 'controles' });
+    corpo.appendChild(controles);
+    deslizante(controles, 'comprimento de penetração \\(\\lambda\\) (nm)',
+      10, 120, 1, lam, function (v) { lam = v; desenhar(); }, inteiro);
+    deslizante(controles, 'espessura da placa \\(d\\) (nm)',
+      20, 600, 5, esp, function (v) { esp = v; desenhar(); }, inteiro);
+    tipografar(controles);
+
+    var mostrar = cartoes(corpo, [
+      { rot: '\\(d/\\lambda\\)', k: 'r' },
+      { rot: '\\(B(0)/B_0\\) no centro', k: 'b' },
+      { rot: 'fluxo expulso', k: 'f' },
+      { rot: 'regime', k: 'g' },
+    ]);
+    tipografar(corpo);
+
+    function inteiro(v) { return String(Math.round(v)); }
+
+    function perfil(x) {
+      /* x em nanômetros, medido do centro da placa */
+      if (Math.abs(x) >= esp / 2) return 1;
+      return Math.cosh(x / lam) / Math.cosh(esp / (2 * lam));
+    }
+
+    function desenhar() {
+      var meia = esp / 2, fora = Math.max(60, esp * 0.45);
+      var g = G.eixos(cv, {
+        altura: 300, xmin: -(meia + fora), xmax: meia + fora,
+        ymin: 0, ymax: 1.12, divY: 4,
+        rotX: 'posição (nm)', rotY: 'B / B₀',
+        marcasX: [{ v: -meia, r: '−d/2' }, { v: 0, r: '0' }, { v: meia, r: 'd/2' }],
+        formataY: function (v) { return v.toFixed(1).replace('.', ','); },
+      });
+
+      // a placa, como faixa de fundo
+      g.ct.save();
+      g.ct.fillStyle = 'rgba(44,95,141,.08)';
+      g.ct.fillRect(g.X(-meia), g.y0, g.X(meia) - g.X(-meia), g.y1 - g.y0);
+      g.ct.restore();
+
+      G.curva(g, perfil, G.COR.vinho, 2.6);
+      G.curva(g, function () { return 1; }, G.COR.suave, 1.2, [6, 5]);
+
+      var centro = perfil(0);
+      /* a média do perfil dentro da placa sai em forma fechada:
+         (1/d) int cosh(x/lam)/cosh(d/2lam) dx = (2 lam/d) tgh(d/2lam) */
+      var soma = (2 * lam / esp) * Math.tanh(esp / (2 * lam));
+      var regime = (esp / lam > 6) ? 'blinda bem' :
+                   (esp / lam > 2.63 ? 'blindagem parcial' : 'quase transparente');
+      mostrar({
+        r: F.fmt(esp / lam, 2),
+        b: F.fmt(centro, 3),
+        f: F.pct ? F.pct(1 - soma) : F.fmt(100 * (1 - soma), 1) + ' %',
+        g: regime,
+      });
+    }
+
+    registrarRedesenho(desenhar);
+  };
+
   /* ---------- inicialização ---------- */
   document.addEventListener('DOMContentLoaded', function () {
     Array.prototype.forEach.call(document.querySelectorAll('[data-widget]'), function (n) {
