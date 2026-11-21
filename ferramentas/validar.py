@@ -52,7 +52,8 @@ for p in paginas:
                 erros.append('%s: class="bloco %s" sem regra no CSS' % (p, mod))
 
         # 5. exercícios numerados pelo módulo
-        for ex in re.findall(r'Exercício resolvido (\d+)\.\d+', t):
+        for ex in (re.findall(r'Exercício resolvido (\d+)\.\d+', t)
+                   + re.findall(r'<b>(\d+)\.\d+</b>', t)):
             if int(ex) != int(m.group(1)):
                 erros.append('%s: exercício numerado %s.x' % (p, ex))
 
@@ -101,6 +102,24 @@ for p in paginas:
         b = len(re.findall(r'</%s>' % tag, t))
         if a != b:
             erros.append('%s: <%s> %d aberturas, %d fechamentos' % (p, tag, a, b))
+
+# 16. toda referência a "exercício N.m" aponta para um exercício que
+#     existe. Uma renumeração de módulos quebra isso sem quebrar nada
+#     mais, e a página continua válida apontando para o nada.
+alvos = {}
+for p in paginas:
+    mm = re.match(r'aula(\d+)\.html$', p)
+    if not mm:
+        continue
+    t = open(p, encoding='utf-8').read()
+    alvos[int(mm.group(1))] = (set(re.findall(r'<b>(\d+\.\d+)</b>', t))
+                               | set(re.findall(r'Exercício resolvido (\d+\.\d+)', t)))
+for p in paginas:
+    t = open(p, encoding='utf-8').read()
+    for ref in sorted(set(re.findall(r'exercícios? (\d+\.\d+)', t))):
+        mod = int(ref.split('.')[0])
+        if mod not in alvos or ref not in alvos[mod]:
+            erros.append('%s: cita exercício %s, que não existe' % (p, ref))
 
 # 11. nos widgets, LaTeX escrito com uma barra invertida só. Dentro de uma
 #     string JavaScript, "\(" vira "(" e "\sigma" vira "sigma": a barra some
