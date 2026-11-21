@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+# o material de origem (livro e apresentações) fica fora do repositório
+# público: ele é inédito e a publicação é decisão do autor
+conteudo/
+fonte/
