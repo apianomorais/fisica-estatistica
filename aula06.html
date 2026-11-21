@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Módulo 6: Gás ideal | Física Estatística</title>
+<title>Módulo 6: Adsorção | Física Estatística</title>
 <link rel="icon" type="image/png" href="assets/img/favicon.png">
-<link rel="stylesheet" href="assets/css/estilo.css?v=202611201318">
-<script src="assets/js/comum.js?v=202611201318"></script>
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611202222">
+<script src="assets/js/comum.js?v=202611202222"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
 <body>
@@ -24,13 +24,14 @@
       <a href="aula04.html" class="num" title="Módulo 4: Movimento browniano">4</a>
       <span class="grupo">Ensembles</span>
       <a href="aula05.html" class="num" title="Módulo 5: Ensembles canônico e grã-canônico">5</a>
+      <a href="aula06.html" class="num ativo" title="Módulo 6: Adsorção">6</a>
       <span class="grupo">Gases</span>
-      <a href="aula06.html" class="num ativo" title="Módulo 6: Gás ideal">6</a>
-      <a href="aula07.html" class="num" title="Módulo 7: Gases clássicos">7</a>
-      <a href="aula08.html" class="num" title="Módulo 8: Gases quânticos">8</a>
+      <a href="aula07.html" class="num" title="Módulo 7: Gás ideal">7</a>
+      <a href="aula08.html" class="num" title="Módulo 8: Gases clássicos">8</a>
+      <a href="aula09.html" class="num" title="Módulo 9: Gases quânticos">9</a>
       <span class="grupo">Magnetismo</span>
-      <a href="aula09.html" class="num" title="Módulo 9: Magnetismo">9</a>
-      <a href="aula10.html" class="num" title="Módulo 10: Supercondutividade">10</a>
+      <a href="aula10.html" class="num" title="Módulo 10: Magnetismo">10</a>
+      <a href="aula11.html" class="num" title="Módulo 11: Supercondutividade">11</a>
     </nav>
   </div>
 </header>
@@ -40,521 +41,399 @@
 <aside class="lateral">
   <h4>Neste módulo</h4>
   <ol>
-    <li><a href="#s1">1. O gás numa caixa</a></li>
-    <li><a href="#s2">2. Densidade de estados</a></li>
-    <li><a href="#s3">3. Por que o fator 1/N!</a></li>
-    <li><a href="#s4">4. A função de partição de uma partícula</a></li>
-    <li><a href="#s5">5. O comprimento de onda térmico</a></li>
-    <li><a href="#s6">6. Termodinâmica do gás ideal</a></li>
-    <li><a href="#s7">7. Quando o gás é clássico?</a></li>
-    <li><a href="#s8">8. A distribuição de Maxwell</a></li>
-    <li><a href="#s9">9. Fórmula barométrica</a></li>
-    <li><a href="#s10">10. O paradoxo de Gibbs</a></li>
-    <li><a href="#s11">11. Sackur e Tetrode</a></li>
-    <li><a href="#s12">12. Exercícios resolvidos</a></li>
-    <li><a href="#s13">13. Exercícios propostos</a></li>
+    <li><a href="#s1">1. A isoterma de Langmuir, em meia página</a></li>
+    <li><a href="#s2">2. O calor isostérico não é a energia de ligação</a></li>
+    <li><a href="#s3">3. Ajustar dados, e o preço de linearizar</a></li>
+    <li><a href="#s4">4. BET: além da primeira camada</a></li>
+    <li><a href="#s5">5. A área superficial que o BET mede</a></li>
+    <li><a href="#s6">6. No Spyder</a></li>
+    <li><a href="#s7">7. Exercícios resolvidos</a></li>
+    <li><a href="#s8">8. Exercícios propostos</a></li>
   </ol>
 </aside>
 
 <main class="conteudo">
 
-  <p class="chapeu">Módulo 6 · Gases</p>
-  <h1>Gás ideal</h1>
-  <p class="subtitulo">O sistema mais simples que existe, e ainda assim o que traz as três
-  lições mais profundas do curso: que estados se contam em células de volume \(h^3\), que
-  partículas idênticas não podem ser numeradas, e que a entropia tem um valor absoluto. Ao
-  fim deste módulo, a constante \(K\) pendente desde o Módulo 1 estará determinada.</p>
+  <p class="chapeu">Módulo 6 · Ensembles</p>
+  <h1>Adsorção</h1>
+  <p class="subtitulo">A isoterma de Langmuir sai do grã-canônico em três linhas, e foi obtida assim no módulo anterior. Este módulo trata do que vem depois: o que a dependência com a temperatura revela, o que a linearização custa, e como uma segunda camada de moléculas virou o método padrão de medir a área de um pó.</p>
 
   <div class="bloco def">
     <span class="rotulo">Objetivos</span>
     <ul>
-      <li>Obter a densidade de estados \(g(p)\,dp=4\pi V p^2dp/h^3\) a partir da caixa quântica;</li>
-      <li>Justificar o fator \(1/N!\) e saber em que regime ele vale;</li>
-      <li>Calcular \(z=V/\lambda_T^3\) e identificar o comprimento de onda térmico;</li>
-      <li>Deduzir \(PV=N\kB T\), \(U=\frac32N\kB T\) e \(\mu(T,n)\) a partir de \(F\);</li>
-      <li>Escrever a condição de validade do regime clássico, \(n\lambda_T^3\ll 1\);</li>
-      <li>Obter a distribuição de Maxwell e a fórmula barométrica;</li>
-      <li>Resolver o paradoxo de Gibbs e escrever a fórmula de Sackur e Tetrode.</li>
+      <li>Reconhecer a isoterma de Langmuir e as suas hipóteses, sem repetir a dedução;</li>
+      <li>Extrair o calor isostérico de isotermas e saber por que ele excede a energia de ligação;</li>
+      <li>Ajustar dados de adsorção sem introduzir o viés da linearização;</li>
+      <li>Deduzir a isoterma BET somando camadas e entender a divergência na saturação;</li>
+      <li>Calcular área superficial a partir do volume de monocamada;</li>
+      <li>Reconhecer, num ajuste BET, os sinais de que o modelo foi usado fora do lugar.</li>
     </ul>
   </div>
 
   <hr class="linha">
 
   <!-- ================================================== -->
-  <h2 id="s1">1. O gás numa caixa</h2>
+  <h2 id="s1">1. A isoterma de Langmuir, em meia página</h2>
 
-  <p>Considere \(N\) partículas sem interação numa caixa de volume \(V=L_xL_yL_z\). Pela
-  relação de de Broglie, \(\vec p=\hbar\vec k\), e a energia de uma partícula é</p>
+  <p>O exercício resolvido 5.2 do módulo anterior já fez a conta inteira, e não vale a pena
+  refazê-la. Vale recordar o resultado e, sobretudo, as hipóteses, porque todo o resto deste
+  módulo consiste em cobrar delas.</p>
 
-  <p>\[\varepsilon=\frac{p^2}{2m}=\frac{\hbar^2}{2m}\left(k_x^2+k_y^2+k_z^2\right).\]</p>
+  <p>Uma superfície com sítios idênticos e independentes, cada um vazio ou ocupado por uma
+  única molécula de energia \(-\epsilon\), em contato com um gás de potencial químico
+  \(\mu\), tem fração ocupada</p>
 
-  <p>Com condições de contorno periódicas, os números de onda são quantizados:</p>
+  <p>\[\theta=\frac{1}{1+e^{-\beta\left(\epsilon+\mu\right)}}
+  =\frac{P}{P+K\left(T\right)},
+  \qquad
+  K\left(T\right)=\frac{\kB T}{\lambda_T^3}\,e^{-\beta\epsilon}.\]</p>
 
-  <p>\[k_x=\frac{2\pi}{L_x}\ell_x,\qquad
-  k_y=\frac{2\pi}{L_y}\ell_y,\qquad
-  k_z=\frac{2\pi}{L_z}\ell_z,\]</p>
-
-  <p>com \(\ell_i=0,\pm1,\pm2,\dots\) Os estados formam uma rede cúbica no espaço dos
-  \(\vec k\), com espaçamento \(2\pi/L_i\) em cada direção.</p>
-
-  <!-- ================================================== -->
-  <h2 id="s2">2. Densidade de estados</h2>
-
-  <p>O número de valores inteiros de \(\ell_x\) para os quais \(k_x\) cai entre \(k_x\) e
-  \(k_x+dk_x\) é</p>
-
-  <p>\[\Delta\ell_x=\frac{L_x}{2\pi}\,dk_x,\]</p>
-
-  <p>e em três dimensões</p>
-
-  <p>\[\Delta\ell_x\,\Delta\ell_y\,\Delta\ell_z
-  =\frac{V}{8\pi^3}\,d^3k \equiv \rho_k\,d^3k.\]</p>
-
-  <p>Passando para o momento com \(\vec p=\hbar\vec k\), de modo que \(dk_i=dp_i/\hbar\):</p>
-
-  <p>\[\rho_p=\frac{V}{8\pi^3\hbar^3}=\boxed{\;\frac{V}{h^3}\;}\]</p>
+  <p>A segunda forma vem de usar \(\mu\) do gás ideal, e é a que se compara com o laboratório,
+  porque pressão se mede e potencial químico não. A constante \(K\) é simplesmente a pressão
+  em que metade dos sítios está ocupada.</p>
 
   <div class="bloco fisica">
-    <span class="rotulo">A célula de volume h³ outra vez</span>
-    <p>Este é o mesmo resultado dos Módulos 2 e 3, agora deduzido em vez de postulado: o
-    espaço de fase é dividido em células de volume \(h^3\), uma por estado, por partícula e
-    por grau de liberdade espacial. No limite clássico \(h\to 0\) a densidade de estados
-    diverge, que é a maneira matemática de dizer que a contagem clássica não existe sem a
-    mecânica quântica.</p>
+    <span class="rotulo">Três hipóteses, e o que cada uma proíbe</span>
+    <ul>
+      <li><strong>Sítios idênticos.</strong> Proíbe superfícies heterogêneas, em que uns sítios
+      ligam mais forte que outros. Numa superfície real, cantos e degraus ligam melhor que
+      faces planas, e enchem primeiro.</li>
+      <li><strong>Sítios independentes.</strong> Proíbe interação entre moléculas vizinhas já
+      adsorvidas. É essa hipótese que faz a soma grã-canônica se fatorar, e a seção 6 a verifica
+      por enumeração direta.</li>
+      <li><strong>Uma molécula por sítio.</strong> Proíbe empilhamento. É a hipótese que a
+      seção 4 vai abandonar.</li>
+    </ul>
   </div>
 
-  <p>Integrando sobre as direções do momento, com \(d^3p=p^2\,dp\,\sen\theta\,d\theta\,d\varphi\):</p>
+  <p>Repare na forma \(\theta=1/(1+e^{-\beta(\epsilon+\mu)})\): é a distribuição de Fermi e
+  Dirac, que aparecerá no módulo 9. O parentesco não é analogia, é identidade estrutural: em
+  ambos os casos cada sítio ou estado comporta no máximo uma partícula, e a fórmula não diz
+  mais do que isso.</p>
 
-  <p>\[\boxed{\;g(p)\,dp=\frac{4\pi V}{h^3}\,p^2\,dp\;}\]</p>
-
-  <p>Esta é a <strong>densidade de estados</strong>: quantos estados individuais existem com
-  módulo do momento entre \(p\) e \(p+dp\). O fator \(p^2\) vem da área da casca esférica no
-  espaço dos momentos, e é ele que, multiplicado pelo peso de Boltzmann, produzirá a forma
-  característica da distribuição de Maxwell.</p>
+  <div data-widget="adsorcao"></div>
 
   <!-- ================================================== -->
-  <h2 id="s3">3. Por que o fator 1/N!</h2>
+  <h2 id="s2">2. O calor isostérico não é a energia de ligação</h2>
 
-  <p>Se tratássemos as partículas como distinguíveis, teríamos \(Z_N=Z_1^N\) como no módulo
-  anterior. Vejamos o que isso significa com duas partículas:</p>
+  <p>A isoterma tem um parâmetro com dimensão de energia, \(\epsilon\), e a pergunta natural é
+  como medi-lo. A resposta não está numa isoterma só: está em como a isoterma se desloca
+  quando a temperatura muda.</p>
 
-  <p>\[Z_2=\left(\sum_{j_1}e^{-\beta\varepsilon_{j_1}}\right)
-  \left(\sum_{j_2}e^{-\beta\varepsilon_{j_2}}\right)
-  =\underbrace{\sum_{j}e^{-2\beta\varepsilon_j}}_{\text{mesmo estado}}
-  +\underbrace{\sum_{j_1\ne j_2}e^{-\beta(\varepsilon_{j_1}+\varepsilon_{j_2})}}_{\text{estados distintos}}.\]</p>
+  <p>O procedimento padrão fixa a <em>cobertura</em> e pergunta qual pressão é necessária para
+  mantê-la em cada temperatura. Com \(\theta\) fixo, a relação \(\theta=P/(P+K)\) obriga
+  \(P\propto K(T)\), de modo que</p>
 
-  <p>No segundo termo, a configuração "partícula A no estado 1, partícula B no estado 2"
-  aparece <em>duas</em> vezes, trocando os rótulos. Mas as partículas são idênticas: trocar
-  os rótulos não produz um estado novo, produz o mesmo estado descrito de outro jeito. Esse
-  termo está contado \(2!\) vezes a mais.</p>
+  <p>\[\left.\frac{\partial\ln P}{\partial\left(1/T\right)}\right|_\theta
+  =\frac{d\ln K}{d\left(1/T\right)}
+  =-\frac{q_{\text{st}}}{\kB},\]</p>
 
-  <p>Generalizando para \(N\) partículas, o termo em que todas ocupam estados distintos está
-  contado \(N!\) vezes a mais:</p>
+  <p>e a grandeza \(q_{\text{st}}\) assim definida chama-se <strong>calor isostérico de
+  adsorção</strong>. É um gráfico de \(\ln P\) contra \(1/T\) a cobertura constante, e a
+  inclinação dá a energia. Simples, e com uma armadilha.</p>
 
-  <p>\[Z_N=\underbrace{\left(\text{termos com estados repetidos}\right)}_{\text{sem correção simples}}
-  +\frac{1}{N!}\sum_{j_1\ne j_2\ne\dots\ne j_N}
-  e^{-\beta(\varepsilon_{j_1}+\dots+\varepsilon_{j_N})}.\]</p>
-
-  <div class="destaque">
-    <span class="anuncio">O regime clássico</span>
-    Se a probabilidade de dois átomos ocuparem o mesmo estado for desprezível, o primeiro
-    grupo de termos some e sobra
-    \[Z_N\approx\frac{Z_1^{\,N}}{N!}\]
+  <div class="bloco alerta">
+    <span class="rotulo">A inclinação não dá \(\epsilon\)</span>
+    <p>Substituindo \(K(T)=\kB T\lambda_T^{-3}e^{-\beta\epsilon}\) e lembrando que
+    \(\lambda_T\propto T^{-1/2}\), tem-se \(\ln K=\text{const}+\tfrac52\ln T-\epsilon/\kB T\), e
+    portanto</p>
+    <p>\[q_{\text{st}}=\epsilon+\tfrac52\kB T.\]</p>
+    <p>Sobra a entalpia por partícula do gás, \(\tfrac32\kB T\) de energia cinética mais
+    \(\kB T\) de trabalho de expansão. O calor isostérico mede a diferença de entalpia entre a
+    molécula adsorvida e a molécula <em>no gás</em>, e não a profundidade do poço. À temperatura
+    ambiente a correção vale 0,065 eV, que é da ordem da diferença entre uma fisissorção forte
+    e uma quimissorção fraca.</p>
   </div>
 
-  <p>Note com cuidado a lógica: a divisão por \(N!\) <strong>não é exata</strong>. Ela é a
-  aproximação válida quando os estados são tão numerosos em relação às partículas que a
-  ocupação dupla praticamente não ocorre. Quando essa condição falha, a correção depende de
-  as partículas serem bósons ou férmions, e o resultado é a estatística quântica do Módulo 8.
-  O \(1/N!\) é o limite comum às duas.</p>
+  <p>Há um segundo uso, mais importante que o primeiro, para esse gráfico. Num modelo de sítios
+  idênticos, \(q_{\text{st}}\) não pode depender de \(\theta\): todos os sítios são iguais, e
+  tanto faz qual se ocupa. Medir \(q_{\text{st}}\) em várias coberturas é, portanto, um teste
+  da própria hipótese de Langmuir. Quando o calor isostérico <em>cai</em> com a cobertura, o
+  que quase sempre acontece em superfícies reais, a leitura é direta: os sítios não são
+  idênticos, e os melhores foram ocupados primeiro.</p>
 
   <!-- ================================================== -->
-  <h2 id="s4">4. A função de partição de uma partícula</h2>
+  <h2 id="s3">3. Ajustar dados, e o preço de linearizar</h2>
 
-  <p>Para uma partícula sem estrutura interna num potencial externo \(u(\vec r)\),</p>
+  <p>A isoterma se deixa linearizar de várias maneiras, sendo a mais comum</p>
 
-  <p>\[\varepsilon(\vec r,\vec p)=\frac{p^2}{2m}+u(\vec r),\]</p>
+  <p>\[\frac{1}{\theta}=1+\frac{K}{P},\]</p>
 
-  <p>e a soma sobre estados vira uma integral no espaço de fase dividida por \(h^3\):</p>
+  <p>que é uma reta de \(1/\theta\) contra \(1/P\). Durante décadas foi assim que se ajustaram
+  dados de adsorção, por uma razão excelente: não havia computador, e uma régua sobre papel
+  milimetrado resolvia. A prática sobreviveu ao motivo, e é hoje a origem de uma quantidade
+  considerável de números errados na literatura.</p>
 
-  <p>\[z=\frac{1}{h^3}\int e^{-\beta\left[\frac{p^2}{2m}+u(\vec r)\right]}d^3p\,d^3r
-  =\underbrace{\frac{1}{h^3}\int e^{-\beta p^2/2m}d^3p}_{z^{\rm tr}}
-  \cdot\underbrace{\int e^{-\beta u(\vec r)}d^3r}_{z^{u}}.\]</p>
-
-  <p>A parte translacional se separa nas três componentes, e cada uma é uma gaussiana:</p>
-
-  <p>\[\int_{-\infty}^{\infty}e^{-ax^2}dx=\sqrt{\frac{\pi}{a}}
-  \;\Longrightarrow\;
-  z^{\rm tr}=\frac{1}{h^3}\left(2\pi m\kB T\right)^{3/2}.\]</p>
-
-  <p>Para uma caixa sem campo externo, \(u=0\) dentro e infinito fora, logo \(z^u=V\), e</p>
-
-  <p>\[\boxed{\;z=\frac{V}{h^3}\left(2\pi m\kB T\right)^{3/2}\;}\]</p>
-
-  <p>Se a partícula tiver estrutura interna (rotação, vibração, estados eletrônicos), o
-  hamiltoniano ganha um termo independente e a função de partição simplesmente fatora,
-  \(Z_1=z\cdot z^{\rm int}\), de modo que as contribuições se somam em \(F\) e em \(U\).</p>
-
-  <!-- ================================================== -->
-  <h2 id="s5">5. O comprimento de onda térmico</h2>
-
-  <p>A expressão acima fica muito mais eloquente escrita assim:</p>
-
-  <div class="destaque">
-    <span class="anuncio">Comprimento de onda térmico de de Broglie</span>
-    \[z=\frac{V}{\lambda_T^{3}},\qquad
-      \lambda_T\equiv\frac{h}{\sqrt{2\pi m\kB T}}\]
-  </div>
-
-  <p>\(\lambda_T\) é, a menos de um fator de ordem 1, o comprimento de onda de de Broglie de
-  uma partícula com energia térmica típica. E \(z\) ganha um significado geométrico direto:
-  <strong>é o número de células de tamanho \(\lambda_T^3\) que cabem no volume</strong>, ou
-  seja, o número de lugares quânticos distinguíveis onde a partícula pode estar.</p>
-
-  <div class="tabela-rolavel">
-  <table>
-    <thead><tr><th>Partícula</th><th>\(\lambda_T\) a 300 K</th><th>\(\lambda_T\) a 1 K</th>
-    <th>Comparar com</th></tr></thead>
-    <tbody>
-      <tr><td>Elétron</td><td>4,3 nm</td><td>74 nm</td><td>espaçamento atômico 0,2 nm</td></tr>
-      <tr><td>Hélio-4</td><td>0,050 nm</td><td>0,87 nm</td><td>espaçamento no líquido 0,3 nm</td></tr>
-      <tr><td>Nitrogênio</td><td>0,019 nm</td><td>0,32 nm</td><td>espaçamento no ar 3 nm</td></tr>
-      <tr><td>Argônio</td><td>0,016 nm</td><td>0,28 nm</td><td>espaçamento no ar 3 nm</td></tr>
-    </tbody>
-  </table>
-  </div>
-
-  <p>Já se vê onde a física quântica vai aparecer: o elétron num metal tem \(\lambda_T\)
-  vinte vezes maior que o espaçamento atômico, de modo que o gás de elétrons
-  <strong>nunca</strong> é clássico, nem à temperatura ambiente. O hélio líquido a 1 K tem
-  \(\lambda_T\) maior que a distância entre átomos, e por isso vira superfluido. O ar é
-  clássico com enorme folga.</p>
-
-  <!-- ================================================== -->
-  <h2 id="s6">6. Termodinâmica do gás ideal</h2>
-
-  <p>Com \(Z=z^N/N!\) e a aproximação de Stirling \(\ln N!\approx N\ln N-N\):</p>
-
-  <p>\[F=-\kB T\ln Z=-\kB TN\ln z+\kB T\left(N\ln N-N\right)
-  =-N\kB T\ln\left[\frac{e\,z}{N}\right],\]</p>
-
-  <p>onde se usou \(N=N\ln e\). Explicitando \(z\):</p>
-
-  <p>\[\boxed{\;F=-N\kB T\ln\left[\frac{eV}{N\lambda_T^3}\right]\;}\]</p>
-
-  <p>Repare que \(F\) depende de \(V\) e \(N\) apenas pela combinação \(V/N\): a energia livre
-  é extensiva, como tem de ser. Foi o \(N!\) que garantiu isso. Agora é só diferenciar.</p>
-
-  <div class="tabela-rolavel">
-  <table>
-    <thead><tr><th>Grandeza</th><th>Derivada</th><th>Resultado</th></tr></thead>
-    <tbody>
-      <tr><td>Pressão</td><td>\(P=-\dpar{F}{V}{T,N}\)</td>
-          <td>\(P=\dfrac{N\kB T}{V}\), isto é \(PV=N\kB T\)</td></tr>
-      <tr><td>Energia</td><td>\(U=-\dfrac{\partial\ln Z}{\partial\beta}\)</td>
-          <td>\(U=\tfrac32 N\kB T\)</td></tr>
-      <tr><td>Calor específico</td><td>\(C_V=\dpar{U}{T}{V}\)</td>
-          <td>\(C_V=\tfrac32 N\kB\)</td></tr>
-      <tr><td>Potencial químico</td><td>\(\mu=\dpar{F}{N}{T,V}\)</td>
-          <td>\(\mu=\kB T\ln\left(n\lambda_T^3\right)\)</td></tr>
-      <tr><td>Entropia</td><td>\(S=-\dpar{F}{T}{V,N}\)</td>
-          <td>\(S=N\kB\left[\ln\dfrac{V}{N\lambda_T^3}+\dfrac52\right]\)</td></tr>
-    </tbody>
-  </table>
-  </div>
+  <p>O problema é estatístico e tem nome. Se a incerteza de \(\theta\) é a mesma em todos os
+  pontos, a incerteza de \(1/\theta\) não é: ela vale \(\sigma/\theta^2\), de modo que os
+  pontos de cobertura baixa, que são justamente os menos precisos, passam a dominar o ajuste.
+  Tomar o recíproco de um dado ruidoso redistribui os pesos de um jeito que ninguém escolheu e
+  quase ninguém percebe.</p>
 
   <div class="bloco fisica">
-    <span class="rotulo">A equação de estado, enfim deduzida</span>
-    <p>No Módulo 1, \(PV=N\kB T\) foi apresentada como um fato experimental. No Módulo 3 foi
-    obtida dos choques, com argumentos cinéticos. Aqui ela sai de uma integral gaussiana e de
-    uma derivada, sem nenhum modelo de colisão.</p>
-    <p>E note de onde ela vem exatamente: do \(V\) dentro do logaritmo em \(F\). A pressão
-    de um gás ideal é <strong>puramente entrópica</strong>. Não há energia envolvida, porque
-    \(U\) não depende do volume. O gás empurra o pistão porque há mais maneiras de arranjá-lo
-    num volume maior, e por nenhuma outra razão.</p>
-  </div>
-
-  <p>Repare ainda no potencial químico: \(\mu=\kB T\ln(n\lambda_T^3)\) é
-  <strong>negativo</strong> para um gás clássico diluído, já que \(n\lambda_T^3\ll1\). Ele
-  fica menos negativo conforme a densidade sobe, e cruza zero exatamente quando o gás deixa
-  de ser clássico. Guarde essa observação para o Módulo 8.</p>
-
-  <!-- ================================================== -->
-  <h2 id="s7">7. Quando o gás é clássico?</h2>
-
-  <p>A condição usada na seção 3 foi que a ocupação média de cada estado seja pequena. No
-  ensemble canônico essa ocupação é</p>
-
-  <p>\[\overline n_i=\frac{N}{z}e^{-\beta\varepsilon_i}\le\frac{N}{z}=\frac{N\lambda_T^3}{V},\]</p>
-
-  <p>de modo que a condição \(\overline n_i\ll1\) se escreve</p>
-
-  <div class="destaque">
-    <span class="anuncio">Critério de classicalidade</span>
-    \[n\lambda_T^{3}\ll 1
-    \qquad\Longleftrightarrow\qquad
-    \Lambda\gg\lambda_T,\quad \Lambda\equiv\left(\frac{V}{N}\right)^{1/3}\]
-  </div>
-
-  <p>Em palavras: o gás é clássico quando o comprimento de onda das partículas é muito menor
-  que a distância média entre elas. As ondas não se superpõem, e portanto não há como
-  perceber que são idênticas.</p>
-
-  <div class="tabela-rolavel">
-  <table>
-    <thead><tr><th>Sistema</th><th>\(n\) (m⁻³)</th><th>\(T\)</th><th>\(n\lambda_T^3\)</th>
-    <th>Regime</th></tr></thead>
-    <tbody>
-      <tr><td>Ar ambiente</td><td>\(2{,}5\times10^{25}\)</td><td>300 K</td>
-          <td>\(\sim10^{-7}\)</td><td>clássico com folga</td></tr>
-      <tr><td>Hélio líquido</td><td>\(2{,}2\times10^{28}\)</td><td>2 K</td>
-          <td>\(\sim 3\)</td><td>quântico: superfluidez</td></tr>
-      <tr><td>Elétrons no cobre</td><td>\(8{,}5\times10^{28}\)</td><td>300 K</td>
-          <td>\(\sim 7\times10^{3}\)</td><td>quântico: gás de Fermi degenerado</td></tr>
-      <tr><td>Condensado de rubídio</td><td>\(10^{19}\)</td><td>100 nK</td>
-          <td>\(\gtrsim 2{,}6\)</td><td>quântico: condensado de Bose</td></tr>
-    </tbody>
-  </table>
+    <span class="rotulo">Quanto isso custa, medido</span>
+    <p>A seção 6 gera dados de Langmuir com \(K\) conhecido, acrescenta ruído e ajusta pelos
+    dois caminhos, repetindo quatrocentas vezes para ter a média. Com ruído de 1 % em
+    \(\theta\), o ajuste linearizado erra \(K\) em 4 % e o ajuste direto em 0,2 %. Com ruído de
+    5 %, o ajuste direto continua em 0,2 % e o linearizado devolve um \(K\)
+    <strong>negativo</strong>, que não tem significado físico nenhum.</p>
+    <p>Não é um detalhe de estatística: pelo que a seção 2 mostrou, um \(K\) errado é uma
+    energia de ligação errada. Hoje o ajuste não linear é uma linha de programa, e a
+    linearização só serve para uma coisa, que continua valiosa: <em>olhar</em> os dados e ver
+    se eles de fato caem numa reta, isto é, se são mesmo de Langmuir.</p>
   </div>
 
   <!-- ================================================== -->
-  <h2 id="s8">8. A distribuição de Maxwell</h2>
+  <h2 id="s4">4. BET: além da primeira camada</h2>
 
-  <p>A probabilidade de encontrar uma partícula com posição em \(d^3r\) e momento em
-  \(d^3p\) é o peso de Boltzmann vezes o número de estados nesse elemento:</p>
+  <p>A terceira hipótese de Langmuir, uma molécula por sítio, é a que falha mais cedo. Quando a
+  pressão se aproxima da pressão de saturação \(P_0\), em que o gás condensaria, moléculas
+  passam a se empilhar sobre as já adsorvidas, e a cobertura não satura em 1: cresce sem
+  limite. Brunauer, Emmett e Teller trataram esse caso em 1938, com um modelo de uma
+  simplicidade quase descarada e de uma utilidade que dura até hoje.</p>
 
-  <p>\[f(\vec r,\vec p)\,d^3r\,d^3p
-  =\frac{1}{h^3}\frac{e^{-\beta\varepsilon(\vec r,\vec p)}}{z}\,d^3r\,d^3p.\]</p>
+  <p>A ideia é permitir pilhas de altura qualquer sobre cada sítio, e supor que <em>todas as
+  camadas acima da primeira se comportam como líquido</em>. Só a primeira camada sente a
+  superfície; da segunda em diante, a energia de ligação é a de condensação do próprio líquido.
+  Chamando \(x=P/P_0\) e deixando a diferença entre a primeira camada e as demais num único
+  parâmetro \(c\), o peso de uma pilha de \(i\) moléculas é \(cx^i\), e somando as séries</p>
 
-  <p>Sem campo externo, a parte espacial é uniforme, \(d^3r/V\), e a de momento fica</p>
+  <p>\[\frac{v}{v_m}
+  =\frac{\sum_{i\ge1}i\,cx^i}{1+\sum_{i\ge1}cx^i}
+  =\frac{cx}{\left(1-x\right)\left(1-x+cx\right)},\]</p>
 
-  <p>\[f(\vec p)\,d^3p
-  =\frac{e^{-p^2/2m\kB T}}{\left(2\pi m\kB T\right)^{3/2}}\,d^3p.\]</p>
+  <p>em que \(v_m\) é o volume de gás que completaria exatamente uma monocamada. O parâmetro
+  \(c\) vale aproximadamente \(e^{(\epsilon_1-\epsilon_L)/\kB T}\), com \(\epsilon_1\) a energia
+  da primeira camada e \(\epsilon_L\) a de liquefação: ele mede o quanto a superfície é mais
+  atraente que o próprio líquido.</p>
 
-  <p>Note que isso <strong>fatora</strong> nas três componentes: cada \(p_j\) é uma gaussiana
-  independente de média zero e variância \(m\kB T\). É o teorema central do limite aparecendo
-  de graça, e justifica tratar \(v_x\), \(v_y\) e \(v_z\) como independentes.</p>
-
-  <p>Passando a coordenadas esféricas e integrando as direções, com \(p=mv\):</p>
-
-  <div class="destaque">
-    <span class="anuncio">Distribuição de Maxwell para o módulo da velocidade</span>
-    \[f(v)=4\pi\left(\frac{m}{2\pi \kB T}\right)^{3/2}v^2\,e^{-mv^2/2\kB T}\]
-  </div>
-
-  <p>O fator \(v^2\) vem da densidade de estados e cresce; a exponencial decresce. O produto
-  tem máximo, e dele saem as três velocidades características:</p>
-
-  <p>\[v_p=\sqrt{\frac{2\kB T}{m}},\qquad
-  \overline v=\sqrt{\frac{8\kB T}{\pi m}},\qquad
-  v_{\rm rms}=\sqrt{\frac{3\kB T}{m}},\]</p>
-
-  <p>sempre nessa ordem, com razões fixas \(1:1{,}128:1{,}225\) independentes de massa e
-  temperatura.</p>
-
-  <div data-widget="maxwell"></div>
-
-  <!-- ================================================== -->
-  <h2 id="s9">9. Fórmula barométrica</h2>
-
-  <p>Ligue agora a gravidade: \(u(y)=mgy\). A parte espacial da distribuição deixa de ser
-  uniforme,</p>
-
-  <p>\[n(y)=n_0\,e^{-mgy/\kB T},\]</p>
-
-  <p>que é a <strong>fórmula barométrica</strong>, com altura de escala \(H=\kB T/mg\). É
-  apenas a distribuição de Boltzmann aplicada à energia potencial, e vale verificar que ela é
-  consistente com a hidrostática: de \(dP/dy=-\rho g\) e \(P=n\kB T\) segue
-  \(dn/dy=-nmg/\kB T\), cuja solução é exatamente a exponencial acima.</p>
-
-  <p>A segunda vista do widget mostra o perfil para vários gases. Como \(H\propto 1/m\), gases
-  leves têm atmosferas mais altas, e é por isso que a composição do ar muda com a altitude.</p>
-
-  <!-- ================================================== -->
-  <h2 id="s10">10. O paradoxo de Gibbs</h2>
-
-  <p>Volte ao exercício 5.3 do módulo anterior. Sem o fator \(1/N!\), a entropia sairia</p>
-
-  <p>\[S_{\rm errada}=N\kB\left[\ln V+\tfrac32\ln T+\text{const}\right],\]</p>
-
-  <p>que contém \(\ln V\) em vez de \(\ln(V/N)\). Dobre \(V\) e \(N\) simultaneamente: a
-  entropia deveria dobrar, e não dobra. <strong>Ela não é extensiva.</strong></p>
-
-  <p>A consequência absurda aparece ao remover uma divisória entre dois recipientes do
-  <em>mesmo</em> gás, nas mesmas condições. Nada acontece fisicamente, e ainda assim a conta
-  errada prevê um ganho \(\Delta S=2N\kB\ln2\). Esse é o <strong>paradoxo de Gibbs</strong>,
-  formulado em 1875.</p>
-
-  <div data-widget="gibbs"></div>
-
-  <div class="bloco fisica">
-    <span class="rotulo">O que o paradoxo estava dizendo</span>
-    <p>Gibbs percebeu o problema e a correção vinte e cinco anos antes de existir mecânica
-    quântica. Mas a <em>razão</em> da correção só a mecânica quântica forneceu: partículas
-    idênticas não têm identidade individual. Não é que não consigamos distingui-las por
-    limitação de instrumento; é que não existe um fato sobre qual é qual.</p>
-    <p>Esse é um daqueles raros casos em que uma inconsistência termodinâmica apontou para
-    uma revolução conceitual décadas antes que ela chegasse. O \(N!\) é uma pegada da
-    mecânica quântica deixada na física clássica.</p>
+  <div class="bloco alerta">
+    <span class="rotulo">A divergência em \(x\to1\) é o modelo falando, não um erro</span>
+    <p>A fórmula diverge quando \(P\to P_0\), e deve divergir: ali o gás condensa, e o número
+    de camadas empilhadas cresce sem limite. Com \(c=100\), o modelo dá 1,4 camadas em
+    \(x=0{,}3\), 10 em \(x=0{,}9\) e 100 em \(x=0{,}99\). Nenhum experimento é feito nessa
+    região, e qualquer ajuste BET que inclua pontos acima de \(x\approx0{,}4\) está pedindo
+    para dar errado.</p>
   </div>
 
   <!-- ================================================== -->
-  <h2 id="s11">11. Sackur e Tetrode</h2>
+  <h2 id="s5">5. A área superficial que o BET mede</h2>
 
-  <p>Com o \(1/N!\) no lugar, a entropia fica</p>
+  <p>O que torna o BET indispensável não é descrever a isoterma, e sim o que se extrai dela.
+  Rearranjando a fórmula,</p>
 
-  <div class="destaque">
-    <span class="anuncio">Fórmula de Sackur e Tetrode (1912)</span>
-    \[S=N\kB\left[\ln\!\left(\frac{V}{N\lambda_T^{3}}\right)+\frac{5}{2}\right],
-    \qquad \lambda_T=\frac{h}{\sqrt{2\pi m\kB T}}\]
-  </div>
+  <p>\[\frac{x}{v\left(1-x\right)}
+  =\frac{1}{v_mc}+\frac{c-1}{v_mc}\,x,\]</p>
 
-  <p>Agora olhe o que foi conquistado. No Módulo 1, integrando a relação fundamental,
-  obtivemos</p>
-
-  <p>\[s=\tfrac32\kB\ln u+\kB\ln v+K,\]</p>
-
-  <p>e dissemos que a termodinâmica não tinha como determinar \(K\). A fórmula acima tem
-  exatamente essa forma, e o \(K\) está lá, escrito:</p>
-
-  <p>\[K=\kB\left[\frac52-\ln\left(\frac{h^3}{(2\pi m)^{3/2}}\right)
-  -\tfrac32\ln\left(\tfrac{2}{3}\right)\right],\]</p>
-
-  <p>e o essencial é que <strong>ele contém \(h\)</strong>. A constante de integração que a
-  termodinâmica deixou em aberto é fixada pela constante de Planck. A entropia tem valor
-  absoluto, e esse valor é quântico.</p>
-
-  <div class="bloco ex">
-    <span class="rotulo">E funciona</span>
-    <p>Para o argônio a 298,15 K e 1 atm, a fórmula dá</p>
-    <p>\[S_{\rm molar}=154{,}74\ \mathrm{J/(mol\cdot K)},\]</p>
-    <p>contra o valor calorimétrico tabelado de \(154{,}8\) J/(mol·K), obtido integrando
-    \(C_P/T\) desde o zero absoluto em medidas feitas em laboratório. Concordância em 0,04%,
-    entre uma conta que contém \(h\) e um termômetro.</p>
-    <p>Esse acordo é um dos testes mais limpos da terceira lei e da contagem de estados.
-    Historicamente, foi também uma das primeiras determinações independentes da constante de
-    Planck fora da espectroscopia.</p>
-  </div>
-
-  <!-- ================================================== -->
-  <h2 id="s12">12. Exercícios resolvidos</h2>
-
-  <div class="bloco ex">
-    <span class="rotulo">Exercício resolvido 6.1: por que a Terra perdeu o hidrogênio</span>
-    <p><b>A velocidade de escape da Terra é 11,2 km/s. Compare \(v_{\rm rms}\) de H₂, He e
-    N₂ na exosfera, onde \(T\approx 1000\) K, e explique a composição atmosférica
-    observada.</b></p>
-    <details class="solucao"><summary>Ver solução</summary>
-    <div class="corpo-solucao">
-    <p>Com \(v_{\rm rms}=\sqrt{3\kB T/m}\) e \(T=1000\) K:</p>
-    <div class="tabela-rolavel">
-    <table>
-      <thead><tr><th>Gás</th><th>\(M\) (u)</th><th>\(v_{\rm rms}\)</th>
-      <th>\(v_{\rm esc}/v_{\rm rms}\)</th><th>observado na Terra</th></tr></thead>
-      <tbody>
-        <tr><td>H₂</td><td>2,02</td><td>3,5 km/s</td><td>3,2</td><td>traços (0,5 ppm)</td></tr>
-        <tr><td>He</td><td>4,00</td><td>2,5 km/s</td><td>4,5</td><td>pouco (5 ppm)</td></tr>
-        <tr><td>N₂</td><td>28,0</td><td>0,94 km/s</td><td>11,9</td><td>78%</td></tr>
-      </tbody>
-    </table>
-    </div>
-    <p><b>O critério.</b> A fuga não depende da média, e sim da cauda da distribuição. A
-    regra empírica dos planetólogos é que um corpo retém um gás pela idade do Sistema Solar
-    se \(v_{\rm esc}/v_{\rm rms}\gtrsim 6\). Hidrogênio e hélio ficam bem abaixo disso e
-    escapam; o nitrogênio fica muito acima e permanece.</p>
-    <p><b>O hélio é instrutivo.</b> Ele é continuamente produzido no subsolo pelo decaimento
-    alfa de urânio e tório, e continuamente perdido para o espaço. A concentração atmosférica
-    de 5 ppm é um equilíbrio dinâmico entre produção e fuga, e não um resquício da formação
-    do planeta.</p>
-    <p><b>Compare com outros corpos.</b> No widget da seção 8, escolha a Lua
-    (\(v_{\rm esc}=2{,}4\) km/s): nenhum gás satisfaz o critério, e de fato a Lua não tem
-    atmosfera. Em Júpiter (\(59{,}5\) km/s) até o hidrogênio fica, e é disso que o planeta é
-    feito. Marte está no meio: perdeu a maior parte da atmosfera, e o que restou é CO₂, o
-    mais pesado da lista.</p>
-    </div></details>
-  </div>
-
-  <div class="bloco ex">
-    <span class="rotulo">Exercício resolvido 6.2: a entropia do argônio</span>
-    <p><b>Calcule a entropia molar do argônio a 298,15 K e 1 atm pela fórmula de Sackur e
-    Tetrode.</b></p>
-    <details class="solucao"><summary>Ver solução</summary>
-    <div class="corpo-solucao">
-    <p><b>Comprimento de onda térmico.</b> Com \(M=39{,}948\) u, isto é
-    \(m=6{,}634\times10^{-26}\) kg:</p>
-    <p>\[\lambda_T=\frac{h}{\sqrt{2\pi m\kB T}}
-    =\frac{6{,}626\times10^{-34}}{\sqrt{2\pi\times6{,}634\times10^{-26}
-    \times1{,}381\times10^{-23}\times298{,}15}}.\]</p>
-    <p>O radicando vale \(1{,}716\times10^{-45}\), cuja raiz é \(4{,}143\times10^{-23}\),
-    logo</p>
-    <p>\[\lambda_T=1{,}600\times10^{-11}\ \mathrm{m}=16{,}00\ \mathrm{pm}.\]</p>
-
-    <p><b>Volume por partícula.</b> De \(PV=N\kB T\),</p>
-    <p>\[\frac{V}{N}=\frac{\kB T}{P}=\frac{1{,}381\times10^{-23}\times298{,}15}{101325}
-    =4{,}064\times10^{-26}\ \mathrm{m^3}.\]</p>
-
-    <p><b>A razão.</b></p>
-    <p>\[\frac{V}{N\lambda_T^3}=\frac{4{,}064\times10^{-26}}{(1{,}600\times10^{-11})^3}
-    =\frac{4{,}064\times10^{-26}}{4{,}096\times10^{-33}}=9{,}92\times10^{6}.\]</p>
-    <p>Note de passagem: esse número é \(1/(n\lambda_T^3)\approx10^{7}\), confirmando com
-    enorme folga o regime clássico.</p>
-
-    <p><b>Entropia.</b></p>
-    <p>\[S=N_A\kB\left[\ln\left(9{,}92\times10^{6}\right)+2{,}5\right]
-    =8{,}314\times\left[16{,}11+2{,}5\right]=154{,}7\ \mathrm{J/(mol\cdot K)}.\]</p>
-    <p>O valor calorimétrico tabelado é 154,8 J/(mol·K). A diferença é de 0,04%, dentro da
-    incerteza experimental.</p>
-    <p><b>O que isso prova.</b> Que a contagem de estados em células de volume \(h^3\) está
-    certa. Se o \(h^3\) fosse trocado por qualquer outra constante, o logaritmo mudaria e o
-    acordo desapareceria. É uma medida de \(h\) feita com um calorímetro.</p>
-    </div></details>
-  </div>
-
-  <!-- ================================================== -->
-  <h2 id="s13">13. Exercícios propostos</h2>
+  <p>que é uma reta em \(x\). Da soma da inclinação com o intercepto sai \(v_m\), e da razão
+  entre eles sai \(c\). Com \(v_m\) em mãos, contar moléculas é aritmética: divide-se pelo
+  volume molar, multiplica-se pelo número de Avogadro e pela área que uma molécula ocupa. Para
+  nitrogênio a 77 K, que é o adsorbato padrão, essa área vale 0,162 nm².</p>
 
   <div class="bloco def">
-    <span class="rotulo">Para resolver</span>
+    <span class="rotulo">A medida que se compra e se vende</span>
+    <p>É assim que se determina a área superficial de um pó, e o número é central em catálise,
+    em farmácia e em armazenamento de gás. Um carvão ativado tem de 500 a 1500 m²/g; uma
+    sílica-gel, umas 300; um catalisador de craqueamento, algumas centenas. Um grama de carvão
+    ativado tem área de duas quadras de tênis, e toda ela sai de contar quantas moléculas de
+    nitrogênio cabem numa camada.</p>
+  </div>
+
+  <p>A norma manda ajustar a reta na faixa \(0{,}05&lt;x&lt;0{,}35\), e convém saber de onde
+  vem esse intervalo, porque ele não vem da matemática: a fórmula do BET funciona em qualquer
+  faixa. Ele vem de onde o <em>sólido real</em> se comporta como o modelo supõe. Abaixo de
+  0,05, a heterogeneidade da superfície domina, e os sítios fortes, que o modelo não prevê, já
+  estão cheios. Acima de 0,35, a condensação capilar nos poros estreitos começa a acrescentar
+  volume que não é adsorção em camadas.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">O parâmetro que denuncia o ajuste</span>
+    <p>A seção 6 ajusta uma isoterma sintética que tem, de propósito, os dois efeitos acima.
+    Alargar a faixa para cima faz o erro em \(v_m\) triplicar, o que já é ruim. Mas o aviso mais
+    claro está em \(c\): ele deveria ser propriedade do sólido, e cai de 158 para 24 conforme a
+    faixa se alarga, um fator seis que depende apenas de onde se escolheu ajustar. Um \(c\) que
+    muda com a faixa, ou que sai negativo, não é erro numérico: é o ajuste avisando que foi
+    usado onde o modelo não vale.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s6">6. No Spyder</h2>
+
+  <p>Três das afirmações deste módulo são do tipo que só convence com número: que a fatoração
+  do grã-canônico está certa, que o calor isostérico excede a energia de ligação exatamente por
+  \(\tfrac52\kB T\), e que a linearização enviesa o ajuste. O programa mede as três.</p>
+
+  <div class="cartoes">
+    <a class="cartao" href="codigo/adsorcao.py">
+      <span class="numero">Programa</span>
+      <h3>adsorcao.py</h3>
+      <p>Confere Langmuir por enumeração exata de todos os estados da superfície, extrai o
+      calor isostérico de um conjunto de isotermas, compara o ajuste linearizado com o direto
+      em quatrocentas realizações de ruído, verifica a fórmula fechada do BET contra a soma da
+      série e recupera a área superficial de uma isoterma sintética.</p>
+    </a>
+  </div>
+
+  <p><strong>O que ele imprime, e o que conferir.</strong></p>
+
+  <ul>
+  <li>Somando sobre os \(2^n\) estados de uma superfície de até 10 sítios, a ocupação média é a
+  fórmula de um sítio só em quinze casas decimais. É a verificação de que a fatoração
+  \(\Xi=\Xi_1^N\), usada no módulo 5, está correta.</li>
+  <li>O calor isostérico recuperado vale 0,41458 eV para uma energia de ligação de 0,35 eV, e a
+  diferença, 0,06458 eV, é o \(\tfrac52\kB T\) previsto, que a 300 K vale 0,06463 eV. O valor
+  não depende de \(\theta\), como tem de ser num modelo de sítios idênticos.</li>
+  <li>Com ruído de 1 % em \(\theta\), o ajuste linearizado erra \(K\) em 3,8 % e o direto em
+  0,2 %. Com 3 % de ruído o linearizado erra 44 %; com 5 %, devolve \(K\) negativo.</li>
+  <li>A fórmula fechada do BET coincide com a soma explícita das camadas em todas as casas, e a
+  cobertura diverge conforme \(x\to1\): 10 camadas em 0,9 e 100 em 0,99.</li>
+  <li>Numa isoterma com heterogeneidade e condensação capilar embutidas, o ajuste na faixa de
+  0,05 a 0,35 recupera \(v_m\) com 3,9 % de erro, e alargar a faixa leva o erro a 11,8 % e o
+  \(c\) de 158 para 24.</li>
+  </ul>
+
+  <div class="bloco ex">
+    <span class="rotulo">Para mexer</span>
+    <p>Acrescente interação entre vizinhos: faça a energia de um sítio ocupado depender de
+    quantos vizinhos estão ocupados, com um termo \(-J\) por par, e refaça a enumeração exata
+    numa rede pequena. Para \(J&gt;0\) a isoterma deixa de ser de Langmuir e desenvolve um
+    degrau, que é a condensação bidimensional, e o problema inteiro é o modelo de Ising do
+    módulo 10 escrito em outras variáveis. Depois trate da adsorção <em>dissociativa</em>, em
+    que a molécula se quebra em dois átomos que ocupam dois sítios, e mostre que a isoterma
+    passa a ir com \(\sqrt P\) em vez de \(P\) a baixa pressão; é por isso que medir o expoente
+    a baixa cobertura diz se a molécula dissocia. Por fim, gere uma superfície heterogênea,
+    com energias de ligação sorteadas de uma distribuição, e verifique que o calor isostérico
+    medido cai com a cobertura, como acontece no laboratório.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s7">7. Exercícios resolvidos</h2>
+
+  <div class="bloco ex">
+    <span class="rotulo">Exercício resolvido 6.1: adsorção dissociativa</span>
+    <p><b>Uma molécula diatômica se dissocia ao adsorver, e cada átomo ocupa um sítio. Obtenha
+    a isoterma e mostre que, a baixa pressão, a cobertura vai com \(\sqrt P\).</b></p>
+    <details class="solucao"><summary>Ver solução</summary>
+    <div class="corpo-solucao">
+    <p>O equilíbrio agora é entre uma molécula no gás e <em>dois</em> átomos adsorvidos, de modo
+    que a condição de equilíbrio químico iguala o potencial químico da molécula ao de dois
+    átomos ligados: \(\mu_{\text{gás}}=2\mu_{\text{ads}}\). Para um sítio que pode estar vazio
+    ou ocupado por um átomo de energia \(-\epsilon_a\),</p>
+    <p>\[\theta=\frac{e^{\beta\left(\epsilon_a+\mu_{\text{ads}}\right)}}
+    {1+e^{\beta\left(\epsilon_a+\mu_{\text{ads}}\right)}},
+    \qquad
+    e^{\beta\mu_{\text{ads}}}=e^{\beta\mu_{\text{gás}}/2}\propto\sqrt{P}.\]</p>
+    <p>Logo</p>
+    <p>\[\theta=\frac{\sqrt{P/K_d}}{1+\sqrt{P/K_d}},\]</p>
+    <p>que a baixa pressão dá \(\theta\approx\sqrt{P/K_d}\), e não \(\theta\approx P/K\) como no
+    caso não dissociativo.</p>
+    <p><b>Por que isso importa.</b> O expoente da isoterma a baixa cobertura é medível, e
+    distingue os dois casos sem precisar de nenhuma espectroscopia. Hidrogênio em metais de
+    transição dá meia potência, e é assim que se sabe que ele adsorve atomicamente, o que é a
+    base de toda a hidrogenação catalítica.</p>
+    </div></details>
+  </div>
+
+  <div class="bloco ex">
+    <span class="rotulo">Exercício resolvido 6.2: duas espécies disputando os mesmos sítios</span>
+    <p><b>Dois gases, A e B, competem pelos mesmos sítios. Obtenha a cobertura de cada um.</b></p>
+    <details class="solucao"><summary>Ver solução</summary>
+    <div class="corpo-solucao">
+    <p>Cada sítio tem agora três estados em vez de dois: vazio, com A, ou com B. A grande função
+    de partição de um sítio é</p>
+    <p>\[\Xi_1=1+e^{\beta\left(\epsilon_A+\mu_A\right)}+e^{\beta\left(\epsilon_B+\mu_B\right)},\]</p>
+    <p>e a probabilidade de estar com A é o peso de A dividido por \(\Xi_1\). Escrevendo em
+    termos das pressões,</p>
+    <p>\[\theta_A=\frac{P_A/K_A}{1+P_A/K_A+P_B/K_B},
+    \qquad
+    \theta_B=\frac{P_B/K_B}{1+P_A/K_A+P_B/K_B}.\]</p>
+    <p><b>O que a fórmula diz.</b> O denominador é comum às duas, e é aí que mora a competição:
+    aumentar \(P_B\) reduz \(\theta_A\) mesmo com \(P_A\) fixo. Se B liga muito mais forte,
+    \(K_B\) é pequeno, e basta um traço de B para zerar \(\theta_A\). É exatamente isso que faz
+    um catalisador ser envenenado por enxofre ou por monóxido de carbono em concentrações de
+    partes por milhão: o veneno não destrói nada, apenas ocupa os sítios e não sai.</p>
+    </div></details>
+  </div>
+
+  <div class="bloco ex">
+    <span class="rotulo">Exercício resolvido 6.3: da isoterma BET à área de um carvão</span>
+    <p><b>Uma amostra de carvão adsorve nitrogênio a 77 K. O gráfico BET, montado na faixa
+    recomendada, tem inclinação \(4{,}32\times10^{-3}\) g/cm³ e intercepto
+    \(3{,}57\times10^{-5}\) g/cm³, com volumes reduzidos às CNTP. Calcule a área
+    específica.</b></p>
+    <details class="solucao"><summary>Ver solução</summary>
+    <div class="corpo-solucao">
+    <p>Da soma da inclinação com o intercepto,</p>
+    <p>\[v_m=\frac{1}{a+b}=\frac{1}{4{,}32\times10^{-3}+3{,}57\times10^{-5}}
+    =230\ \text{cm}^3/\text{g},\]</p>
+    <p>e de \(c=a/b+1=122\), que é um valor saudável: grande o bastante para o joelho da
+    isoterma ser nítido, e não tão grande que indique microporos enchendo em bloco.</p>
+    <p>Convertendo o volume em moléculas, com o volume molar de 22 414 cm³/mol,</p>
+    <p>\[N=\frac{230}{22\,414}\times6{,}022\times10^{23}
+    =6{,}17\times10^{21}\ \text{moléculas por grama},\]</p>
+    <p>e multiplicando pela área de uma molécula de nitrogênio,</p>
+    <p>\[A=6{,}17\times10^{21}\times0{,}162\times10^{-18}
+    =1{,}00\times10^{3}\ \text{m}^2/\text{g}.\]</p>
+    <p><b>Confira a ordem de grandeza antes de acreditar.</b> Mil metros quadrados por grama é
+    muito, e é justamente o que se espera de um carvão ativado: a conta sai certa. O teste
+    rápido é comparar com a área geométrica. Um grama de carvão compacto, numa esfera só,
+    teria cerca de 5 cm² de superfície; a porosidade multiplica isso por dois milhões. Se a
+    conta tivesse dado alguns cm²/g, o erro estaria nas unidades, porque em adsorção os
+    volumes vêm em cm³ nas CNTP por grama e trocar a potência de dez é o engano mais comum do
+    assunto.</p>
+    </div></details>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s8">8. Exercícios propostos</h2>
+
+  <div class="bloco ex">
     <ol>
-      <li><b>6.1</b> Verifique por integração direta que a distribuição de Maxwell é
-      normalizada, e obtenha \(\overline v\), \(v_{\rm rms}\) e \(v_p\). Mostre que as razões
-      \(v_p:\overline v:v_{\rm rms}\) valem \(1:\sqrt{4/\pi}:\sqrt{3/2}\), independentes de
-      \(m\) e \(T\).</li>
+      <li><b>6.1</b> Mostre, a partir de \(\theta=P/(P+K)\), que a pressão necessária para
+      passar de \(\theta=0{,}1\) a \(\theta=0{,}9\) aumenta por um fator 81. Esse número não
+      depende de \(K\) nem de \(T\), e é a assinatura da forma de Langmuir: use-o como teste
+      rápido antes de ajustar qualquer coisa.</li>
 
-      <li><b>6.2</b> Mostre que a distribuição de Maxwell escrita em termos da energia é
-      \(f(\varepsilon)\propto\sqrt{\varepsilon}\,e^{-\beta\varepsilon}\), e que o seu máximo
-      está em \(\varepsilon=\kB T/2\), e não em \(\frac32\kB T\). Explique por que o máximo e
-      a média não coincidem.</li>
+      <li><b>6.2</b> Um sítio pode acomodar até duas moléculas, a segunda com energia
+      \(-\epsilon_2\neq-\epsilon_1\). Escreva \(\Xi_1\) com três estados e obtenha a ocupação
+      média. Verifique que ela recai em Langmuir quando \(\epsilon_2\to-\infty\) e discuta o
+      que acontece quando \(\epsilon_2&gt;\epsilon_1\).</li>
 
-      <li><b>6.3</b> Calcule \(\lambda_T\) para um elétron a 300 K e compare com o
-      espaçamento atômico no cobre (0,23 nm). Conclua se o gás de elétrons de condução é
-      clássico e estime a temperatura em que passaria a ser.</li>
+      <li><b>6.3</b> Deduza a isoterma BET somando as duas séries do texto. Mostre que, para
+      \(c\gg1\) e \(x\) pequeno, ela se reduz a Langmuir, e identifique a faixa de \(x\) em que
+      a aproximação vale dentro de 5 %.</li>
 
-      <li><b>6.4</b> Deduza a fórmula barométrica pela hidrostática, partindo de
-      \(dP/dy=-\rho g\) e \(P=n\kB T\), e confirme que coincide com a distribuição de
-      Boltzmann em \(u=mgy\). Calcule a altura de escala do N₂ a 290 K.</li>
+      <li><b>6.4</b> Partindo de \(q_{\text{st}}=\epsilon+\tfrac52\kB T\), estime o erro
+      percentual que se comete ao identificar o calor isostérico com a energia de ligação, para
+      fisissorção de nitrogênio (\(\epsilon\approx0{,}1\) eV) e para quimissorção de hidrogênio
+      em níquel (\(\epsilon\approx1\) eV), ambos à temperatura ambiente. Em qual dos dois a
+      distinção importa mais?</li>
 
-      <li><b>6.5</b> Dois recipientes de 1 L contêm, cada um, 1 mmol de gás a 300 K: no
-      primeiro caso, nitrogênio nos dois; no segundo, nitrogênio e argônio. Calcule
-      \(\Delta S\) ao remover a divisória nos dois casos e explique a diferença.</li>
+      <li><b>6.5</b> Mostre que, para a isoterma de Langmuir, a incerteza relativa de \(K\)
+      obtida de um único ponto é mínima quando \(\theta=1/2\). Esse é o argumento para
+      concentrar as medidas perto da meia cobertura, e explica por que um conjunto de dados
+      todo em \(\theta&lt;0{,}1\) determina \(K\) tão mal.</li>
 
-      <li><b>6.6</b> <b>Efusão.</b> Mostre que o fluxo de moléculas que atravessa um furo
-      pequeno de área \(A\) numa parede é \(\Phi=\frac14 n\overline v A\). Use isso para
-      explicar a lei de Graham, \(\Phi\propto1/\sqrt m\), e estime quanto tempo um balão de
-      hélio leva para murchar em comparação com um de ar.</li>
+      <li><b>6.6</b> Um catalisador perde atividade quando 1 % dos sítios é ocupado por um
+      veneno com \(K_{\text{ven}}=10^{-9}\) atm. Usando a isoterma competitiva do exercício
+      resolvido 6.2, calcule a pressão parcial de veneno que produz essa cobertura e compare
+      com os limites típicos de enxofre em gás natural tratado.</li>
 
-      <li><b>6.7</b> Partindo de \(F\) para o gás ideal, mostre que num processo adiabático
-      quase-estático vale \(TV^{2/3}=\) const, e identifique \(\gamma=5/3\).</li>
+      <li><b>6.7</b> Escreva a isoterma de um sólido com dois tipos de sítio, em frações
+      \(f\) e \(1-f\), com energias diferentes. Mostre que ela é a soma de duas Langmuir e que,
+      ajustada por uma Langmuir só, devolve um \(K\) efetivo que depende da faixa de pressão
+      usada. Relacione isso com o calor isostérico que cai com a cobertura.</li>
 
-      <li><b>6.8</b> Mostre que \(\mu=\kB T\ln(n\lambda_T^3)\) é negativo no regime clássico
-      e que cruza zero quando \(n\lambda_T^3=1\). Calcule a densidade correspondente para
-      hélio a 4 K e compare com a densidade do hélio líquido.</li>
+      <li><b>6.8</b> O modelo BET supõe que todas as camadas acima da primeira são idênticas ao
+      líquido. Discuta por que essa hipótese é obviamente falsa para a segunda camada e, ainda
+      assim, por que o método funciona bem o bastante para ser norma internacional. O que
+      exatamente o BET mede, se o seu modelo microscópico é tão grosseiro?</li>
     </ol>
   </div>
 
   <nav class="nav-aulas">
     <a href="aula05.html"><small>Módulo anterior</small>← 5. Canônico e grã-canônico</a>
-    <a class="prox" href="aula07.html"><small>Próximo módulo</small>7. Gases clássicos →</a>
+    <a class="prox" href="aula07.html"><small>Próximo módulo</small>7. Gás ideal →</a>
   </nav>
 
 </main>
@@ -567,6 +446,6 @@
   <!--PORTAL--><p><small><a href="https://apianomorais.github.io/">Todas as disciplinas e a pesquisa em apianomorais.github.io</a></small></p><!--/PORTAL-->
 </footer>
 
-<script src="assets/js/widgets.js?v=202611201318"></script>
+<script src="assets/js/widgets.js?v=202611202222"></script>
 </body>
 </html>

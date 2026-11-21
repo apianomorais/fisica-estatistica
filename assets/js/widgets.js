@@ -8189,6 +8189,169 @@
     registrarRedesenho(desenhar);
   };
 
+
+  /* ============================================================
+     Módulo 6 — adsorção: Langmuir e BET
+     ============================================================ */
+  REGISTRO.adsorcao = function (raiz) {
+    var est = { vista: 'langmuir', eps: 0.35, T: 300, c: 100 };
+    var KB_EV = 8.617333262e-5;                 // eV/K
+
+    var corpo = moldura(raiz, 'Isotermas de adsorção');
+    var topo = el('div', { class: 'controles' });
+    corpo.appendChild(topo);
+    opcoes(topo, [{ rot: 'Langmuir', v: 'langmuir' },
+                  { rot: 'BET: multicamada', v: 'bet' }], 0,
+      function (v) { est.vista = v; montar(); desenhar(); });
+
+    var ctrl = el('div', { class: 'controles' });
+    corpo.appendChild(ctrl);
+    var cv = el('canvas');
+    corpo.appendChild(cv);
+    var caixa = el('div');
+    corpo.appendChild(caixa);
+    var mostrar = null;
+    var nota = el('div', { class: 'saida' });
+    corpo.appendChild(nota);
+
+    function rotular(lista) { caixa.innerHTML = ''; mostrar = cartoes(caixa, lista); }
+
+    function montar() {
+      ctrl.innerHTML = '';
+      if (est.vista === 'langmuir') {
+        deslizante(ctrl, 'Energia de ligação ε:', 0.1, 0.8, 0.01, est.eps,
+          function (v) { est.eps = v; desenhar(); },
+          function (v) { return F.fmt(v, 2) + ' eV'; });
+        deslizante(ctrl, 'Temperatura:', 200, 500, 5, est.T,
+          function (v) { est.T = v; desenhar(); },
+          function (v) { return F.fmt(v, 0) + ' K'; });
+      } else {
+        deslizante(ctrl, 'Parâmetro c:', 2, 300, 1, est.c,
+          function (v) { est.c = v; desenhar(); },
+          function (v) { return F.fmt(v, 0); });
+      }
+    }
+
+    /* G.curva prende a curva na moldura; perto da saturacao o BET sobe
+       muito e precisa SAIR dela, e por isso o traco e feito a mao. */
+    function tracar(gr, f, cor, esp, tracejado) {
+      var ct = gr.ct, i, dentro = false;
+      ct.save();
+      ct.strokeStyle = cor; ct.lineWidth = esp || 2.4;
+      if (tracejado) ct.setLineDash(tracejado);
+      ct.beginPath();
+      for (i = 0; i <= 500; i++) {
+        var x = gr.xmin + (gr.xmax - gr.xmin) * i / 500, y = f(x);
+        if (!isFinite(y) || y < gr.ymin || y > gr.ymax) { dentro = false; continue; }
+        if (dentro) ct.lineTo(gr.X(x), gr.Y(y)); else ct.moveTo(gr.X(x), gr.Y(y));
+        dentro = true;
+      }
+      ct.stroke();
+      ct.restore();
+    }
+
+    function desenhar() {
+      return est.vista === 'langmuir' ? vistaLangmuir() : vistaBet();
+    }
+
+    function vistaLangmuir() {
+      /* K em unidades arbitrarias de pressao: so a razao P/K importa para a
+         forma, e o cartao traz o K absoluto. */
+      var K = Math.exp(-est.eps / (KB_EV * est.T));
+      var Kref = Math.exp(-0.35 / (KB_EV * 300));
+      var xmax = 12;
+      var gr = G.eixos(cv, {
+        altura: 300, xmin: 0, xmax: xmax, ymin: 0, ymax: 1.05,
+        rotX: 'P/K  (pressão em unidades da meia ocupação)', rotY: 'θ',
+        marcasX: G.marcasLineares(0, xmax, 6, 0),
+        formataY: function (v) { return F.fmt(v, 2); }
+      });
+      tracar(gr, function (u) { return u / (1 + u); }, G.COR.mestra, 2.6);
+      /* a tangente na origem e a reta de Henry, que vale a baixa cobertura */
+      tracar(gr, function (u) { return u; }, G.COR.vinho, 1.8, [6, 4]);
+      G.legenda(gr, [
+        { texto: 'Langmuir', cor: G.COR.mestra },
+        { texto: 'regime de Henry (θ ≈ P/K)', cor: G.COR.vinho }
+      ]);
+      rotular([{ rot: 'calor isostérico q_st', k: 'q' },
+               { rot: 'disso, energia de ligação', k: 'e' },
+               { rot: 'e entalpia do gás (5/2)kT', k: 'g' },
+               { rot: 'P para ir de θ=0,1 a 0,9', k: 'r' }]);
+      mostrar({ q: F.fmt(est.eps + 2.5 * KB_EV * est.T, 3) + ' eV',
+                e: F.fmt(est.eps, 2) + ' eV',
+                g: F.fmt(2.5 * KB_EV * est.T, 4) + ' eV',
+                r: '81×' });
+      nota.innerHTML = '<p>A forma da isoterma não depende de \\(\\epsilon\\) '
+        + 'nem de \\(T\\): mudar qualquer um dos dois apenas desloca a curva '
+        + 'ao longo do eixo da pressão, porque só a razão \\(P/K\\) entra. '
+        + 'Daí o teste rápido do exercício 6.1: em qualquer Langmuir, ir de '
+        + '\\(\\theta=0{,}1\\) a \\(\\theta=0{,}9\\) custa um fator 81 na '
+        + 'pressão. A reta tracejada é o regime de Henry, em que a cobertura '
+        + 'ainda é proporcional à pressão.</p>';
+      tipografar(nota);
+    }
+
+    function vistaBet() {
+      var c = est.c;
+      function bet(x) { return c * x / ((1 - x) * (1 - x + c * x)); }
+      function lang(x) { return c * x / (1 + c * x); }
+      var gr = G.eixos(cv, {
+        altura: 300, xmin: 0, xmax: 1, ymin: 0, ymax: 5,
+        rotX: 'x = P/P₀', rotY: 'v/v_m  (camadas)',
+        marcasX: G.marcasLineares(0, 1, 5, 1),
+        formataY: function (v) { return F.fmt(v, 1); }
+      });
+      /* a monocamada, para enxergar onde o BET a ultrapassa */
+      var ct = gr.ct;
+      ct.save();
+      ct.setLineDash([4, 4]); ct.strokeStyle = G.COR.suave; ct.lineWidth = 1.3;
+      ct.beginPath(); ct.moveTo(gr.x0, gr.Y(1)); ct.lineTo(gr.x1, gr.Y(1));
+      ct.stroke(); ct.restore();
+      ct.save();
+      ct.fillStyle = G.COR.suave;
+      ct.font = '600 12px system-ui, sans-serif';
+      ct.textAlign = 'left';
+      ct.fillText('uma monocamada', gr.x0 + 8, gr.Y(1) - 8);
+      ct.restore();
+      /* a faixa em que a norma manda ajustar */
+      ct.save();
+      ct.fillStyle = 'rgba(80,80,160,0.07)';
+      ct.fillRect(gr.X(0.05), gr.y0, gr.X(0.35) - gr.X(0.05), gr.y1 - gr.y0);
+      ct.restore();
+      ct.save();
+      ct.fillStyle = G.COR.suave;
+      ct.font = '600 11px system-ui, sans-serif';
+      ct.textAlign = 'center';
+      ct.fillText('faixa do ajuste', gr.X(0.20), gr.y0 + 14);
+      ct.restore();
+      tracar(gr, lang, G.COR.vinho, 1.8, [6, 4]);
+      tracar(gr, bet, G.COR.mestra, 2.6);
+      G.legenda(gr, [
+        { texto: 'BET', cor: G.COR.mestra },
+        { texto: 'Langmuir, para comparar', cor: G.COR.vinho }
+      ]);
+      rotular([{ rot: 'camadas em x = 0,35', k: 'a' },
+               { rot: 'camadas em x = 0,90', k: 'b' },
+               { rot: 'camadas em x = 0,99', k: 'd' },
+               { rot: 'x de uma monocamada', k: 'm' }]);
+      var xm = 0.001;
+      while (xm < 0.999 && bet(xm) < 1) xm += 0.001;
+      mostrar({ a: F.fmt(bet(0.35), 2), b: F.fmt(bet(0.90), 1),
+                d: F.fmt(bet(0.99), 0), m: F.fmt(xm, 3) });
+      nota.innerHTML = '<p>As duas só se aproximam a pressão baixa, onde a '
+        + 'primeira camada domina: já em \\(x=0{,}2\\) o BET dá um quarto a '
+        + 'mais que Langmuir, e a cobertura depois diverge conforme '
+        + '\\(x\\to1\\), porque ali o gás simplesmente condensa. Baixar o '
+        + '\\(c\\) suaviza o joelho da curva, e quando ele some a monocamada '
+        + 'deixa de ser identificável: é por isso que um \\(c\\) pequeno '
+        + 'torna a medida de área pouco confiável.</p>';
+      tipografar(nota);
+    }
+
+    montar();
+    registrarRedesenho(desenhar);
+  };
+
   /* ---------- inicialização ---------- */
   document.addEventListener('DOMContentLoaded', function () {
     Array.prototype.forEach.call(document.querySelectorAll('[data-widget]'), function (n) {

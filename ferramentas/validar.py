@@ -5,6 +5,7 @@ import glob, os, re, sys
 erros = []
 avisos = []
 paginas = sorted(glob.glob('*.html'))
+css = open('assets/css/estilo.css', encoding='utf-8').read()
 
 for p in paginas:
     t = open(p, encoding='utf-8').read()
@@ -42,6 +43,13 @@ for p in paginas:
         lat = re.findall(r'<li><a href="#s(\d+)">(\d+)\.', t)
         if [a for a, _ in lat] != [a for a, _, _ in h2]:
             erros.append('%s: índice lateral não bate com os h2' % p)
+
+        # 15. todo modificador de bloco tem regra no CSS. Sem ela o bloco
+        #     continua valido e some visualmente, com a borda e o rotulo da
+        #     cor padrao, como se fosse uma definicao.
+        for mod in sorted(set(re.findall(r'class="bloco ([a-z]+)"', t))):
+            if not re.search(r'\.bloco\.%s\b' % mod, css):
+                erros.append('%s: class="bloco %s" sem regra no CSS' % (p, mod))
 
         # 5. exercícios numerados pelo módulo
         for ex in re.findall(r'Exercício resolvido (\d+)\.\d+', t):

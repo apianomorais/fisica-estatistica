@@ -18,19 +18,20 @@ TITULOS = {
     3: ("Caminhante aleatório e estados microscópicos", "Caminhante aleatório"),
     4: ("Movimento browniano", "Movimento browniano"),
     5: ("Ensembles canônico e grã-canônico", "Canônico e grã-canônico"),
-    6: ("Gás ideal", "Gás ideal"),
-    7: ("Gases clássicos", "Gases clássicos"),
-    8: ("Gases quânticos", "Gases quânticos"),
-    9: ("Magnetismo", "Magnetismo"),
-    10: ("Supercondutividade", "Supercondutividade"),
+    6: ("Adsorção", "Adsorção"),
+    7: ("Gás ideal", "Gás ideal"),
+    8: ("Gases clássicos", "Gases clássicos"),
+    9: ("Gases quânticos", "Gases quânticos"),
+    10: ("Magnetismo", "Magnetismo"),
+    11: ("Supercondutividade", "Supercondutividade"),
 }
 
 UNIDADES = [
     ("Fundamentos", "Fundamentos", [1, 2]),
     ("Estados microscópicos e entropia", "Microestados", [3, 4]),
-    ("Ensembles", "Ensembles", [5]),
-    ("Gases", "Gases", [6, 7, 8]),
-    ("Magnetismo e supercondutividade", "Magnetismo", [9, 10]),
+    ("Ensembles", "Ensembles", [5, 6]),
+    ("Gases", "Gases", [7, 8, 9]),
+    ("Magnetismo e supercondutividade", "Magnetismo", [10, 11]),
 ]
 
 # o que vai no chapéu de cada página, logo acima do título

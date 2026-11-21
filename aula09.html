@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Módulo 9: Magnetismo | Física Estatística</title>
+<title>Módulo 9: Gases quânticos | Física Estatística</title>
 <link rel="icon" type="image/png" href="assets/img/favicon.png">
-<link rel="stylesheet" href="assets/css/estilo.css?v=202611201318">
-<script src="assets/js/comum.js?v=202611201318"></script>
+<link rel="stylesheet" href="assets/css/estilo.css?v=202611202222">
+<script src="assets/js/comum.js?v=202611202222"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
 <body>
@@ -24,13 +24,14 @@
       <a href="aula04.html" class="num" title="Módulo 4: Movimento browniano">4</a>
       <span class="grupo">Ensembles</span>
       <a href="aula05.html" class="num" title="Módulo 5: Ensembles canônico e grã-canônico">5</a>
+      <a href="aula06.html" class="num" title="Módulo 6: Adsorção">6</a>
       <span class="grupo">Gases</span>
-      <a href="aula06.html" class="num" title="Módulo 6: Gás ideal">6</a>
-      <a href="aula07.html" class="num" title="Módulo 7: Gases clássicos">7</a>
-      <a href="aula08.html" class="num" title="Módulo 8: Gases quânticos">8</a>
+      <a href="aula07.html" class="num" title="Módulo 7: Gás ideal">7</a>
+      <a href="aula08.html" class="num" title="Módulo 8: Gases clássicos">8</a>
+      <a href="aula09.html" class="num ativo" title="Módulo 9: Gases quânticos">9</a>
       <span class="grupo">Magnetismo</span>
-      <a href="aula09.html" class="num ativo" title="Módulo 9: Magnetismo">9</a>
-      <a href="aula10.html" class="num" title="Módulo 10: Supercondutividade">10</a>
+      <a href="aula10.html" class="num" title="Módulo 10: Magnetismo">10</a>
+      <a href="aula11.html" class="num" title="Módulo 11: Supercondutividade">11</a>
     </nav>
   </div>
 </header>
@@ -40,989 +41,980 @@
 <aside class="lateral">
   <h4>Neste módulo</h4>
   <ol>
-    <li><a href="#s1">1. Por que o magnetismo é quântico</a></li>
-    <li><a href="#s2">2. Pauli: o paramagnetismo do mar de Fermi</a></li>
-    <li><a href="#s3">3. Landau: o diamagnetismo das órbitas quantizadas</a></li>
-    <li><a href="#s4">4. Dois elétrons: singleto e tripleto</a></li>
-    <li><a href="#s5">5. A integral de troca</a></li>
-    <li><a href="#s6">6. O hamiltoniano de Heisenberg</a></li>
-    <li><a href="#s7">7. Regras de Hund</a></li>
-    <li><a href="#s8">8. O campo médio de Weiss</a></li>
-    <li><a href="#s9">9. O parâmetro de Weiss</a></li>
-    <li><a href="#s10">10. A equação de autoconsistência</a></li>
-    <li><a href="#s11">11. A lei de Curie-Weiss</a></li>
-    <li><a href="#s12">12. Magnetização espontânea</a></li>
-    <li><a href="#s13">13. Expoentes críticos</a></li>
-    <li><a href="#s14">14. A energia livre de Landau</a></li>
-    <li><a href="#s15">15. Histerese e domínios</a></li>
-    <li><a href="#s16">16. Ginzburg-Landau</a></li>
-    <li><a href="#s17">17. O modelo de Ising</a></li>
-    <li><a href="#s18">18. O que o campo médio erra</a></li>
-    <li><a href="#s19">19. Exercícios resolvidos</a></li>
-    <li><a href="#s20">20. Exercícios propostos</a></li>
+    <li><a href="#s1">1. Onde a contagem clássica se rompe</a></li>
+    <li><a href="#s2">2. Partículas idênticas</a></li>
+    <li><a href="#s3">3. O princípio de exclusão</a></li>
+    <li><a href="#s4">4. Microestados por ocupação</a></li>
+    <li><a href="#s5">5. O ensemble grã-canônico</a></li>
+    <li><a href="#s6">6. A grande função de partição fatora</a></li>
+    <li><a href="#s7">7. Fermi-Dirac e Bose-Einstein</a></li>
+    <li><a href="#s8">8. Densidade de estados em energia</a></li>
+    <li><a href="#s9">9. O gás de Fermi no zero absoluto</a></li>
+    <li><a href="#s10">10. Sommerfeld e o calor dos metais</a></li>
+    <li><a href="#s11">11. A esfera de Fermi deslocada</a></li>
+    <li><a href="#s12">12. A equação de transporte</a></li>
+    <li><a href="#s13">13. Bandas de energia</a></li>
+    <li><a href="#s14">14. O gás de fótons</a></li>
+    <li><a href="#s15">15. A condensação de Bose-Einstein</a></li>
+    <li><a href="#s16">16. Anãs brancas e Chandrasekhar</a></li>
+    <li><a href="#s17">17. Exercícios resolvidos</a></li>
+    <li><a href="#s18">18. Exercícios propostos</a></li>
   </ol>
 </aside>
 
 <main class="conteudo">
 
-  <p class="chapeu">Módulo 9 · Magnetismo e supercondutividade</p>
-  <h1>Magnetismo</h1>
-  <p class="subtitulo">Um ímã é um sistema que escolheu uma direção sem que ninguém a tenha
-  apontado. Este módulo mostra de onde vem a força que faz spins se alinharem (não é a
-  interação magnética entre eles, que é dez mil vezes fraca demais), como uma aproximação de
-  três linhas produz uma transição de fase, e o que ela acerta e o que erra.</p>
+  <p class="chapeu">Módulo 9 · Gases</p>
+  <h1>Gases quânticos</h1>
+  <p class="subtitulo">Até aqui, partículas idênticas eram apenas indistinguíveis, e isso
+  custou um fator \(1/N!\). Agora elas são idênticas de verdade, e a simetria da função de
+  onda sob troca passa a ditar a contagem. Duas estatísticas nascem daí, e com elas a pressão
+  que sustenta uma anã branca, o calor específico dos metais, a cor de uma estrela e um
+  estado da matéria onde um milhão de átomos ocupam o mesmo estado quântico.</p>
 
   <div class="bloco def">
     <span class="rotulo">Objetivos</span>
     <ul>
-      <li>Obter as susceptibilidades de Pauli e de Landau, e ver nelas por onde a
-      quantização escapa do teorema de Bohr-van Leeuwen;</li>
-      <li>Deduzir a integral de troca a partir da antissimetria da função de onda;</li>
-      <li>Escrever o hamiltoniano de Heisenberg e justificar por que só o spin aparece;</li>
-      <li>Fazer a aproximação de campo médio e obter o parâmetro de Weiss;</li>
-      <li>Resolver \(m=\tanh\left(mT_C/T\right)\) e obter a magnetização espontânea;</li>
-      <li>Deduzir a lei de Curie-Weiss e usá-la para medir \(T_C\);</li>
-      <li>Construir a energia livre de Landau e ler nela a quebra de simetria;</li>
-      <li>Simular o modelo de Ising por Metropolis e comparar com Onsager;</li>
-      <li>Identificar onde o campo médio falha, e por quê.</li>
+      <li>Deduzir o princípio de exclusão da antissimetria da função de onda;</li>
+      <li>Montar o ensemble grã-canônico e mostrar que \(Y=\prod_j Y_j\);</li>
+      <li>Obter \(\bar n_j=1/\left(e^{\beta(\epsilon_j-\mu)}\pm1\right)\) num único cálculo;</li>
+      <li>Calcular \(\epsilon_F\), \(\bar u=\frac35\epsilon_F\) e \(P=\frac25 n\epsilon_F\);</li>
+      <li>Fazer a expansão de Sommerfeld e obter \(c\propto T\) para os elétrons;</li>
+      <li>Resolver a equação de Boltzmann no tempo de relaxação e achar a superfície de Fermi;</li>
+      <li>Deduzir a lei de Planck, Stefan-Boltzmann e o deslocamento de Wien;</li>
+      <li>Obter \(T_c\) e \(\bar n_0/N=1-(T/T_c)^{3/2}\) para o condensado de Bose.</li>
     </ul>
   </div>
 
   <hr class="linha">
 
   <!-- ================================================== -->
-  <h2 id="s1">1. Por que o magnetismo é quântico</h2>
+  <h2 id="s1">1. Onde a contagem clássica se rompe</h2>
 
-  <p>Comece por uma estimativa que decide tudo. Se dois momentos magnéticos atômicos
-  vizinhos se alinhassem por causa da <strong>interação magnética</strong> entre eles, o
-  campo que um produz no outro, a uma distância típica de 2,5 ångström, seria</p>
+  <p>No Módulo 7 obtivemos o critério de validade do regime clássico e o deixamos numa
+  tabela. Vale reler aquela tabela, porque este módulo inteiro mora nas linhas que ela
+  reprova:</p>
 
-  <p>\[B_{\rm dip}\sim\frac{\mu_0\mu_B}{4\pi r^3}\approx0{,}06\ \mathrm{T},\]</p>
-
-  <p>que corresponde a uma energia \(\mu_B B\sim 5\times10^{-25}\) J, ou cerca de
-  \(0{,}04\) K em unidades de temperatura. A agitação térmica destruiria esse alinhamento
-  bem antes de um kelvin, e no entanto o ferro é ferromagnético até <strong>1043 K</strong>.
-  Invertendo a conta: para sustentar o ferro a 1043 K seria preciso um campo de</p>
-
-  <p>\[B_{\rm efe}=\frac{\kB T_C}{\mu_B}\approx1550\ \mathrm{T},\]</p>
-
-  <p>vinte e seis mil vezes maior que o dipolar, e mil vezes maior que o campo mais intenso
-  já produzido num laboratório. Weiss postulou esse "campo molecular" em 1907 sem saber de
-  onde ele poderia vir, e viveu com o incômodo por vinte anos.</p>
-
-  <div class="bloco fisica">
-    <span class="rotulo">O teorema que fecha a porta clássica</span>
-    <p>Não adianta procurar a resposta na física clássica, e isso é um teorema. O
-    <strong>teorema de Bohr-van Leeuwen</strong> (1911, redescoberto em 1919) diz que a
-    magnetização de equilíbrio de qualquer sistema clássico de cargas é <em>exatamente
-    zero</em>.</p>
-    <p>A demonstração é curta e vale a pena. Um campo magnético entra na hamiltoniana só
-    pela substituição \(\vec p\to\vec p-q\vec A\). Na função de partição clássica integra-se
-    sobre todo o espaço de momentos, e a mudança de variável \(\vec p\,'=\vec p-q\vec A\) é
-    uma translação: o jacobiano é 1 e os limites continuam sendo \(\pm\infty\). Logo
-    \(Z\) <strong>não depende de \(\vec A\)</strong>, portanto não depende do campo, portanto
-    \(M=-\partial F/\partial B=0\).</p>
-    <p>Diamagnetismo, paramagnetismo e ferromagnetismo são, todos os três, efeitos
-    quânticos. O que salva a conta é que na mecânica quântica os momentos são discretos, e
-    somas sobre estados discretos não admitem aquela translação.</p>
-    <p>Do lado do eletromagnetismo, esse é exatamente o ponto em que a descrição
-    macroscópica precisa parar e pedir ajuda:
-    <a href="https://apianomorais.github.io/eletromagnetismo/cap06.html">o capítulo 6 de
-    Eletromagnetismo</a> monta \(\vec M\), \(\vec H\) e a susceptibilidade sem nunca poder
-    explicar de onde vêm os seus valores, e manda a pergunta para cá.</p>
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>Sistema</th><th>\(n\lambda_T^3\)</th><th>O que acontece</th></tr></thead>
+    <tbody>
+      <tr><td>Ar ambiente, 300 K</td><td>\(\sim10^{-7}\)</td>
+          <td>clássico com folga: Módulos 6 e 7</td></tr>
+      <tr><td>Hélio líquido, 2 K</td><td>\(\sim3\)</td><td>superfluidez</td></tr>
+      <tr><td>Condensado de rubídio, 100 nK</td><td>\(\gtrsim2{,}6\)</td>
+          <td>condensado de Bose-Einstein</td></tr>
+      <tr><td>Elétrons no cobre, 300 K</td><td>\(\sim7\times10^{3}\)</td>
+          <td>gás de Fermi degenerado</td></tr>
+    </tbody>
+  </table>
   </div>
 
-  <p>A resposta veio em 1926, de Heisenberg e, independentemente, de Dirac: a força que
-  alinha os spins não é magnética, é <strong>eletrostática</strong>. É a repulsão de Coulomb
-  de sempre, filtrada pelo princípio de exclusão. E é por isso que ela é mil vezes mais
-  forte.</p>
+  <p>A grandeza \(n\lambda_T^3\) compara o comprimento de onda térmico com a distância média
+  entre as partículas. Quando ela passa de um, as funções de onda se superpõem, e aí não há
+  mais como fingir que as partículas são bolinhas numeradas: a <strong>simetria da função de
+  onda sob troca</strong> entra em cena, e a contagem muda.</p>
+
+  <p>Repare numa coisa desconfortável na última linha. Os elétrons de condução de um pedaço
+  de cobre, à temperatura ambiente, estão <em>mais</em> degenerados que um condensado de
+  Bose-Einstein a cem nanokelvin. A degenerescência quântica não é um fenômeno exótico de
+  laboratório criogênico: ela está no fio da tomada.</p>
 
   <!-- ================================================== -->
-  <!-- ================================================== -->
-  <h2 id="s2">2. Pauli: o paramagnetismo do mar de Fermi</h2>
+  <h2 id="s2">2. Partículas idênticas</h2>
 
-  <p>Antes de chegar à interação de troca, vale gastar duas seções com o caso mais simples
-  de magnetismo quântico que existe, o do gás de elétrons livres. Ele não tem interação
-  nenhuma entre os spins, de modo que não dá ferromagnetismo, mas mostra, com conta curta,
-  por onde a quantização entra para salvar o que Bohr e van Leeuwen haviam proibido.</p>
+  <p>Considere \(N\) partículas idênticas sem estrutura interna num volume \(V\). A função de
+  onda do sistema é</p>
 
-  <p>Ligue um campo \(B\) num gás de elétrons degenerado. Cada elétron tem energia
-  magnética \(\mp\mu_B B\) conforme o spin esteja a favor ou contra o campo, e o efeito
-  sobre as bandas é puramente geométrico: a sub-banda de spin a favor desce em bloco por
-  \(\mu_B B\) e a de spin contra sobe por \(\mu_B B\). As duas, porém, têm de compartilhar
-  o mesmo nível de Fermi, porque elétrons passam de uma para a outra até que o custo de
-  mudar seja zero. O resultado é um desbalanço de população.</p>
+  <p>\[\psi_{n_1,n_2,\dots,n_N}\left(q_1,q_2,\dots,q_N\right),\]</p>
 
-  <p>Se \(g(E_F)\) é a densidade de estados por unidade de volume no nível de Fermi,
-  contando os dois spins, cada sub-banda tem \(g/2\). O número transferido por unidade de
-  volume é a área do retângulo de altura \(g(E_F)/2\) e largura \(\mu_B B\), e ele conta
-  duas vezes, uma por sub-banda:</p>
-
-  <p>\[n_\uparrow-n_\downarrow=2\cdot\frac{g(E_F)}{2}\,\mu_B B=g(E_F)\,\mu_B B .\]</p>
-
-  <p>Cada elétron transferido contribui com \(\mu_B\) para a magnetização, de modo que
-  \(M=\mu_B^2\,g(E_F)\,B\) e a susceptibilidade vale</p>
-
-  <p>\[\boxed{\;\chi_{\rm Pauli}=\mu_0\,\mu_B^2\,g(E_F)=\frac{3}{2}\,
-  \frac{\mu_0 n\mu_B^2}{\kB T_F}\;}\]</p>
-
-  <p>na última forma usando \(g(E_F)=3n/2E_F\) do gás livre. Olhe o que sumiu: a
-  temperatura. A susceptibilidade de Pauli é praticamente constante, enquanto a lei de
-  Curie, que o mesmo gás daria se fosse clássico e distinguível, vai com \(1/T\).</p>
-
-  <div class="bloco fisica">
-    <span class="rotulo">Por que o 1/T desaparece</span>
-    <p>A conta de Curie supõe que todos os \(n\) momentos podem escolher livremente a
-    direção. No mar de Fermi, quase nenhum pode: um elétron no fundo da banda que quisesse
-    virar o spin teria de ir para um estado já ocupado, o que o princípio de exclusão
-    proíbe. Só os que estão a menos de \(\kB T\) do nível de Fermi têm estados vazios por
-    perto, e eles são uma fração \(\sim T/T_F\) do total.</p>
-    <p>A susceptibilidade fica, então, a de Curie vezes essa fração, e o \(1/T\) de uma
-    cancela o \(T\) da outra:</p>
-    <p>\[\chi_{\rm Pauli}\sim\frac{\mu_0 n\mu_B^2}{\kB T}\cdot\frac{T}{T_F}
-    =\frac{\mu_0 n\mu_B^2}{\kB T_F}.\]</p>
-    <p>É o mesmo argumento de fração ativa que no Módulo 8 explicou por que o calor
-    específico eletrônico é linear em \(T\) e não \(3\kB/2\). Vale a pena guardar o padrão:
-    toda vez que o mar de Fermi entra, aparece um fator \(T/T_F\) que corta a resposta
-    clássica.</p>
-  </div>
-
-  <p>Números, para o sódio, com \(n=2{,}65\times10^{28}\ \mathrm{m^{-3}}\) e
-  \(E_F=3{,}24\ \mathrm{eV}\), ou seja \(T_F\approx3{,}8\times10^{4}\ \mathrm{K}\):</p>
-
-  <p>\[\chi_{\rm Pauli}\approx8{,}3\times10^{-6},\qquad
-  \chi_{\rm Curie}(300\ \mathrm{K})\approx6{,}9\times10^{-4},\]</p>
-
-  <p>uma razão de \(0{,}012\), que é exatamente \(\tfrac32\,T/T_F\) com \(T=300\) K. O
-  metal é paramagnético, mas oitenta vezes mais fraco do que a conta clássica previa, e
-  essa discrepância foi, historicamente, um dos primeiros indícios de que os elétrons de
-  condução obedecem à estatística de Fermi e não à de Boltzmann.</p>
-
-  <!-- ================================================== -->
-  <h2 id="s3">3. Landau: o diamagnetismo das órbitas quantizadas</h2>
-
-  <p>O spin não é a única coisa que o campo mexe. O movimento orbital também responde, e é
-  justamente aí que o teorema de Bohr-van Leeuwen parecia mais seguro: foi a integral sobre
-  os momentos, contínua, que matou a magnetização clássica. A saída é que num campo
-  magnético o movimento transversal <em>não</em> é contínuo.</p>
-
-  <p>Num campo uniforme \(B\hat z\), a energia de um elétron livre é</p>
-
-  <p>\[E_{\nu,k_z}=\left(\nu+\tfrac12\right)\hbar\omega_c+\frac{\hbar^2k_z^2}{2m},
-  \qquad \omega_c=\frac{eB}{m},\qquad \nu=0,1,2,\dots\]</p>
-
-  <p>O movimento ao longo do campo continua livre, como manda a força de Lorentz, que não
-  tem componente nessa direção. O movimento no plano perpendicular, que classicamente seria
-  um círculo de qualquer raio, vira uma escada de <strong>níveis de Landau</strong>
-  igualmente espaçados, cada um com degenerescência \(eB/h\) por unidade de área. É a
-  escada que quebra o argumento clássico: somar sobre níveis discretos não é a mesma coisa
-  que integrar sobre um contínuo, e a translação \(\vec p\to\vec p-q\vec A\) deixa de ser
-  inofensiva.</p>
-
-  <p>O cálculo da energia livre dessa escada, que não faremos aqui linha a linha, dá um
-  resultado de uma elegância difícil de acreditar quando se vê pela primeira vez:</p>
-
-  <p>\[\boxed{\;\chi_{\rm Landau}=-\frac{1}{3}\,\chi_{\rm Pauli}\;}\]</p>
-
-  <p>para elétrons livres de massa \(m\). O sinal é negativo, como tem de ser: a resposta
-  orbital é <em>diamagnética</em>, ela se opõe ao campo que a criou, que é a lei de Lenz
-  aparecendo onde menos se espera. E o fator \(1/3\) não é aproximação nenhuma, é exato
-  nesse modelo.</p>
+  <p>onde \(q_j\) reúne as três coordenadas de posição e a de spin da partícula \(j\), e
+  \(n_j\) são os números quânticos do seu estado individual.</p>
 
   <div class="bloco def">
-    <span class="rotulo">O saldo, e por que o bismuto é diferente</span>
-    <p>Somando as duas contribuições, o gás de elétrons livres é paramagnético, com
-    \(\chi=\tfrac23\chi_{\rm Pauli}\). Num metal de verdade, porém, os elétrons não têm a
-    massa do elétron livre, e sim uma <strong>massa efetiva</strong> \(m^\ast\) que a rede
-    cristalina impõe. O spin não sabe disso, de modo que \(\chi_{\rm Pauli}\) não muda,
-    mas a frequência de cíclotron vai com \(1/m^\ast\), e o termo de Landau ganha um fator
-    \((m/m^\ast)^2\):</p>
-    <p>\[\frac{\chi_{\rm Landau}}{\chi_{\rm Pauli}}=-\frac13\left(\frac{m}{m^\ast}\right)^2 .\]</p>
-    <p>No bismuto a massa efetiva é cerca de cem vezes menor que a do elétron livre, o
-    fator explode, e o diamagnetismo de Landau domina com folga. É por isso que o bismuto é
-    o diamagneto de bancada preferido, aquele que levita sobre um ímã de neodímio numa
-    demonstração de dois minutos.</p>
+    <span class="rotulo">O postulado de simetrização</span>
+    <p>Um sistema de partículas idênticas de spin <strong>inteiro</strong> (bósons) é
+    descrito por uma função de onda <strong>simétrica</strong> sob a troca de duas
+    partículas:</p>
+    <p>\[\psi_S(\dots,q_i,\dots,q_j,\dots)=\psi_S(\dots,q_j,\dots,q_i,\dots).\]</p>
+    <p>Um sistema de partículas idênticas de spin <strong>semi-inteiro</strong> (férmions) é
+    descrito por uma função de onda <strong>antissimétrica</strong>:</p>
+    <p>\[\psi_A(\dots,q_i,\dots,q_j,\dots)=-\,\psi_A(\dots,q_j,\dots,q_i,\dots).\]</p>
   </div>
+
+  <p>Nada aqui é escolha nossa. A conexão entre spin e estatística é um teorema, demonstrado
+  por Pauli em 1940 a partir da teoria quântica de campos relativística: em três dimensões
+  espaciais, exigir que a teoria seja relativisticamente invariante e que a energia seja
+  limitada por baixo já força spin inteiro a vir com simetria e spin semi-inteiro com
+  antissimetria. Aqui ele entra como postulado.</p>
+
+  <p>Veja o que ele faz com duas partículas sem interação. Sejam \(\phi_a\) e \(\phi_b\)
+  autofunções do hamiltoniano de uma partícula, com autovalores \(\epsilon_a\) e
+  \(\epsilon_b\). Como \(\hat{\mathcal H}_{\rm gás}=\hat{\mathcal H}_1+\hat{\mathcal H}_2\),
+  o produto</p>
+
+  <p>\[\psi_{ab}(1,2)=\phi_a(1)\,\phi_b(2)\]</p>
+
+  <p>é autofunção com autovalor \(E=\epsilon_a+\epsilon_b\), pois</p>
+
+  <p>\[\left(\hat{\mathcal H}_1+\hat{\mathcal H}_2\right)\phi_a(1)\phi_b(2)
+  =\left[\hat{\mathcal H}_1\phi_a(1)\right]\phi_b(2)+\phi_a(1)\left[\hat{\mathcal H}_2\phi_b(2)\right]
+  =\left(\epsilon_a+\epsilon_b\right)\phi_a(1)\phi_b(2).\]</p>
+
+  <p>Mas \(\psi_{ab}\) não tem simetria definida: trocar as partículas dá
+  \(\psi_{ab}(2,1)=\phi_a(2)\phi_b(1)\), que é uma função diferente com o <em>mesmo</em>
+  autovalor. As combinações com simetria definida são as duas óbvias:</p>
+
+  <p>\[\psi_S(1,2)=\phi_a(1)\phi_b(2)+\phi_a(2)\phi_b(1),\qquad
+  \psi_A(1,2)=\phi_a(1)\phi_b(2)-\phi_a(2)\phi_b(1),\]</p>
+
+  <p>ambas ainda com autovalor \(E=\epsilon_a+\epsilon_b\), já que o hamiltoniano é linear.
+  A degenerescência de troca, que classicamente daria dois microestados distintos, foi
+  substituída por <strong>um</strong>: dada a espécie da partícula, só uma das duas
+  combinações existe.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s3">3. O princípio de exclusão</h2>
+
+  <p>Ponha agora as duas partículas no mesmo estado individual, \(b=a\), e olhe o que sobra
+  da função antissimétrica:</p>
+
+  <p>\[\psi_A(1,2)=\phi_a(1)\phi_a(2)-\phi_a(2)\phi_a(1)=0.\]</p>
+
+  <p>Não é que seja improvável: é que o estado <em>não existe</em>. Eis o</p>
+
+  <div class="bloco def">
+    <span class="rotulo">Princípio de exclusão de Pauli</span>
+    <p>Não existe microestado de um sistema de férmions com duas ou mais partículas no mesmo
+    estado individual. Os números de ocupação de férmions só podem valer \(n_j=0\) ou
+    \(n_j=1\).</p>
+  </div>
+
+  <p>Para bósons, \(\psi_S(1,2)=2\phi_a(1)\phi_a(2)\neq0\), e não há limite algum: qualquer
+  número de bósons cabe no mesmo estado. Essas duas frases, que cabem em duas linhas, são
+  tudo o que distingue um mar de Fermi de um condensado de Bose. O resto deste módulo é
+  consequência.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s4">4. Microestados por ocupação</h2>
+
+  <p>Se as partículas são indistinguíveis, perguntar <em>qual</em> partícula está em qual
+  estado não faz sentido. A única pergunta legítima é <em>quantas</em> estão em cada estado.
+  Um microestado do gás fica então especificado por um conjunto de <strong>números de
+  ocupação</strong></p>
+
+  <p>\[\{n_1,n_2,\dots,n_j,\dots\},\qquad
+  \epsilon_1\le\epsilon_2\le\dots\le\epsilon_j\le\dots\]</p>
+
+  <p>dos estados individuais, com energia e número de partículas dados por</p>
+
+  <p>\[E\left(n_1,n_2,\dots\right)=\sum_j n_j\epsilon_j,\qquad N=\sum_j n_j,\]</p>
+
+  <p>onde a soma percorre todos os estados individuais, inclusive os de spin.</p>
+
+  <p>E aqui aparece o problema técnico que organiza o módulo inteiro. No ensemble canônico
+  teríamos de somar \(e^{-\beta\sum_j n_j\epsilon_j}\) sobre todos os conjuntos
+  \(\{n_j\}\) <em>com o vínculo</em> \(\sum_j n_j=N\). Esse vínculo acopla os estados: se
+  um ganha uma partícula, outro perde. A soma não fatora, e o cálculo trava.</p>
+
+  <p>A saída é abandonar o vínculo.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s5">5. O ensemble grã-canônico</h2>
+
+  <p>Retomando o que ficou armado no Módulo 5: um sistema \(B\) em contato com um
+  reservatório \(A\) por uma parede rígida, diatérmica e <strong>permeável</strong>. Agora
+  trocam-se energia e partículas. A probabilidade de encontrar \(B\) no estado \(i\), com
+  energia \(U_i\) e \(N_i\) partículas, é proporcional ao número de microestados que sobram
+  para o reservatório:</p>
+
+  <p>\[\wp_i=C\,\Omega_A\left(U_0-U_i,\;N_0-N_i\right).\]</p>
+
+  <p>Tomando o logaritmo e expandindo em torno de \((U_0,N_0)\), já que \(U_i\ll U_0\) e
+  \(N_i\ll N_0\):</p>
+
+  <p>\[\ln\wp_i=\ln C+\ln\Omega_A(U_0,N_0)
+  -U_i\left[\frac{\partial\ln\Omega_A}{\partial U}\right]_0
+  -N_i\left[\frac{\partial\ln\Omega_A}{\partial N}\right]_0+\dots\]</p>
+
+  <p>Com \(S=\kB\ln\Omega\), \(\partial S/\partial U=1/T\) e
+  \(\partial S/\partial N=-\mu/T\), as duas derivadas têm nome, e</p>
+
+  <p>\[\boxed{\;\wp_i=\frac{e^{-\beta\left(U_i-\mu N_i\right)}}{Y},\qquad
+  Y=\sum_i e^{-\beta\left(U_i-\mu N_i\right)}\;}\]</p>
+
+  <p>onde \(Y\) é a <strong>grande função de partição</strong>. Repare que o potencial
+  químico entrou exatamente como a temperatura: \(1/T\) é o preço da energia, \(\mu/T\) é o
+  preço das partículas, e os dois são fixados pelo reservatório.</p>
+
+  <p>Como \(F=-\kB T\ln Z\), a mesma manipulação do Módulo 5 dá
+  \(Y\cong e^{-\beta(F-\mu N)}\), e define-se o <strong>potencial grã-canônico</strong></p>
+
+  <p>\[\Phi\equiv F-\mu N=-\kB T\ln Y,\qquad
+  d\Phi(T,V,\mu)=-S\,dT-P\,dV-N\,d\mu,\]</p>
+
+  <p>de onde saem as três derivadas de trabalho:</p>
+
+  <p>\[S=-\dpar{\Phi}{T}{V,\mu},\qquad
+  N=-\dpar{\Phi}{\mu}{T,V},\qquad
+  P=-\dpar{\Phi}{V}{T,\mu}.\]</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Por que Φ = −PV</span>
+    <p>Pela relação de Euler, \(U=TS-PV+\mu N\), de modo que
+    \(F=U-TS=-PV+\mu N\) e portanto</p>
+    <p>\[\Phi=F-\mu N=-PV.\]</p>
+    <p>Como \(\Phi\) é extensivo e suas variáveis naturais \(T\) e \(\mu\) são intensivas,
+    ele <em>tem</em> de ser proporcional a \(V\), e o coeficiente só pode ser \(-P\). É por
+    isso que \(P=-\Phi/V\) e não apenas \(-\partial\Phi/\partial V\): as duas coisas
+    coincidem aqui.</p>
+    <p>Na prática isso é uma conveniência enorme. Calculada \(\ln Y\), a pressão sai de
+    \(PV=\kB T\ln Y\) sem derivar nada.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s6">6. A grande função de partição fatora</h2>
+
+  <p>Agora o pagamento. Sem o vínculo, somar sobre todos os \(N\) e todos os microestados é
+  o mesmo que somar sobre todos os \(\{n_j\}\) <em>livremente</em>:</p>
+
+  <p>\[Y=\sum_{n_1,n_2,\dots}
+  \exp\left\{\beta\left[\mu\left(n_1+n_2+\dots\right)
+  -\left(n_1\epsilon_1+n_2\epsilon_2+\dots\right)\right]\right\}.\]</p>
+
+  <p>O expoente é uma soma de termos, cada um com um só \(n_j\). A exponencial de uma soma é
+  um produto, e as somas independentes se desacoplam:</p>
+
+  <p>\[Y=\left[\sum_{n_1}e^{\beta(\mu-\epsilon_1)n_1}\right]
+  \left[\sum_{n_2}e^{\beta(\mu-\epsilon_2)n_2}\right]\cdots
+  =\prod_j Y_j,\qquad
+  Y_j\equiv\sum_{n_j}e^{\beta(\mu-\epsilon_j)n_j}.\]</p>
+
+  <p>E com isso a probabilidade conjunta também fatora,</p>
+
+  <p>\[\wp\left(n_1,n_2,\dots\right)=\prod_j\frac{e^{\beta(\mu-\epsilon_j)n_j}}{Y_j}
+  =\prod_j\wp_j\left(n_j\right),\]</p>
+
+  <p>isto é: a ocupação de cada estado individual é <strong>estatisticamente independente</strong>
+  da dos outros. Essa independência é consequência do gás ser ideal, e é ela que torna o
+  problema solúvel. Resta fazer uma soma de uma variável, e o resultado depende só de quais
+  valores \(n_j\) pode assumir.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s7">7. Fermi-Dirac e Bose-Einstein</h2>
+
+  <p>A ocupação média de um estado sai de \(Y_j\) por uma derivada:</p>
+
+  <p>\[\bar n_j=\frac{1}{\beta}\frac{\partial}{\partial\mu}\ln Y_j.\]</p>
+
+  <p><strong>Bósons.</strong> Aqui \(n_j=0,1,2,\dots\) sem limite, e a soma é uma série
+  geométrica de razão \(e^{\beta(\mu-\epsilon_j)}\):</p>
+
+  <p>\[Y_j=\sum_{n_j=0}^{\infty}e^{\beta(\mu-\epsilon_j)n_j}
+  =\frac{1}{1-e^{\beta(\mu-\epsilon_j)}}
+  \quad\Longrightarrow\quad
+  \bar n_j=\frac{e^{\beta(\mu-\epsilon_j)}}{1-e^{\beta(\mu-\epsilon_j)}}
+  =\frac{1}{e^{\beta(\epsilon_j-\mu)}-1}.\]</p>
+
+  <p><strong>Férmions.</strong> Aqui a soma tem exatamente dois termos,
+  \(Y_j=1+e^{\beta(\mu-\epsilon_j)}\), e</p>
+
+  <p>\[\bar n_j=\frac{0+e^{\beta(\mu-\epsilon_j)}}{1+e^{\beta(\mu-\epsilon_j)}}
+  =\frac{1}{e^{\beta(\epsilon_j-\mu)}+1}.\]</p>
+
+  <div class="bloco def">
+    <span class="rotulo">As duas distribuições, numa linha só</span>
+    <p>\[\boxed{\;\bar n(\epsilon)=\frac{1}{e^{(\epsilon-\mu)/\kB T}\pm1}\;}\]</p>
+    <p>com \(+\) para férmions (Fermi-Dirac), \(-\) para bósons (Bose-Einstein), e o limite
+    diluído \(\bar n=e^{-(\epsilon-\mu)/\kB T}\) de Maxwell-Boltzmann quando o denominador é
+    grande e o \(\pm1\) deixa de importar.</p>
+  </div>
+
+  <p>Dois comentários antes da figura. Primeiro, para férmions, \(\bar n(\mu)=1/2\) em
+  qualquer temperatura: o potencial químico é, por definição operacional, a energia onde a
+  ocupação vale meio. Segundo, para bósons é preciso ter \(\epsilon>\mu\) sempre, senão
+  \(\bar n&lt;0\), o que não significa nada. Como o estado de menor energia pode ser tomado
+  como \(\epsilon_0=0\), isso obriga \(\mu\le0\) num gás de bósons. É um aperto, e a seção
+  15 mostra o que acontece quando ele não pode mais ser respeitado.</p>
+
+  <div data-widget="estatisticas"></div>
+
+  <!-- ================================================== -->
+  <h2 id="s8">8. Densidade de estados em energia</h2>
+
+  <p>Do Módulo 7 trazemos pronta a densidade de estados em momento,</p>
+
+  <p>\[g(p)\,dp=\frac{4\pi V}{h^3}\,p^2\,dp,\]</p>
+
+  <p>que vale aqui sem nenhuma modificação. Ela apenas conta células de volume \(h^3\) no espaço de
+  fase. Passando para a energia com \(\epsilon=p^2/2m\), de modo
+  que \(p=\sqrt{2m\epsilon}\) e \(dp=\frac12\sqrt{2m/\epsilon}\,d\epsilon\):</p>
+
+  <p>\[\boxed{\;g(\epsilon)\,d\epsilon=\frac{2\pi V}{h^3}\left(2m\right)^{3/2}
+  \sqrt{\epsilon}\,d\epsilon\;}\]</p>
+
+  <p>O \(\sqrt\epsilon\) é o mesmo \(p^2\) da casca esférica, só que visto em outra variável;
+  o widget da seção 12 do Módulo 8 mostrou de onde ele vem e o que acontece quando a relação
+  entre \(\epsilon\) e \(p\) é outra. O número médio de partículas com energia entre
+  \(\epsilon\) e \(\epsilon+d\epsilon\) é então</p>
+
+  <p>\[dN(\epsilon)=\left(2s+1\right)\bar n(\epsilon)\,g(\epsilon)\,d\epsilon,\]</p>
+
+  <p>com o fator \(2s+1\) contando os estados de spin: vale 2 para elétrons, e é só uma
+  multiplicação porque a energia translacional não depende do spin.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s9">9. O gás de Fermi no zero absoluto</h2>
+
+  <p>Começamos pelo caso mais frio possível. Em \(T=0\), a função de Fermi é um degrau, onde todos os
+  estados com \(\epsilon&lt;\mu\) estão ocupados e todos acima vazios. Esse valor de \(\mu\) tem
+  nome.</p>
+
+  <div class="bloco def">
+    <span class="rotulo">Energia de Fermi</span>
+    <p>\(\epsilon_F\equiv\mu(T=0)\) é a energia do último estado ocupado no zero absoluto, e
+    \(T_F\equiv\epsilon_F/\kB\) é a <strong>temperatura de Fermi</strong>.</p>
+  </div>
+
+  <p>Contar as partículas é integrar a densidade de estados até \(\epsilon_F\):</p>
+
+  <p>\[N=\left(2s+1\right)\frac{2\pi V}{h^3}\left(2m\right)^{3/2}
+  \int_0^{\epsilon_F}\sqrt{\epsilon}\,d\epsilon
+  =\frac{4\pi}{3}\left(2s+1\right)\frac{\left(2m\right)^{3/2}}{h^3}V\epsilon_F^{3/2},\]</p>
+
+  <p>e invertendo,</p>
+
+  <p>\[\boxed{\;\epsilon_F=\frac{\hbar^2}{2m}
+  \left(\frac{6\pi^2}{2s+1}\frac{N}{V}\right)^{2/3}\;}\]</p>
+
+  <p>que para elétrons, com \(2s+1=2\), é
+  \(\epsilon_F=\frac{\hbar^2}{2m}\left(3\pi^2n\right)^{2/3}\). A energia de Fermi depende só
+  da <strong>densidade</strong> e da massa: nada de temperatura.</p>
+
+  <p>A energia média por partícula é a mesma integral com um \(\epsilon\) a mais:</p>
+
+  <p>\[\bar u_{T=0}=\frac{2s+1}{N}\frac{2\pi V}{h^3}\left(2m\right)^{3/2}
+  \int_0^{\epsilon_F}\epsilon^{3/2}\,d\epsilon
+  =\frac{3}{5}\,\epsilon_F,\]</p>
+
+  <p>onde a razão \(\frac{2/5}{2/3}=\frac35\) é só a comparação dos dois expoentes. E a
+  pressão, usando que no zero absoluto não há distinção entre \(U\) e \(F\), sai de
+  \(P=-\partial U/\partial V\) com \(U=\frac35N\epsilon_F\propto V^{-2/3}\):</p>
+
+  <p>\[\boxed{\;P=\frac{2}{5}\frac{N}{V}\epsilon_F=\frac23\frac{U}{V}\;}\]</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Pressão sem temperatura</span>
+    <p>Este é o resultado mais estranho do módulo. Um gás de férmions a \(T=0\) tem energia
+    e exerce pressão. Não é energia térmica, nem energia de interação: as partículas nem se
+    veem. É o princípio de exclusão cobrando aluguel pelo espaço de fase. Como só cabe um
+    férmion por estado, empacotar \(N\) deles obriga a ocupar estados de momento cada vez
+    maior, e momento é o que gera pressão nas paredes.</p>
+    <p>Para o cobre dá 38 GPa, quase 400 mil atmosferas, numa barra de metal parada em cima
+    da mesa. O que impede o metal de explodir é a atração dos íons positivos da rede, que
+    equilibra exatamente essa pressão. Em escala astrofísica, é essa mesma pressão que
+    segura uma anã branca contra a gravidade, e voltaremos a ela na seção 16.</p>
+  </div>
+
+  <div data-widget="gasfermi"></div>
+
+  <!-- ================================================== -->
+  <h2 id="s10">10. Sommerfeld e o calor específico dos metais</h2>
+
+  <p>Agora ligue a temperatura. A energia por partícula é</p>
+
+  <p>\[\bar u=\frac1N\int_{-\infty}^{\infty}\bar n(\epsilon)\,\epsilon\,g(\epsilon)\,d\epsilon,\]</p>
+
+  <p>e o truque de Sommerfeld é explorar que, para \(T\ll T_F\), a função \(\bar n\) é um
+  degrau quase perfeito, e sua <em>derivada</em> é um pico estreito em torno de \(\mu\).
+  Defina \(f\) por \(\epsilon g(\epsilon)=df/d\epsilon\) e integre por partes:</p>
+
+  <p>\[\bar u=\frac1N\left[\bar n(\epsilon)f(\epsilon)\right]_{-\infty}^{\infty}
+  -\frac1N\int_{-\infty}^{\infty}f(\epsilon)\,\frac{d\bar n}{d\epsilon}\,d\epsilon
+  =-\frac1N\int_{-\infty}^{\infty}f(\epsilon)\,\frac{d\bar n}{d\epsilon}\,d\epsilon,\]</p>
+
+  <p>com o termo de borda nulo porque \(\bar n\to0\) em \(+\infty\) e \(g\to0\) em
+  \(-\infty\). Agora a integral só vê a vizinhança de \(\mu\), e lá dá para expandir \(f\) em
+  série:</p>
+
+  <p>\[f(\epsilon)=f(\mu)+\left(\epsilon-\mu\right)f'(\mu)
+  +\tfrac12\left(\epsilon-\mu\right)^2f''(\mu)+\dots\]</p>
+
+  <p>Com \(u=\beta(\epsilon-\mu)\), os três primeiros termos são integrais puras de número:</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>Termo</th><th>Integral</th><th>Valor</th></tr></thead>
+    <tbody>
+      <tr><td>\(f(\mu)\)</td>
+          <td>\(\displaystyle\int_{-\infty}^{\infty}\frac{e^{-u}\,du}{\left(e^{-u}+1\right)^2}\)</td>
+          <td>\(1\)</td></tr>
+      <tr><td>\(f'(\mu)\)</td>
+          <td>\(\displaystyle\int_{-\infty}^{\infty}\frac{u\,e^{-u}\,du}{\left(e^{-u}+1\right)^2}\)</td>
+          <td>\(0\), integrando ímpar</td></tr>
+      <tr><td>\(f''(\mu)\)</td>
+          <td>\(\displaystyle\int_{-\infty}^{\infty}\frac{u^2e^{-u}\,du}{\left(e^{-u}+1\right)^2}\)</td>
+          <td>\(\pi^2/3\)</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>O termo linear morre por paridade, que é o ponto fino de toda a expansão: a primeira
+  correção térmica é de <strong>segunda</strong> ordem, qualquer que seja a forma de
+  \(g(\epsilon)\). Juntando,</p>
+
+  <p>\[\boxed{\;\bar u\approx\frac{f(\mu)}{N}
+  +\frac{\pi^2}{6N}\left[\frac{d^2f}{d\epsilon^2}\right]_{\epsilon=\mu}\kB^2T^2\;}\]</p>
+
+  <p>que é a <strong>expansão de Sommerfeld</strong>. Para o gás de elétrons,
+  \(f''(\mu)=g(\epsilon_F)\) a menos de correções de ordem superior, de modo que</p>
+
+  <p>\[\bar u\approx\frac35\epsilon_F+\frac{\pi^2}{6}\kB^2T^2g(\epsilon_F)
+  \quad\Longrightarrow\quad
+  c=\frac{d\bar u}{dT}=\frac{\pi^2}{3}\kB^2T\,g(\epsilon_F)
+  =\frac{\pi^2}{2}\frac{\kB^2T}{\epsilon_F}.\]</p>
+
+  <p>Sai também, pela mesma expansão aplicada ao número de partículas,
+  \(\mu(T)\approx\epsilon_F\left[1-\frac{\pi^2}{12}\left(T/T_F\right)^2\right]\): o potencial
+  químico mal se move.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">O fator mil que resolveu um escândalo de meio século</span>
+    <p>Classicamente, cada elétron de condução deveria contribuir com \(\frac32\kB\) ao calor
+    específico, e um metal monovalente deveria ter um calor específico 50% maior que um
+    isolante com a mesma rede. Nada disso é observado, e esse foi um dos escândalos da teoria
+    de Drude.</p>
+    <p>A resposta está no fator \(\kB T/\epsilon_F\), que no cobre a 300 K vale
+    \(0{,}0037\). Só os elétrons a menos de \(\kB T\) do nível de Fermi têm estados vazios
+    para onde ir; os outros estão travados pelo princípio de exclusão. A fração ativa é
+    \(\sim T/T_F\), e o calor específico eletrônico fica em 1,2% do valor da
+    equipartição, \(\frac32\kB\) por elétron,
+    abaixo da precisão dos calorímetros da época.</p>
+    <p>O mesmo fator aparece em tudo o que envolva absorver energia pelos elétrons de
+    condução: susceptibilidade de Pauli, emissão termiônica, coeficiente Seebeck. Sempre a
+    mesma física, sempre o mesmo fator.</p>
+  </div>
+
+  <div data-widget="calormetal"></div>
+
+  <!-- ================================================== -->
+  <h2 id="s11">11. A esfera de Fermi deslocada</h2>
+
+  <p>Falta explicar como um metal conduz. No modelo de Drude, puramente clássico, a
+  condutividade é</p>
+
+  <p>\[\sigma_0=\frac{ne^2\tau}{m},\]</p>
+
+  <p>com \(\tau\) o tempo médio entre colisões. A fórmula está certa, mas a dedução não:
+  sob campo, o gás de férmions sai do equilíbrio, e \(\bar n(\epsilon)\) deixa de valer.
+  Precisamos de uma distribuição \(f(\vec k)\) fora do equilíbrio, e a corrente é</p>
+
+  <p>\[\vec J=-\frac{e}{4\pi^3}\int \vec v(\vec k)\,f(\vec k)\,d^3k.\]</p>
+
+  <p>A hipótese mais simples sobre \(f\) é que, desligado o campo, ela relaxa
+  exponencialmente de volta a \(\bar n\) com uma constante de tempo \(\tau\). No regime
+  estacionário e sem gradiente de temperatura, a equação de Boltzmann fica, em uma dimensão,</p>
+
+  <p>\[\frac{e}{\hbar}\mathcal{E}_x\frac{\partial f}{\partial k_x}
+  =\frac{f(\epsilon)-\bar n(\epsilon)}{\tau},\]</p>
+
+  <p>e resolvê-la por uma iteração, substituindo \(f\to\bar n\) do lado esquerdo, dá</p>
+
+  <p>\[f(\epsilon)\approx\bar n(\epsilon)
+  +\frac{e}{\hbar}\mathcal{E}_x\tau\,\frac{\partial\bar n}{\partial k_x}.\]</p>
+
+  <p>Esta expressão tem uma leitura geométrica imediata: ela é o primeiro termo da expansão
+  de \(\bar n\left(\vec k+\delta\vec k\right)\) com
+  \(\delta k=e\mathcal{E}\tau/\hbar\). Ou seja, a solução é simplesmente a distribuição de
+  equilíbrio <strong>deslocada em bloco</strong> no espaço dos \(\vec k\).</p>
+
+  <div data-widget="deriva"></div>
+
+  <p>Substituindo na corrente, o termo com \(\bar n\) sozinho não contribui, por simetria, e
+  sobra \(J_x=\sigma\mathcal{E}_x\) com</p>
+
+  <p>\[\sigma=-\frac{e^2}{4\pi^3\hbar}\int v_x(\vec k)\,\tau\,
+  \frac{\partial\bar n}{\partial k_x}\,d^3k.\]</p>
+
+  <p>Use agora \(\partial\bar n/\partial k_x=\hbar v_x\,\partial\bar n/\partial\epsilon\) e,
+  o passo decisivo, que \(\bar n\) só varia perto de \(\epsilon_F\):</p>
+
+  <p>\[\frac{\partial\bar n}{\partial\epsilon}\cong-\,\delta\left(\epsilon-\epsilon_F\right).\]</p>
+
+  <p>Escrevendo o elemento de volume como
+  \(d^3k=dS_\epsilon\,d\epsilon/\left|\nabla_k\epsilon\right|=dS_\epsilon\,d\epsilon/\hbar v\),
+  a delta mata a integral em \(\epsilon\) e sobra uma integral de superfície:</p>
+
+  <p>\[\boxed{\;\sigma=\frac{e^2}{4\pi^3\hbar}\int_{\epsilon=\epsilon_F}
+  \frac{v_x^2}{v}\,\tau\,dS_\epsilon\;}\]</p>
+
+  <p>A condutividade elétrica é uma propriedade da <strong>superfície de Fermi</strong>, e de
+  mais nada. Os elétrons do fundo do mar não conduzem: não têm para onde ir.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s12">12. A equação de transporte</h2>
+
+  <p>Vale abrir a caixa que foi usada acima. A distribuição \(f(\vec r,\vec p,t)\) no espaço
+  de fase escoa como um fluido, e se nada a destruísse teríamos \(df/dt=0\). Pela regra da
+  cadeia,</p>
+
+  <p>\[\frac{df}{dt}=\frac{\partial f}{\partial t}
+  +\sum_i\left(\frac{\partial f}{\partial x_i}\frac{dx_i}{dt}
+  +\frac{\partial f}{\partial p_i}\frac{dp_i}{dt}\right)
+  =\frac{\partial f}{\partial t}+\frac{\vec p}{m}\cdot\nabla f+\vec F\cdot\nabla_p f,\]</p>
+
+  <p>que é a <strong>derivada convectiva</strong> da mecânica dos fluidos, aqui no espaço de
+  fase. É o teorema de Liouville do Módulo 2 escrito para uma partícula.</p>
+
+  <p>Mas as colisões destroem. Acrescentando o termo que falta,</p>
+
+  <p>\[\boxed{\;\frac{\partial f}{\partial t}+\frac{\vec p}{m}\cdot\nabla f
+  +\vec F\cdot\nabla_p f=\left(\frac{\partial f}{\partial t}\right)_{\rm col}\;}\]</p>
+
+  <p>que é a <strong>equação de transporte de Boltzmann</strong>, de 1872. Todo o resto é
+  achar o lado direito.</p>
+
+  <p>Boltzmann o fez supondo um gás diluído, onde só colisões binárias importam, e
+  acrescentando a hipótese que ele chamou de <em>Stosszahlansatz</em> e que hoje se chama
+  <strong>caos molecular</strong>: as duas partículas que vão colidir são
+  estatisticamente <strong>não correlacionadas</strong> antes da colisão. Com isso a taxa de
+  colisões é um produto de distribuições de uma partícula, e</p>
+
+  <p>\[\left(\frac{\partial f}{\partial t}\right)_{\rm col}
+  =\int\!\!\int\left|\vec v_1-\vec v_2\right|
+  \sigma_\Omega\left(f_1'f_2'-f_1f_2\right)d\Omega\,d^3p_2,\]</p>
+
+  <p>onde \(\sigma_\Omega\) é a seção de choque diferencial, \(f_1f_2\) conta as colisões que
+  tiram partículas do estado e \(f_1'f_2'\) as que trazem.</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Onde a seta do tempo entra</span>
+    <p>O caos molecular parece inocente e não é. Ele quebra a reversibilidade temporal: as
+    partículas são supostas descorrelacionadas <em>antes</em> da colisão, mas depois dela
+    certamente não estão. Essa assimetria, introduzida à mão numa hipótese estatística, é
+    exatamente de onde vem o teorema H do Módulo 4 e o crescimento irreversível da entropia a
+    partir de uma mecânica perfeitamente reversível.</p>
+    <p>Foi esse o alvo das objeções de Loschmidt e de Zermelo, e a resposta de Boltzmann foi
+    a que se adota até hoje: a hipótese não é exata, é esmagadoramente provável.</p>
+  </div>
+
+  <p>O termo de colisão é quadrático em \(f\) e integro-diferencial, o que torna a equação
+  intratável salvo em casos especiais. Três estratégias merecem registro:</p>
+
+  <div class="tabela-rolavel">
+  <table>
+    <thead><tr><th>Método</th><th>Ideia</th><th>Serve para</th></tr></thead>
+    <tbody>
+      <tr><td><b>Chapman-Enskog</b></td>
+          <td>Expansão sistemática em torno do equilíbrio local, em potências do livre
+          caminho médio</td>
+          <td>Deduzir viscosidade e condutividade térmica a partir do potencial
+          intermolecular</td></tr>
+      <tr><td><b>Aproximação BGK</b></td>
+          <td>Trocar todo o termo de colisão por \(\omega\left(f_0-f\right)\): as colisões
+          simplesmente puxam \(f\) de volta à maxwelliana local, a uma taxa \(\omega\)</td>
+          <td>Contas analíticas; é o tempo de relaxação usado na seção 11</td></tr>
+      <tr><td><b>Lattice-Boltzmann</b></td>
+          <td>Discretizar \(\vec r\) e \(\vec v\) numa rede e evoluir numericamente</td>
+          <td>Simulação de escoamentos complexos, hoje um método padrão de dinâmica de
+          fluidos</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>A segunda linha é a que usamos. Quando se escreve
+  \(\left(\partial f/\partial t\right)_{\rm col}=-\left(f-\bar n\right)/\tau\), está-se
+  fazendo BGK com a distribuição de Fermi no lugar da maxwelliana, e \(\tau\) deixa de ser
+  calculado para virar um parâmetro ajustado ao \(\sigma\) medido. É pouco, mas é o
+  suficiente para a esfera deslocada.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s13">13. Bandas de energia</h2>
+
+  <p>Até aqui o elétron era livre. Num cristal ele não é, e a consequência é uma só, mas
+  decisiva.</p>
+
+  <p>Os elétrons de um átomo isolado ocupam orbitais com níveis discretos. Junte dois átomos
+  e os orbitais se superpõem; junte \(N\) átomos num cristal e cada orbital atômico se divide
+  em \(N\) orbitais moleculares de energias distintas, porque o princípio de exclusão proíbe
+  que dois elétrons do sólido tenham os mesmos números quânticos. Com \(N\sim10^{23}\), os
+  níveis ficam tão próximos que formam um contínuo: uma <strong>banda</strong>. Entre bandas
+  podem existir faixas de energia sem nenhum estado, as <strong>separações</strong> ou
+  <em>bandgaps</em>.</p>
+
+  <p>O efeito é mais forte nos orbitais de valência, que são os que se superpõem; os orbitais
+  internos quase não se tocam e geram bandas estreitíssimas.</p>
+
+  <div data-widget="bandas"></div>
+
+  <p>Toda a classificação cabe numa frase: o que importa é <strong>onde cai o nível de
+  Fermi</strong>. Dentro de uma banda, há estados vazios a uma distância infinitesimal dos
+  ocupados, e um campo elétrico mínimo produz corrente: é um metal. Dentro de uma separação,
+  conduzir exige promover elétrons por cima de \(E_g\), e o custo entra como
+  \(e^{-E_g/2\kB T}\). Entre um semicondutor e um isolante não há diferença de natureza, só
+  de número.</p>
+
+  <!-- ================================================== -->
+  <h2 id="s14">14. O gás de fótons</h2>
+
+  <p>Troque agora os férmions por bósons, e tome o caso extremo: os fótons de uma cavidade em
+  equilíbrio térmico. Duas particularidades mudam as contas.</p>
+
+  <p>A primeira: <strong>o número de fótons não se conserva</strong>. As paredes criam e
+  destroem fótons livremente, de modo que não há vínculo algum sobre \(N\), e o multiplicador
+  de Lagrange que o imporia é nulo:</p>
+
+  <p>\[\mu=0\quad\Longrightarrow\quad
+  \bar n(\omega)=\frac{1}{e^{\beta\hbar\omega}-1}.\]</p>
+
+  <p>A segunda: fótons são ultrarrelativísticos por natureza, \(\epsilon=pc=\hbar\omega\).
+  Pela seção 12 do Módulo 8, a densidade de estados muda de acordo. Com \(p=\hbar\omega/c\)
+  em \(g(p)dp=4\pi Vp^2dp/h^3\), e multiplicando por 2 pelas duas polarizações,</p>
+
+  <p>\[g(\omega)\,d\omega=\frac{V}{\pi^2c^3}\,\omega^2\,d\omega.\]</p>
+
+  <p>A densidade espectral de energia é o produto dos três fatores, energia por modo vezes
+  ocupação vezes número de modos:</p>
+
+  <p>\[\boxed{\;u_\omega(T)=\frac{\hbar}{\pi^2c^3}\,
+  \frac{\omega^3}{e^{\beta\hbar\omega}-1}\;}\]</p>
+
+  <p>que é a <strong>lei de Planck</strong>, de 1900. Integrando sobre todas as frequências,
+  com a substituição \(x=\beta\hbar\omega\),</p>
+
+  <p>\[u(T)=\frac{\hbar}{\pi^2c^3}\left(\frac{\kB T}{\hbar}\right)^4
+  \int_0^{\infty}\frac{x^3\,dx}{e^x-1}
+  =\frac{\pi^2\kB^4}{15\hbar^3c^3}\,T^4,\]</p>
+
+  <p>usando \(\int_0^\infty x^3dx/(e^x-1)=\pi^4/15\approx6{,}4939\). Essa é a <strong>lei de
+  Stefan-Boltzmann</strong>, e a emitância da superfície é \(u c/4=\sigma_{SB}T^4\), com</p>
+
+  <p>\[\sigma_{SB}=\frac{2\pi^5\kB^4}{15h^3c^2}=5{,}6704\times10^{-8}\ \mathrm{W/m^2K^4}.\]</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Três datas e um deslocamento</span>
+    <p>A lei \(u\propto T^4\) foi adivinhada por Stefan em 1879 a partir de dados, deduzida
+    termodinamicamente por Boltzmann em 1884 (usando a pressão de radiação \(P=u/3\), que é
+    o \(P=U/3V\) do gás ultrarrelativístico), e derivada da mecânica estatística por Planck em
+    1900. O que Planck acrescentou foi a quantização, e o que ele ganhou com ela foi
+    \(\sigma_{SB}\) <em>calculado</em>, não medido: o \(\pi^4/15\) da integral.</p>
+    <p>Derivando a lei em relação a \(\lambda\) e igualando a zero, chega-se à equação
+    transcendente \(5\left(1-e^{-x}\right)=x\), de raiz \(x=4{,}9651\). Daí a <strong>lei de
+    deslocamento de Wien</strong>, \(\lambda_{\max}T=hc/x\kB=2{,}8977\times10^{-3}\)
+    m·K.</p>
+  </div>
+
+  <div data-widget="corponegro"></div>
+
+  <!-- ================================================== -->
+  <h2 id="s15">15. A condensação de Bose-Einstein</h2>
+
+  <p>Volte ao gás de bósons com número fixo de partículas, e ao aperto da seção 7:
+  \(\mu\le0\) sempre. A ocupação do estado fundamental, \(\epsilon_0=0\), é</p>
+
+  <p>\[\bar n_0=\frac{e^{\beta\mu}}{1-e^{\beta\mu}}
+  \;\xrightarrow[\mu\to0^-]{}\;\frac{1}{\beta|\mu|}\to\infty.\]</p>
+
+  <p>Guarde isso: quando \(\mu\) encosta em zero, o estado fundamental sozinho pode
+  acomodar <em>qualquer</em> número de partículas. Isso é importante porque o estado
+  fundamental não aparece na integral com \(g(\epsilon)\propto\sqrt\epsilon\), que se anula
+  em \(\epsilon=0\). A conta correta é a integral <strong>mais</strong> o termo do
+  fundamental, separado à mão:</p>
+
+  <p>\[\frac{N}{V}=\frac{2\pi}{h^3}\left(2m\right)^{3/2}
+  \int_0^{\infty}\frac{\sqrt\epsilon\,d\epsilon}{e^{\beta(\epsilon-\mu)}-1}
+  +\frac{1}{V}\frac{\phi}{1-\phi},\]</p>
+
+  <p>com a <strong>fugacidade</strong> \(\phi\equiv e^{\beta\mu}\in[0,1]\). Em termos do
+  comprimento de onda térmico \(\lambda_T=h/\sqrt{2\pi m\kB T}\) e do momento reduzido
+  \(p'=p/\sqrt{2m\kB T}\), a integral se escreve</p>
+
+  <p>\[\frac{4}{\sqrt\pi}\int_0^{\infty}\frac{p'^2\,dp'}{\phi^{-1}e^{p'^2}-1}
+  =\sum_{j=1}^{\infty}\frac{\phi^j}{j^{3/2}}\equiv g_{3/2}(\phi),\]</p>
+
+  <p>expandindo o denominador em série geométrica e integrando termo a termo. Ora: esta
+  função é crescente em \(\phi\), e seu valor máximo, em \(\phi=1\), é finito:</p>
+
+  <p>\[g_{3/2}(1)=\sum_{j=1}^{\infty}\frac{1}{j^{3/2}}=\zeta\!\left(\tfrac32\right)
+  =2{,}6124.\]</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">A saturação, que é o fenômeno inteiro</span>
+    <p>Os estados excitados <strong>não conseguem</strong> acomodar mais que
+    \(2{,}612\,V/\lambda_T^3\) partículas, por mais que se empurre \(\mu\) para cima: ele
+    esbarra no teto \(\mu=0\). Se \(N\) ultrapassar esse número, as partículas excedentes não
+    têm para onde ir a não ser para o estado fundamental, e caem lá <em>todas</em>.</p>
+    <p>A condensação não é causada por interação nenhuma: o gás é ideal. É uma transição de
+    fase que vem só da simetria da função de onda e de uma série convergir.</p>
+  </div>
+
+  <p>A condição de saturação, \(n\lambda_T^3=\zeta(3/2)\), define a <strong>temperatura
+  crítica</strong>:</p>
+
+  <p>\[\boxed{\;T_c=\frac{2\pi\hbar^2}{m\kB}
+  \left(\frac{n}{\zeta(3/2)}\right)^{2/3}\;}\]</p>
+
+  <p>Abaixo dela, a parte excitada fica congelada em \(\zeta(3/2)V/\lambda_T^3\) e o resto é
+  condensado. Como \(\lambda_T\propto T^{-1/2}\), a fração sai de graça:</p>
+
+  <p>\[\frac{\bar n_0}{N}=1-\frac{\zeta(3/2)V}{N\lambda_T^3}
+  =1-\frac{\lambda_c^3}{\lambda_T^3}
+  =\boxed{\;1-\left(\frac{T}{T_c}\right)^{3/2}\;}\]</p>
+
+  <p>Note que o critério \(n\lambda_T^3\geq2{,}612\) é o mesmo do Módulo 7, agora com o
+  número exato no lugar do "da ordem de um". Na temperatura crítica, o comprimento de onda
+  térmico é da ordem da separação média entre as partículas.</p>
+
+  <div data-widget="condensado"></div>
+
+  <div class="bloco fisica">
+    <span class="rotulo">Hélio, rubídio e setenta anos de espera</span>
+    <p>Einstein previu a condensação em 1925, a partir de um manuscrito que Bose lhe enviara
+    sobre a estatística dos fótons. A primeira pista experimental veio em 1938, quando o
+    hélio-4 líquido se revelou superfluido abaixo de 2,17 K: a fórmula acima, com a
+    densidade do hélio líquido, dá \(T_c=3{,}13\) K, perto o bastante para ninguém achar
+    coincidência. A diferença se deve às interações, que o gás ideal ignora e que no hélio
+    líquido são fortes.</p>
+    <p>O condensado puro, de gás diluído, só apareceu em 1995, em Boulder, com rubídio-87 a
+    170 nanokelvin, e no MIT com sódio. O atraso de setenta anos é medido em técnica de
+    resfriamento: resfriamento a laser e depois evaporativo, que valeram o Nobel de 1997 e o
+    de 2001. Vale olhar os números do widget: a densidade de um condensado de rubídio é um
+    milhão de vezes <em>menor</em> que a do ar, e é justamente por isso que ele precisa ser tão
+    frio.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s16">16. Anãs brancas e Chandrasekhar</h2>
+
+  <p>No fim do Módulo 8 ficou prometida uma conta. Ela se faz agora, porque precisa das duas
+  peças deste módulo: a pressão de Fermi da seção 9 e o \(\gamma=4/3\) relativístico.</p>
+
+  <p>Uma anã branca é o caroço de carbono e oxigênio que sobra de uma estrela como o Sol.
+  Não há fusão: o que a impede de colapsar é a <strong>pressão de degenerescência</strong>
+  dos elétrons. Tome Sirius B, com \(1{,}02\) massas solares comprimidas num raio de
+  \(5{,}8\times10^6\) m, pouco menor que a Terra. Com dois nucleons por elétron, a densidade
+  eletrônica é</p>
+
+  <p>\[n_e=\frac{M}{2m_u}\frac{1}{V}\approx7{,}3\times10^{35}\ \mathrm{m^{-3}},\]</p>
+
+  <p>cerca de dez milhões de vezes a do cobre. O momento de Fermi correspondente é</p>
+
+  <p>\[p_F=\hbar\left(3\pi^2n_e\right)^{1/3}
+  \quad\Longrightarrow\quad
+  p_Fc\approx0{,}55\ \mathrm{MeV},\]</p>
+
+  <p>contra \(m_ec^2=0{,}511\) MeV. Ou seja: <strong>os elétrons de Sirius B são
+  relativísticos</strong>, não por estarem quentes, mas por estarem espremidos. A exclusão de
+  Pauli empurra o momento de Fermi para cima como \(n^{1/3}\), e a partir de certa densidade
+  ele ultrapassa \(m_ec\) sem que a temperatura tenha nada a ver com isso.</p>
+
+  <p>E aí vem o problema. No regime não relativístico, \(P\propto n^{5/3}\) e
+  \(\gamma=5/3\); no ultrarrelativístico, \(\epsilon=pc\) e a mesma conta da seção 9 dá
+  \(P\propto n^{4/3}\), isto é \(\gamma=4/3\). Como a estabilidade contra o colapso exige
+  \(\gamma>4/3\), uma anã branca suficientemente massiva perde o que a segurava.</p>
+
+  <p>Uma estimativa rápida mostra por quê. Equilibrando a pressão de degenerescência
+  ultrarrelativística com a pressão gravitacional de uma esfera de massa \(M\) e raio
+  \(R\), ambas escalam como \(R^{-4}\): o raio <strong>cancela</strong>, e sobra uma
+  condição só sobre a massa,</p>
+
+  <p>\[M_{\rm Ch}\sim\left(\frac{\hbar c}{G}\right)^{3/2}\frac{1}{\left(2m_u\right)^{2}}
+  \approx1{,}4\,M_\odot.\]</p>
+
+  <div class="bloco fisica">
+    <span class="rotulo">O limite é nítido porque a transição é suave</span>
+    <p>Repare na estrutura do argumento, que é o ponto que a seção 14 do Módulo 8 preparou.
+    Não existe uma densidade em que os elétrons "ficam relativísticos": \(\gamma\) desce
+    continuamente de \(5/3\) para \(4/3\) ao longo de décadas de densidade. O limite de
+    Chandrasekhar é nítido não apesar disso, mas por causa disso: \(4/3\) é o valor
+    <em>assintótico</em>, aquele em que o raio some da equação de equilíbrio, e por isso a
+    massa correspondente é um número e não uma faixa.</p>
+    <p>Chandrasekhar fez essa conta em 1930, aos 19 anos, numa viagem de navio da Índia para
+    a Inglaterra. Eddington, a maior autoridade da época, ridicularizou o resultado em
+    público: "deveria haver uma lei da Natureza que impedisse a estrela de se comportar de
+    maneira tão absurda". A estrela se comporta assim. Acima de 1,4 massas solares o colapso
+    continua até os elétrons serem forçados dentro dos prótons, e o que sobra é uma estrela
+    de nêutrons, sustentada pela mesma pressão de Fermi com \(m_n\) no lugar de \(m_e\).
+    Chandrasekhar recebeu o Nobel em 1983.</p>
+  </div>
+
+  <!-- ================================================== -->
+  <h2 id="s17">17. Exercícios resolvidos</h2>
 
   <div class="bloco ex">
-    <span class="rotulo">Quando a escada aparece sozinha</span>
-    <p>Os níveis de Landau não são artifício de cálculo: em campo alto e temperatura baixa
-    eles aparecem um a um nas medidas. À medida que \(B\) cresce, os níveis sobem e cruzam o
-    nível de Fermi um de cada vez, e toda propriedade que dependa de \(g(E_F)\) passa a
-    oscilar periodicamente em \(1/B\). Na magnetização isso se chama efeito de Haas-van
-    Alphen, na resistividade, efeito Shubnikov-de Haas, e as duas são hoje a maneira
-    padrão de medir a forma da superfície de Fermi de um metal.</p>
-    <p>No limite de duas dimensões, com a escada inteiramente resolvida, a mesma
-    degenerescência \(eB/h\) por unidade de área produz os platôs do efeito Hall quântico,
-    em que a condutância vale \(\nu e^2/h\) com precisão de nove casas. A constante que sai
-    daí define hoje o ohm.</p>
-  </div>
-
-  <p>Repare no que estas duas seções fizeram com o teorema do início do módulo. O
-  magnetismo clássico era nulo por uma razão técnica, a invariância da integral gaussiana
-  sob translação. A mecânica quântica quebra essa invariância de dois jeitos independentes:
-  pelo spin, que é discreto por natureza e dá o termo de Pauli, e pela quantização das
-  órbitas, que dá o termo de Landau. Nenhum dos dois, porém, produz ferromagnetismo: para
-  um ímã permanente é preciso algo que faça os spins preferirem o alinhamento mútuo, e é
-  isso que a próxima seção vai buscar.</p>
-
-  <!-- ================================================== -->
-  <h2 id="s4">4. Dois elétrons: singleto e tripleto</h2>
-
-  <p>Tome dois elétrons com funções de onda orbitais \(\phi_\alpha\) e \(\phi_\beta\). Pelo
-  postulado de simetrização do Módulo 8, a função de onda total tem de ser antissimétrica, e
-  como ela é um produto de uma parte orbital por uma parte de spin, só há duas maneiras de
-  conseguir isso.</p>
-
-  <div class="tabela-rolavel">
-  <table>
-    <thead><tr><th></th><th>Parte orbital</th><th>Parte de spin</th>
-      <th>Spin total</th><th>Nome</th></tr></thead>
-    <tbody>
-      <tr><td>Opção 1</td><td>simétrica</td><td>antissimétrica</td><td>\(S=0\), um estado</td>
-          <td><b>singleto</b></td></tr>
-      <tr><td>Opção 2</td><td>antissimétrica</td><td>simétrica</td>
-          <td>\(S=1\), três estados</td><td><b>tripleto</b></td></tr>
-    </tbody>
-  </table>
-  </div>
-
-  <p>As partes orbitais são</p>
-
-  <p>\[\psi_S\left(\vec r_1,\vec r_2\right)
-  =\tfrac{1}{\sqrt2}\left[\phi_\alpha(\vec r_1)\phi_\beta(\vec r_2)
-  +\phi_\alpha(\vec r_2)\phi_\beta(\vec r_1)\right],\qquad
-  \psi_A=\tfrac{1}{\sqrt2}\left[\phi_\alpha(\vec r_1)\phi_\beta(\vec r_2)
-  -\phi_\alpha(\vec r_2)\phi_\beta(\vec r_1)\right],\]</p>
-
-  <p>e o fato decisivo está escondido em \(\psi_A\): quando \(\vec r_1\to\vec r_2\), ela
-  <strong>se anula</strong>. Dois elétrons de spins paralelos não podem ocupar o mesmo ponto,
-  e na verdade evitam a vizinhança um do outro. Os de spins antiparalelos não têm essa
-  restrição.</p>
-
-  <p>Guarde isso: <em>a simetria do spin controla a distância média entre os elétrons</em>.
-  E a distância média entre os elétrons controla a energia de Coulomb. É assim que o spin
-  entra numa conta que não o contém.</p>
-
-  <!-- ================================================== -->
-  <h2 id="s5">5. A integral de troca</h2>
-
-  <p>Seja o hamiltoniano de duas partículas, que <strong>não depende do spin</strong>:</p>
-
-  <p>\[\hat H=\frac{1}{2m}\left(\hat p_1^2+\hat p_2^2\right)
-  +\hat U\left(\vec r_1,\vec r_2\right).\]</p>
-
-  <p>O valor esperado da energia de interação em cada um dos dois estados é</p>
-
-  <p>\[U_\pm=\left\langle\psi_\pm\left|\hat U(r_{12})\right|\psi_\pm\right\rangle
-  =\frac12\int\!\!\int d^3r_1\,d^3r_2
-  \left[\phi_\alpha^*(\vec r_1)\phi_\beta^*(\vec r_2)
-  \pm\phi_\alpha^*(\vec r_2)\phi_\beta^*(\vec r_1)\right]
-  \hat U(r_{12})
-  \left[\phi_\alpha(\vec r_1)\phi_\beta(\vec r_2)
-  \pm\phi_\alpha(\vec r_2)\phi_\beta(\vec r_1)\right].\]</p>
-
-  <p>Expandindo o produto aparecem quatro termos. Os dois diretos dão a mesma coisa e se
-  somam; os dois cruzados dão a mesma coisa e se somam, com o sinal \(\pm\). O resultado é</p>
-
-  <p>\[\boxed{\;U_\pm=I_0\pm\frac{J}{2}\;}\]</p>
-
-  <p>onde</p>
-
-  <p>\[I_0=\int\!\!\int\left|\phi_\alpha(\vec r_1)\right|^2
-  \left|\phi_\beta(\vec r_2)\right|^2
-  \frac{1}{4\pi\varepsilon_0}\frac{q_e^2}{r_{12}}\,d^3r_1d^3r_2\]</p>
-
-  <p>é a <strong>integral de Coulomb</strong>, a repulsão eletrostática clássica entre as
-  duas nuvens de carga, e</p>
-
-  <p>\[J=2\int\!\!\int\phi_\alpha^*(\vec r_1)\phi_\beta^*(\vec r_2)\,
-  \frac{1}{4\pi\varepsilon_0}\frac{q_e^2}{r_{12}}\,
-  \phi_\alpha(\vec r_2)\phi_\beta(\vec r_1)\,d^3r_1d^3r_2\]</p>
-
-  <p>é a <strong>integral de troca</strong>, que não tem análogo clássico nenhum: ela
-  envolve cada elétron em dois orbitais ao mesmo tempo.</p>
-
-  <p>A diferença de energia entre os dois estados é</p>
-
-  <p>\[\Delta U=U_+-U_-=J,\]</p>
-
-  <p>com \(U_+\) correspondendo à parte orbital simétrica, isto é ao <strong>singleto</strong>
-  (spins antiparalelos), e \(U_-\) ao <strong>tripleto</strong> (spins paralelos). Portanto,
-  para \(J>0\) o tripleto tem energia menor e <em>os spins paralelos são favorecidos</em>;
-  para \(J<0\), o contrário.</p>
-
-  <div class="bloco fisica">
-    <span class="rotulo">Por que a troca é de curto alcance</span>
-    <p>Olhe o integrando de \(J\): ele contém \(\phi_\alpha(\vec r_1)\phi_\beta(\vec r_1)\),
-    isto é, o <strong>produto</strong> dos dois orbitais avaliado no mesmo ponto. Esse
-    produto só é diferente de zero onde as duas funções de onda se superpõem.</p>
-    <p>Como as funções de onda atômicas decaem exponencialmente, \(J\) decai
-    exponencialmente com a separação entre os átomos. Daí duas consequências. A primeira é
-    que a soma do Módulo 9 inteiro pode ser restrita aos <strong>primeiros vizinhos</strong>,
-    o que é o que torna o problema tratável. A segunda é que \(J\) é extremamente sensível à
-    distância interatômica, e por isso comprimir um material pode ligar ou desligar seu
-    ferromagnetismo.</p>
-    <p>O sinal de \(J\) também depende da distância, e em geral é negativo para separações
-    pequenas e positivo para separações maiores. É por isso que ferro, cobalto e níquel são
-    ferromagnéticos e o manganês, com a mesma estrutura eletrônica de valência, é
-    antiferromagnético.</p>
-  </div>
-
-  <!-- ================================================== -->
-  <h2 id="s6">6. O hamiltoniano de Heisenberg</h2>
-
-  <p>A observação de Dirac foi que a diferença de energia entre singleto e tripleto pode ser
-  escrita como um operador que atua só nos spins, embora nenhum spin apareça no hamiltoniano
-  original. Para dois spins \(1/2\), o produto \(\hat s_i\cdot\hat s_j\) vale
-  \(+\hbar^2/4\) no tripleto e \(-3\hbar^2/4\) no singleto, de modo que o operador</p>
-
-  <p>\[\hat{\Hm}_{ij}=-J_{ij}\left(\frac12+\frac{2}{\hbar^2}\hat s_i\cdot\hat s_j\right)\]</p>
-
-  <p>vale \(-J_{ij}\) no tripleto e \(+J_{ij}\) no singleto, reproduzindo a separação. Para
-  átomos com spin \(\hat S_i\) qualquer, a forma é a mesma com \(\hat S\) no lugar de
-  \(\hat s\).</p>
-
-  <p>Juntando com o acoplamento ao campo externo, e supondo que a contribuição orbital ao
-  momento magnético se anula (seção 5),</p>
-
-  <p>\[\hat{\Hm}_0=-\sum_{i=1}^{N}\vec\mu_i\cdot\vec B
-  =-\frac{g\mu_B}{\hbar}\sum_{i=1}^{N}\hat S_i\cdot\vec B,\]</p>
-
-  <p>com \(g\) o fator de Landé, chega-se ao</p>
-
-  <div class="bloco def">
-    <span class="rotulo">Modelo de Heisenberg</span>
-    <p>\[\hat{\Hm}=-\frac{g\mu_B}{\hbar}\sum_{i=1}^{N}\hat S_i\cdot\vec B
-    +\sum_{\{i,j\}}\hat{\Hm}_{ij},\]</p>
-    <p>com a segunda soma percorrendo apenas pares de primeiros vizinhos.</p>
-  </div>
-
-  <p>Convém registrar uma armadilha de notação. O termo de troca aparece na literatura em
-  pelo menos três convenções: \(-J\sum\hat S_i\cdot\hat S_j\), \(-2J\sum\hat S_i\cdot\hat
-  S_j\) e a forma acima. Elas diferem por fatores de 2 no significado de \(J\), e comparar
-  valores numéricos entre dois livros sem conferir a convenção é um erro clássico.</p>
-
-  <p>Este hamiltoniano parece simples e <strong>não tem solução exata em três dimensões</strong>.
-  Nem em duas, com spins de Heisenberg. O que existe é a solução exata do caso particular em
-  que só a componente \(z\) sobrevive, que é o modelo de Ising, e mesmo essa só foi obtida em
-  duas dimensões, por Onsager, em 1944, e é considerada um dos cálculos mais difíceis da
-  física matemática. O resto do módulo é sobre como contornar isso.</p>
-
-  <!-- ================================================== -->
-  <h2 id="s7">7. Regras de Hund</h2>
-
-  <p>Uma pergunta incômoda: por que o hamiltoniano acima contém só o spin \(\hat S\), e não o
-  momento angular total \(\hat J=\hat L+\hat S\)?</p>
-
-  <p>Num átomo isolado, em campo central, \(\hat L^2\) e \(\hat L_z\) são constantes de
-  movimento e o momento orbital contribui para o momento magnético. Num cristal, porém, cada
-  íon está num campo elétrico <em>não central</em>, criado pelos íons vizinhos. O plano das
-  órbitas eletrônicas deixa de ser fixo, \(\hat L_z\) deixa de se conservar, e a média
-  \(\langle L_z\rangle\) se anula. Diz-se que o momento angular orbital está
-  <strong>congelado</strong> pelo campo cristalino, e então \(\hat J\approx\hat S\).</p>
-
-  <p>É o que acontece nos metais do grupo do ferro, e é por isso que o modelo acima funciona
-  para eles. Nos lantanídeos, cujos elétrons \(4f\) ficam blindados pelas camadas externas,
-  o congelamento não ocorre e é preciso trabalhar com \(\hat J\).</p>
-
-  <p>Restando o spin, falta saber quanto ele vale. É o que dizem as duas primeiras
-  <strong>regras de Hund</strong>:</p>
-
-  <div class="bloco def">
-    <span class="rotulo">Regras de Hund (as duas primeiras)</span>
-    <ol>
-      <li>Cada orbital de um subnível é ocupado individualmente antes que qualquer um seja
-      duplamente ocupado, e todos os elétrons desses orbitais têm o mesmo spin. O estado
-      fundamental <strong>maximiza o spin total \(S\)</strong>.</li>
-      <li>Para o \(S\) máximo, o estado fundamental maximiza \(L\).</li>
-    </ol>
-  </div>
-
-  <p>A primeira regra é a seção 5 aplicada dentro de um átomo: spins paralelos obrigam a
-  parte orbital a ser antissimétrica, os elétrons se evitam, e a repulsão de Coulomb entre
-  eles diminui. Hund descobriu a regra empiricamente em 1925, espectroscopicamente, um ano
-  antes de haver explicação para ela.</p>
-
-  <!-- ================================================== -->
-  <h2 id="s8">8. O campo médio de Weiss</h2>
-
-  <p>O modelo de Heisenberg é insolúvel porque cada spin está acoplado a \(\nu\) vizinhos,
-  que estão acoplados aos vizinhos deles, e assim por diante. A aproximação de Weiss corta
-  esse nó com uma única substituição: troca-se a soma sobre os operadores de spin vizinhos
-  pelo seu <strong>valor médio</strong>,</p>
-
-  <p>\[\sum_{\nu}\hat S_\nu\;\approx\;\nu\,\overline S.\]</p>
-
-  <p>Cada spin deixa de interagir com vizinhos específicos e passa a interagir com uma média.
-  Substituindo no hamiltoniano de Heisenberg,</p>
-
-  <p>\[\hat{\Hm}\approx-\frac{g\mu_B}{\hbar}\sum_i\hat S_i\cdot\vec B
-  -\frac{2\nu J}{\hbar^2}\sum_i\hat S_i\cdot\overline S
-  =-\frac{g\mu_B}{\hbar}\sum_i\hat S_i\cdot
-  \underbrace{\left(\vec B+\frac{2\nu J}{\hbar g\mu_B}\overline S\right)}_{\vec B_{\rm efe}}.\]</p>
-
-  <p>E aqui está o truque inteiro: o problema de \(N\) spins acoplados virou o problema de
-  <strong>um</strong> spin num campo efetivo. Esse problema já foi resolvido, no Módulo 3,
-  quando se tratou o paramagneto.</p>
-
-  <div class="bloco fisica">
-    <span class="rotulo">O que se perde</span>
-    <p>Vale registrar desde já o preço, porque a seção 18 vai cobrá-lo. Ao substituir os
-    vizinhos pela sua média, apagam-se as <strong>flutuações</strong> e as
-    <strong>correlações</strong>. O spin passa a sentir um ambiente liso, sempre igual, e
-    nunca fica sabendo que o vizinho da direita acabou de virar.</p>
-    <p>Longe da transição isso é inofensivo, porque as flutuações são pequenas. Perto de
-    \(T_C\) é fatal, porque é exatamente ali que as flutuações dominam. O campo médio prevê
-    que há transição, acerta a sua existência e erra todos os seus expoentes.</p>
-  </div>
-
-  <!-- ================================================== -->
-  <h2 id="s9">9. O parâmetro de Weiss</h2>
-
-  <p>Escreva o campo efetivo em termos da magnetização, que é o momento magnético por unidade
-  de volume:</p>
-
-  <p>\[\Mg=\frac{\overline M}{V}=\frac{N}{V}\,g\mu_B\frac{\overline S}{\hbar}
-  \qquad\Longrightarrow\qquad
-  \frac{\overline S}{\hbar}=\frac{V\Mg}{Ng\mu_B}.\]</p>
-
-  <p>Substituindo no campo efetivo e definindo \(\vec B_{\rm efe}=\vec B+\lambda\mu_0\Mg\),</p>
-
-  <p>\[\boxed{\;\lambda=\frac{2\nu VJ}{Ng^2\mu_B^2\mu_0}\;}\]</p>
-
-  <p>que é o <strong>parâmetro de Weiss</strong>. Ele é adimensional, e o que ele mede é a
-  razão entre a intensidade da interação de troca e a da interação puramente magnética entre
-  primeiros vizinhos. Pela estimativa da seção 1, \(\lambda\) é da ordem de dezenas de
-  milhares.</p>
-
-  <p>Como \(\vec B_0=\mu_0\vec{\Hm}\), pode-se escrever tudo em termos do campo \(\Hm\):</p>
-
-  <p>\[\vec B_{\rm efe}=\mu_0\left(\vec{\Hm}+\lambda\Mg\right)=\mu_0\vec{\Hm}_{\rm efe}.\]</p>
-
-  <!-- ================================================== -->
-  <h2 id="s10">10. A equação de autoconsistência</h2>
-
-  <p>Tome agora o caso mais simples: um meio uniaxial, contribuição orbital nula, \(S=1/2\)
-  e portanto \(g\approx2\). Os autovalores de energia de um spin são</p>
-
-  <p>\[\epsilon_i=-2\mu_BB_{\rm efe}m_i=\mp\mu_BB_{\rm efe},\qquad m_i=\pm\tfrac12,\]</p>
-
-  <p>e a função de partição de um sítio tem dois termos:</p>
-
-  <p>\[Z=e^{\mu_BB_{\rm efe}/\kB T}+e^{-\mu_BB_{\rm efe}/\kB T}
-  =2\cosh\frac{\mu_BB_{\rm efe}}{\kB T}.\]</p>
-
-  <p>O momento magnético médio é o de sempre, do paramagneto do Módulo 3, mas com
-  \(B_{\rm efe}\) no lugar de \(B\):</p>
-
-  <p>\[\Mg=\mu_B\frac{N}{V}\tanh\left[\frac{\mu_B\mu_0}{\kB T}
-  \left(\Hm+\lambda\Mg\right)\right].\]</p>
-
-  <p>E aqui está o ponto. <strong>A magnetização aparece dos dois lados</strong>, porque ela
-  é ao mesmo tempo a resposta ao campo e a fonte do campo. A equação é implícita, e é essa
-  realimentação que produz tudo o que vem a seguir.</p>
-
-  <p>Em temperatura baixa o argumento da tangente hiperbólica é grande e ela satura em 1,
-  dando a <strong>magnetização de saturação</strong></p>
-
-  <p>\[\Mg_0\approx\mu_B\frac{N}{V},\]</p>
-
-  <p>que corresponde a todos os \(N\) spins alinhados. Definindo as variáveis reduzidas</p>
-
-  <p>\[m=\frac{\Mg}{\Mg_0},\qquad
-  \mathfrak{H}=\frac{\mu_B\mu_0\Hm}{\kB T},\qquad
-  T_C=\lambda\frac{N}{V}\frac{\mu_B^2\mu_0}{\kB},\]</p>
-
-  <p>a equação inteira se reduz a uma linha sem nenhum parâmetro dimensional:</p>
-
-  <p>\[\boxed{\;m=\tanh\left(\mathfrak{H}+\frac{T_C}{T}m\right)\;}\]</p>
-
-  <div data-widget="weiss"></div>
-
-  <!-- ================================================== -->
-  <h2 id="s11">11. A lei de Curie-Weiss</h2>
-
-  <p>Em temperatura alta o argumento é pequeno e vale \(\tanh x\approx x\):</p>
-
-  <p>\[\Mg\approx\frac{N}{V}\frac{\mu_B^2\mu_0}{\kB T}\left(\Hm+\lambda\Mg\right)
-  \qquad\Longrightarrow\qquad
-  \Mg\left(1-\frac{T_C}{T}\right)=\frac{T_C}{\lambda}\frac{\Hm}{T},\]</p>
-
-  <p>usando \(T_C=\lambda(N/V)\mu_B^2\mu_0/\kB\) para abreviar. Isolando,</p>
-
-  <p>\[\Mg=\frac{T_C}{T-T_C}\frac{\Hm}{\lambda}
-  \qquad\Longrightarrow\qquad
-  \boxed{\;\chi=\dpar{\Mg}{\Hm}{T}=\frac{C}{T-T_C},\qquad
-  C=\frac{N}{V}\frac{\mu_B^2\mu_0}{\kB}\;}\]</p>
-
-  <p>que é a <strong>lei de Curie-Weiss</strong>. Com \(\lambda=0\) ela se reduz à lei de
-  Curie do Módulo 3, \(\chi=C/T\): a interação apenas desloca o polo de zero para
-  \(T_C\).</p>
-
-  <p class="nota-lateral">Convenção: aqui \(\chi=\partial\Mg/\partial\Hm\) é adimensional,
-  que é o uso corrente em magnetismo. No Módulo 1 a mesma letra apareceu dividida por
-  \(\mu_0\), porque lá ela fazia o papel da compressibilidade no par conjugado
-  \((M,\mu_0\Hm)\). As duas diferem por um fator \(\mu_0\).</p>
-
-  <p>O valor prático disso é grande: traçando \(1/\chi\) contra \(T\) obtém-se uma reta cujo
-  <strong>intercepto no eixo das temperaturas é \(T_C\)</strong>. Mede-se a temperatura
-  crítica sem precisar chegar perto dela, e o sinal do intercepto já diz se o material é
-  ferromagnético, paramagnético puro ou antiferromagnético.</p>
-
-  <!-- ================================================== -->
-  <h2 id="s12">12. Magnetização espontânea</h2>
-
-  <p>Quando \(T\to T_C^+\), a susceptibilidade diverge: um campo infinitesimal produz uma
-  magnetização finita. Abaixo de \(T_C\) a situação é mais drástica, e aparece magnetização
-  <em>sem campo nenhum</em>. Fazendo \(\Hm=0\) na equação de autoconsistência,</p>
-
-  <p>\[m_s=\tanh\left(\frac{T_C}{T}m_s\right).\]</p>
-
-  <p>A razão \(m_s=\Mg_s/\Mg_0\) é o <strong>parâmetro de ordem</strong>: vale 1 com todos os
-  spins alinhados, a ordem máxima, e 0 na desordem completa. A equação acima sempre tem a
-  solução \(m_s=0\); a questão é se tem outras.</p>
-
-  <p>A resposta está na inclinação da tangente hiperbólica na origem, que vale \(T_C/T\).
-  Se for menor que 1, a curva fica abaixo da reta \(y=m\) e só há o cruzamento trivial. Se
-  for maior que 1, a curva sai por cima e precisa voltar, porque satura em 1, e aparecem
-  mais dois cruzamentos, \(\pm m_s\). O limiar é exatamente \(T=T_C\).</p>
-
-  <p>Como \(m_s\) varia <strong>continuamente</strong> ao passar por \(T_C\), sem salto, a
-  transição ferromagnética é de <strong>segunda ordem</strong>, ou contínua: não há calor
-  latente.</p>
-
-  <!-- ================================================== -->
-  <h2 id="s13">13. Expoentes críticos</h2>
-
-  <p>Logo abaixo de \(T_C\), \(m_s\ll1\) e dá para expandir:</p>
-
-  <p>\[\tanh x=x-\frac{x^3}{3}+\frac{2x^5}{15}-\dots\]</p>
-
-  <p>Com \(x=\left(T_C/T\right)m_s\) e guardando até o termo cúbico,</p>
-
-  <p>\[m_s\approx\frac{T_C}{T}m_s-\frac13\left(\frac{T_C}{T}\right)^3m_s^3
-  \qquad\Longrightarrow\qquad
-  m_s\approx\frac{T}{T_C}\sqrt{3\left(1-\frac{T}{T_C}\right)}.\]</p>
-
-  <p>Junto a \(T_C\) o prefator vai a 1 e sobra</p>
-
-  <p>\[m_s\sim\left(1-\frac{T}{T_C}\right)^{1/2},\qquad\text{isto é}\qquad
-  \beta=\frac12.\]</p>
-
-  <p>Esse \(\beta\) é um <strong>expoente crítico</strong>. Junto com ele a mesma expansão
-  entrega os outros três:</p>
-
-  <div class="tabela-rolavel">
-  <table>
-    <thead><tr><th>Expoente</th><th>Define</th><th>Campo médio</th></tr></thead>
-    <tbody>
-      <tr><td>\(\beta\)</td><td>\(m_s\sim\left(T_C-T\right)^{\beta}\)</td><td>1/2</td></tr>
-      <tr><td>\(\gamma\)</td><td>\(\chi\sim\left|T-T_C\right|^{-\gamma}\)</td><td>1</td></tr>
-      <tr><td>\(\delta\)</td><td>\(m\sim\Hm^{1/\delta}\) em \(T=T_C\)</td><td>3</td></tr>
-      <tr><td>\(\alpha\)</td><td>\(c\sim\left|T-T_C\right|^{-\alpha}\)</td>
-          <td>0 (salto finito)</td></tr>
-    </tbody>
-  </table>
-  </div>
-
-  <p>O \(\delta=3\) sai direto: em \(T=T_C\) o termo linear se cancela e sobra
-  \(\mathfrak{H}\approx m^3/3\). Guarde os quatro números; a seção 18 os compara com a
-  realidade.</p>
-
-  <!-- ================================================== -->
-  <h2 id="s14">14. A energia livre de Landau</h2>
-
-  <p>Há um modo de obter tudo isso sem passar pela tangente hiperbólica, e ele é mais geral.
-  Invertendo a equação de autoconsistência e expandindo
-  \(\operatorname{arctgh}(m)\approx m+m^3/3\),</p>
-
-  <p>\[\mathfrak{H}(m)=\operatorname{arctgh}(m)-\frac{T_C}{T}m
-  \approx\left(1-\frac{T_C}{T}\right)m+\frac{m^3}{3}.\]</p>
-
-  <p>Como \(dF=\dots+\mu_0\Hm\,d\overline M\), integrar o campo em relação à magnetização dá
-  a parte magnética da energia livre. Em forma adimensional,</p>
-
-  <p>\[\boxed{\;\mathcal F(m)=\frac{a}{2}m^2+\frac{b}{4}m^4-hm,
-  \qquad a\propto T-T_C\;}\]</p>
-
-  <p>e o equilíbrio é o mínimo: \(am+bm^3=h\). Em campo nulo as soluções são \(m=0\) e
-  \(m=\pm\sqrt{-a/b}\), e estas últimas só existem se \(a<0\), isto é, \(T&lt;T_C\).</p>
-
-  <div data-widget="landau"></div>
-
-  <div class="bloco fisica">
-    <span class="rotulo">O que Landau percebeu</span>
-    <p>O caminho acima chegou a \(\mathcal F\) <em>partindo</em> do modelo de Weiss. Landau
-    propôs em 1937 o caminho inverso: escrever \(\mathcal F\) <strong>sem modelo
-    nenhum</strong>, a partir de três exigências.</p>
-    <p>Que seja analítica em \(m\), já que \(m\) é pequeno junto à transição. Que respeite a
-    simetria do problema, \(\mathcal F(m)=\mathcal F(-m)\) em campo nulo, o que elimina todas
-    as potências ímpares. E que o coeficiente do termo quadrático troque de sinal em
-    \(T_C\), que é a definição operacional do ponto crítico.</p>
-    <p>Isso basta, e a consequência é profunda: qualquer sistema com a mesma simetria do
-    parâmetro de ordem tem a mesma energia livre e, portanto, os mesmos expoentes. Um ímã
-    uniaxial, um fluido perto do ponto crítico e uma liga binária que se separa são, para a
-    teoria de Landau, o mesmo problema. É a origem da ideia de <strong>universalidade</strong>.</p>
-    <p>A teoria também explica a diferença entre transições de primeira e segunda ordem: se
-    a simetria permitir um termo \(m^3\), o mínimo salta descontinuamente e a transição é de
-    primeira ordem. É o caso da transição líquido-vapor fora do ponto crítico, do Módulo
-    7.</p>
-  </div>
-
-  <!-- ================================================== -->
-  <h2 id="s15">15. Histerese e domínios</h2>
-
-  <p>A curva \(\mathfrak{H}(m)=\operatorname{arctgh}(m)-mT_C/T\) tem, abaixo de \(T_C\), a
-  forma de um S deitado: um mesmo campo admite três magnetizações. Quem leu o Módulo 7
-  reconhece a figura, e o parentesco não é superficial.</p>
-
-  <div data-widget="histerese"></div>
-
-  <div class="tabela-rolavel">
-  <table>
-    <thead><tr><th>Fluido de van der Waals (Módulo 7)</th><th>Ferromagneto de Weiss</th></tr></thead>
-    <tbody>
-      <tr><td>volume \(V\)</td><td>magnetização \(m\)</td></tr>
-      <tr><td>pressão \(P\)</td><td>campo \(\mathfrak{H}\)</td></tr>
-      <tr><td>temperatura crítica \(T_c\)</td><td>temperatura de Curie \(T_C\)</td></tr>
-      <tr><td>trecho com \(\partial P/\partial V>0\): instável</td>
-          <td>trecho com \(\partial m/\partial\mathfrak{H}<0\): instável</td></tr>
-      <tr><td>líquido e vapor superaquecidos: metaestáveis</td>
-          <td>magnetização presa no sentido errado: metaestável</td></tr>
-      <tr><td>construção de Maxwell escolhe o patamar</td>
-          <td>a simetria põe o patamar em \(\mathfrak{H}=0\)</td></tr>
-      <tr><td>coexistência no espaço: gotas</td><td>coexistência no espaço: domínios</td></tr>
-    </tbody>
-  </table>
-  </div>
-
-  <p>A diferença prática está na última linha. Um ferromagneto abaixo de \(T_C\) não fica
-  uniformemente magnetizado: ele se quebra em <strong>domínios de Weiss</strong>, regiões de
-  magnetização oposta separadas por paredes. A razão é energética: um bloco uniformemente
-  magnetizado cria um campo externo, e armazenar energia nesse campo custa caro. Dividir-se
-  em domínios de sentidos alternados cancela o campo externo, ao preço de criar paredes. O
-  tamanho de equilíbrio sai do balanço entre os dois custos.</p>
-
-  <p>É por isso que um prego de ferro virgem não atrai outro prego apesar de estar
-  internamente ordenado, e é por isso que magnetizá-lo consiste em mover paredes de domínio,
-  não em alinhar spins um a um.</p>
-
-  <!-- ================================================== -->
-  <h2 id="s16">16. Ginzburg-Landau</h2>
-
-  <p>Para falar de domínios é preciso deixar o parâmetro de ordem variar no espaço. Ginzburg
-  e Landau acrescentaram à energia livre um termo que cobra pela variação:</p>
-
-  <p>\[\mathcal F\left[\psi\right]=\int d^3r\left[\frac{a}{2}\psi^2+\frac{b}{4}\psi^4
-  +\frac{\gamma}{2}\left|\nabla\psi\right|^2\right].\]</p>
-
-  <p>O termo de gradiente é a <strong>rigidez</strong>: criar uma parede entre regiões de
-  sinal oposto custa energia, proporcional à área da parede. Dele sai o
-  <strong>comprimento de coerência</strong> \(\xi=\sqrt{\gamma/|a|}\), que é a espessura
-  mínima de uma parede, e que diverge quando \(a\to0\), isto é, em \(T_C\).</p>
-
-  <p>A dinâmica mais simples compatível com essa energia livre é a relaxacional: o sistema
-  desce o gradiente funcional,</p>
-
-  <p>\[\frac{\partial\psi}{\partial t}=-\frac{\delta\mathcal F}{\delta\psi}
-  =-a\psi-b\psi^3+\gamma\nabla^2\psi.\]</p>
-
-  <div data-widget="ginzburg"></div>
-
-  <p>Com \(\psi\) complexo em vez de real, a mesma equação descreve supercondutores e
-  superfluidos, e a fase de \(\psi\) passa a carregar a supercorrente. Os defeitos
-  topológicos deixam de ser paredes e viram <strong>vórtices quantizados</strong>. Nada na
-  construção é específico de magnetismo: ela vale para qualquer parâmetro de ordem que tenha
-  de escolher entre estados equivalentes.</p>
-
-  <!-- ================================================== -->
-  <h2 id="s17">17. O modelo de Ising</h2>
-
-  <p>O campo médio diz o que acontece com um spin num ambiente liso. Para saber o que
-  acontece de verdade é preciso simular, e o modelo mínimo para isso é o de
-  <strong>Ising</strong>, proposto por Ernst Ising em 1925 na sua tese, sob orientação de
-  Lenz. Cada sítio de uma rede carrega \(s_i=\pm1\) e</p>
-
-  <p>\[\hat H=-J\sum_{\langle i,j\rangle}s_is_j-B\sum_i s_i,\]</p>
-
-  <p>com a primeira soma só sobre pares de primeiros vizinhos. É o modelo de Heisenberg com
-  os spins reduzidos à componente \(z\): perde-se a estrutura vetorial e guarda-se a
-  competição entre ordem e temperatura, que é o que importa aqui.</p>
-
-  <p>Somar sobre os \(2^N\) estados é impossível para \(N\) grande, e a saída é
-  <strong>amostrar</strong> em vez de somar. O algoritmo de Metropolis faz isso.</p>
-
-  <div class="bloco def">
-    <span class="rotulo">Metropolis, em duas linhas</span>
-    <ol>
-      <li>Sorteie um sítio \(i\) e calcule o custo de girá-lo,
-      \(\Delta E=2Js_i\sum_{\rm viz}s_j+2Bs_i\).</li>
-      <li>Aceite o giro com probabilidade
-      \(P=\min\left(1,e^{-\Delta E/\kB T}\right)\): sempre, se \(\Delta E\le0\);
-      com a probabilidade de Boltzmann, se \(\Delta E>0\).</li>
-    </ol>
-  </div>
-
-  <p>Por que isso amostra a distribuição certa é a parte bonita, e vale escrever. A regra
-  satisfaz o <strong>balanço detalhado</strong>:</p>
-
-  <p>\[\wp(A)\,W(A\to B)=\wp(B)\,W(B\to A)
-  \qquad\text{com}\qquad
-  \frac{\wp(B)}{\wp(A)}=e^{-\Delta E/\kB T}.\]</p>
-
-  <p>Verifique: se \(\Delta E>0\), então \(W(A\to B)=e^{-\Delta E/\kB T}\) e
-  \(W(B\to A)=1\), e a identidade se confirma. Qualquer cadeia de Markov que obedeça ao
-  balanço detalhado e consiga alcançar todos os estados converge para \(\wp\),
-  independentemente de onde comece. Não se está resolvendo o modelo: está-se construindo um
-  processo aleatório cujo estado estacionário <em>é</em> a resposta.</p>
-
-  <div data-widget="ising"></div>
-
-  <p>Em duas dimensões há com o que comparar. Onsager resolveu o modelo exatamente em 1944 e
-  obteve</p>
-
-  <p>\[\frac{\kB T_C}{J}=\frac{2}{\ln\left(1+\sqrt2\right)}=2{,}269185\dots,
-  \qquad
-  m_s=\left[1-\operatorname{senh}^{-4}\!\left(\frac{2J}{\kB T}\right)\right]^{1/8},\]</p>
-
-  <p>de onde \(\beta=1/8\), e não \(1/2\). A segunda vista do widget põe os pontos medidos
-  sobre essa curva.</p>
-
-  <!-- ================================================== -->
-  <h2 id="s18">18. O que o campo médio erra</h2>
-
-  <p>Chegou a hora da prestação de contas. O campo médio acerta a existência da transição, a
-  forma geral da curva de magnetização e a lei de Curie-Weiss, que é verificada
-  experimentalmente com precisão. E erra três coisas, em ordem crescente de gravidade.</p>
-
-  <p><strong>Primeira: a temperatura crítica.</strong> O campo médio sempre a superestima,
-  porque ignora as flutuações que destroem a ordem. Em duas dimensões o erro é de uns 60%.</p>
-
-  <p><strong>Segunda: a dimensão.</strong> O campo médio prevê transição em qualquer
-  dimensão, e em uma dimensão <em>não há transição nenhuma</em> em temperatura finita. O
-  argumento, de Peierls, é de contagem pura: numa cadeia de \(N\) spins alinhados, criar uma
-  única parede custa energia \(2J\), mas pode ser feita de \(N\) maneiras, de modo que a
-  variação de energia livre é</p>
-
-  <p>\[\Delta F=2J-\kB T\ln N,\]</p>
-
-  <p>que é negativa para qualquer \(T>0\) assim que \(N\) é grande. A entropia sempre vence,
-  as paredes proliferam e a ordem não sobrevive. Em duas dimensões o custo de uma parede
-  cresce com o seu comprimento e o argumento se inverte, o que é a razão profunda de existir
-  transição em 2D e não em 1D.</p>
-
-  <p><strong>Terceira: os expoentes.</strong> Aqui o erro é sistemático e informativo.</p>
-
-  <div class="tabela-rolavel">
-  <table>
-    <thead><tr><th>Expoente</th><th>Campo médio</th><th>Ising 2D (exato)</th>
-      <th>Ising 3D (numérico)</th><th>Medido em fluidos</th></tr></thead>
-    <tbody>
-      <tr><td>\(\beta\)</td><td>0,5</td><td>0,125</td><td>0,3265</td><td>0,325</td></tr>
-      <tr><td>\(\gamma\)</td><td>1</td><td>1,75</td><td>1,237</td><td>1,24</td></tr>
-      <tr><td>\(\delta\)</td><td>3</td><td>15</td><td>4,789</td><td>4,8</td></tr>
-      <tr><td>\(\alpha\)</td><td>0 (salto)</td><td>0 (logarítmico)</td><td>0,110</td>
-          <td>0,11</td></tr>
-    </tbody>
-  </table>
-  </div>
-
-  <p>Repare nas duas últimas colunas. O modelo de Ising em três dimensões e um
-  <em>fluido</em> perto do seu ponto crítico, que não tem spin nenhum, dão os mesmos
-  expoentes dentro do erro experimental. Essa é a <strong>universalidade</strong>: perto de
-  um ponto crítico o comprimento de correlação diverge, o sistema deixa de ter escala
-  própria, e os detalhes microscópicos tornam-se irrelevantes. Só sobrevivem a
-  dimensionalidade do espaço e a simetria do parâmetro de ordem.</p>
-
-  <div class="bloco fisica">
-    <span class="rotulo">Onde o campo médio volta a estar certo</span>
-    <p>O campo médio não é uma aproximação ruim por acaso: ele é a resposta
-    <strong>exata</strong> acima da <em>dimensão crítica superior</em>, que para este
-    problema é \(d=4\).</p>
-    <p>A razão é intuitiva. Em dimensão alta cada sítio tem muitos vizinhos, a média sobre
-    eles tem flutuação relativa \(\sim1/\sqrt\nu\) pequena, e substituir os vizinhos pela
-    média deixa de ser uma violência. O critério de Ginzburg torna isso quantitativo:
-    compara o tamanho das flutuações do parâmetro de ordem dentro de um volume de
-    correlação com o próprio parâmetro de ordem, e mostra que a razão deixa de divergir em
-    \(d\ge4\).</p>
-    <p>Em \(d<4\) as flutuações dominam, e tratá-las corretamente exigiu o
-    <strong>grupo de renormalização</strong> de Kenneth Wilson, nos anos 1970, que é a
-    continuação natural deste módulo e rendeu o Nobel de 1982. A ideia central dele já está
-    visível na figura do Ising em \(T_C\): se o sistema parece o mesmo em todas as escalas,
-    então a operação de <em>mudar de escala</em> é a simetria que organiza o problema.</p>
-  </div>
-
-  <!-- ================================================== -->
-  <h2 id="s19">19. Exercícios resolvidos</h2>
-
-  <div class="bloco ex">
-    <span class="rotulo">Exercício resolvido 9.1: o campo molecular do ferro</span>
-    <p><b>O ferro tem \(T_C=1043\) K. Calcule o campo efetivo de Weiss necessário para
-    sustentar essa temperatura crítica, e compare com o campo dipolar que um momento de
-    \(1\,\mu_B\) produz num vizinho a 2,5 Å.</b></p>
+    <span class="rotulo">Exercício resolvido 9.1: a energia de Fermi do cobre</span>
+    <p><b>O cobre tem densidade 8960 kg/m³, massa molar 63,55 g/mol e um elétron de condução
+    por átomo. Calcule \(n\), \(\epsilon_F\), \(T_F\), \(v_F\) e a pressão de
+    degenerescência.</b></p>
     <details class="solucao"><summary>Ver solução</summary>
     <div class="corpo-solucao">
-    <p>Em campo externo nulo e temperatura logo abaixo de \(T_C\), o campo efetivo é
-    \(B_{\rm efe}=\lambda\mu_0\Mg\). No zero absoluto, com \(\Mg=\Mg_0=\mu_BN/V\) e usando
-    \(T_C=\lambda(N/V)\mu_B^2\mu_0/\kB\),</p>
-    <p>\[B_{\rm efe}=\lambda\mu_0\mu_B\frac{N}{V}=\frac{\kB T_C}{\mu_B}
-    =\frac{1{,}381\times10^{-23}\times1043}{9{,}274\times10^{-24}}=1553\ \mathrm{T}.\]</p>
-    <p>O campo dipolar de um vizinho é</p>
-    <p>\[B_{\rm dip}=\frac{\mu_0\mu_B}{4\pi r^3}
-    =\frac{10^{-7}\times9{,}274\times10^{-24}}{\left(2{,}5\times10^{-10}\right)^3}
-    =0{,}059\ \mathrm{T},\]</p>
-    <p>uma razão de <b>26 mil</b>.</p>
-    <p><b>A conclusão.</b> Mesmo somando sobre todos os vizinhos, o que dá um fator de
-    ordem 10, a interação magnética fica quatro ordens de grandeza aquém. O alinhamento não
-    pode ser de origem magnética, e esta conta é a razão pela qual se procurou outra coisa
-    durante vinte anos. A outra coisa era a integral de troca, que é eletrostática e tem a
-    escala certa: \(e^2/4\pi\varepsilon_0 r\) a 2,5 Å vale cerca de 5,8 eV, isto é 67 mil
-    kelvin. Sobra energia.</p>
+    <p>A densidade de elétrons é</p>
+    <p>\[n=\frac{\rho N_A}{M}
+    =\frac{8960\times6{,}022\times10^{23}}{63{,}55\times10^{-3}}
+    =8{,}49\times10^{28}\ \mathrm{m^{-3}}.\]</p>
+    <p>Com \(2s+1=2\),</p>
+    <p>\[\epsilon_F=\frac{\hbar^2}{2m_e}\left(3\pi^2n\right)^{2/3}
+    =1{,}13\times10^{-18}\ \mathrm{J}=7{,}03\ \mathrm{eV},\]</p>
+    <p>e portanto \(T_F=\epsilon_F/\kB=8{,}2\times10^{4}\) K, oitenta mil kelvin. A
+    velocidade de Fermi é \(v_F=\sqrt{2\epsilon_F/m_e}=1{,}57\times10^{6}\) m/s, meio por
+    cento da velocidade da luz. E a pressão,</p>
+    <p>\[P=\frac25 n\epsilon_F=0{,}4\times8{,}49\times10^{28}\times1{,}13\times10^{-18}
+    =3{,}8\times10^{10}\ \mathrm{Pa}=38\ \mathrm{GPa}.\]</p>
+    <p><b>Leitura dos números.</b> A 300 K temos \(T/T_F=0{,}0037\): o mar de Fermi está
+    congelado. Os elétrons se movem a 1570 km/s sem que nada os tenha aquecido, e exercem
+    380 mil atmosferas sobre as paredes. Nada disso é térmico, e nada disso desaparece
+    resfriando o metal.</p>
     </div>
     </details>
   </div>
 
   <div class="bloco ex">
-    <span class="rotulo">Exercício resolvido 9.2: medindo T<sub>C</sub> sem chegar nele</span>
-    <p><b>Uma amostra tem susceptibilidade medida de \(\chi=0{,}0120\) a 400 K e
-    \(\chi=0{,}0060\) a 700 K. Supondo Curie-Weiss, encontre \(T_C\) e a constante
-    \(C\). O material é ferromagnético?</b></p>
+    <span class="rotulo">Exercício resolvido 9.2: por que o calor específico eletrônico some</span>
+    <p><b>Estime a razão entre o calor específico eletrônico medido e o que a equipartição
+    clássica preveria, para o cobre a 300 K. Em seguida, calcule a temperatura abaixo da
+    qual o termo eletrônico supera o de Debye, sabendo que
+    \(\theta_D=343\) K e \(\gamma_{\rm exp}=0{,}695\) mJ/(mol·K²).</b></p>
     <details class="solucao"><summary>Ver solução</summary>
     <div class="corpo-solucao">
-    <p>De \(\chi=C/(T-T_C)\) vem \(1/\chi=(T-T_C)/C\), reta em \(T\). Com os dois pontos,
-    \(1/\chi_1=83{,}33\) e \(1/\chi_2=166{,}67\):</p>
-    <p>\[\frac1C=\frac{166{,}67-83{,}33}{700-400}=0{,}2778\ \mathrm{K^{-1}}
-    \quad\Longrightarrow\quad C=3{,}60\ \mathrm{K}.\]</p>
-    <p>E o intercepto, de \(1/\chi_1=(400-T_C)/C\):</p>
-    <p>\[400-T_C=83{,}33\times3{,}60=300{,}0\quad\Longrightarrow\quad T_C=100\ \mathrm{K}.\]</p>
-    <p><b>Sim, é ferromagnético</b>, com temperatura de Curie de 100 K, e isso foi
-    determinado a partir de medidas feitas a 400 e 700 K, muito longe da transição. Se
-    \(T_C\) tivesse dado negativo, o material seria antiferromagnético, com \(|T_C|\) a
-    temperatura de Weiss; se tivesse dado zero, seria um paramagneto sem interação, obedecendo
-    à lei de Curie pura do Módulo 3.</p>
-    <p><b>O cuidado.</b> Na prática a reta só é reta bem acima de \(T_C\). Perto da transição
-    as flutuações a encurvam, e o \(T_C\) extrapolado difere do observado. Essa discrepância
-    é uma das assinaturas experimentais de que o campo médio é aproximado.</p>
+    <p>Classicamente cada elétron daria \(\frac32\kB\). O resultado de Sommerfeld é</p>
+    <p>\[\frac{c}{c_{\rm clássico}}
+    =\frac{\frac{\pi^2}{2}\kB^2T/\epsilon_F}{\frac32\kB}
+    =\frac{\pi^2}{3}\frac{\kB T}{\epsilon_F}
+    =\frac{\pi^2}{3}\times0{,}00368=0{,}0121,\]</p>
+    <p>isto é, pouco mais de 1%. Não é que os elétrons não absorvam calor: é que só a fração
+    \(\sim T/T_F\) deles tem estados vazios para onde ir.</p>
+    <p>Para a segunda parte, o calor específico total a baixas temperaturas é
+    \(c=\gamma T+AT^3\), com</p>
+    <p>\[A=\frac{12\pi^4R}{5\theta_D^3}
+    =\frac{12\pi^4\times8{,}314}{5\times343^3}
+    =4{,}82\times10^{-5}\ \mathrm{J/(mol\,K^4)}=0{,}0482\ \mathrm{mJ/(mol\,K^4)}.\]</p>
+    <p>Os dois termos se igualam quando \(\gamma T=AT^3\), ou seja</p>
+    <p>\[T=\sqrt{\gamma/A}=\sqrt{0{,}695/0{,}0482}=3{,}80\ \mathrm{K}.\]</p>
+    <p><b>A moral experimental.</b> Para ver os elétrons é preciso descer abaixo de uns 4 K,
+    e mesmo lá o jeito é traçar \(c/T\) contra \(T^2\) e ler o intercepto. É exatamente o
+    que o widget da seção 10 desenha, e é o motivo pelo qual o calor específico eletrônico
+    ficou invisível de Drude (1900) até os criostatos de hélio líquido.</p>
     </div>
     </details>
   </div>
 
   <div class="bloco ex">
-    <span class="rotulo">Exercício resolvido 9.3: o expoente β do campo médio</span>
-    <p><b>Obtenha \(m_s\approx(T/T_C)\sqrt{3(1-T/T_C)}\) a partir de
-    \(m_s=\tanh(m_sT_C/T)\), e verifique numericamente o quão perto de \(T_C\) a aproximação
-    precisa estar para valer dentro de 5%.</b></p>
+    <span class="rotulo">Exercício resolvido 9.3: a temperatura do condensado</span>
+    <p><b>A equipe de Boulder condensou rubídio-87 com densidade de pico
+    \(2{,}5\times10^{19}\) m⁻³. Calcule \(T_c\) e o comprimento de onda térmico nessa
+    temperatura, e compare com a separação média entre os átomos. Repita para o hélio-4
+    líquido, com densidade 145 kg/m³.</b></p>
     <details class="solucao"><summary>Ver solução</summary>
     <div class="corpo-solucao">
-    <p>Escreva \(a=T_C/T\). Com \(\tanh x\approx x-x^3/3\) e \(x=am_s\),</p>
-    <p>\[m_s=am_s-\frac{a^3m_s^3}{3}.\]</p>
-    <p>Descartando a solução \(m_s=0\) e dividindo por \(m_s\),</p>
-    <p>\[1=a-\frac{a^3m_s^2}{3}\quad\Longrightarrow\quad
-    m_s^2=\frac{3\left(a-1\right)}{a^3}\quad\Longrightarrow\quad
-    m_s=\frac{\sqrt{3\left(a-1\right)}}{a^{3/2}}.\]</p>
-    <p>Com \(a=T_C/T\), isso é \((T/T_C)\sqrt{3\left(T_C/T-1\right)\cdot T/T_C}\), que
-    rearranjado dá exatamente \((T/T_C)\sqrt{3\left(1-T/T_C\right)}\).</p>
-    <p>Junto a \(T_C\) temos \(a-1\approx\left(T_C-T\right)/T_C\) e o prefator vai a 1, de
-    modo que \(m_s\approx\sqrt{3\left(1-T/T_C\right)}\) e \(\beta=1/2\).</p>
-    <p><b>O alcance.</b> Comparando com a solução numérica da equação completa, a
-    aproximação erra menos de 5% apenas para \(T/T_C>0{,}87\), isto é, nos últimos 13% antes
-    da transição. É o preço de cortar a série no termo cúbico: ela é uma expansão em
-    \(m_s\), e \(m_s\) só é pequeno bem perto de \(T_C\). Deslize a curva tracejada no widget
-    da seção 10 para ver onde ela descola.</p>
+    <p>Com \(m=86{,}91\,u=1{,}443\times10^{-25}\) kg,</p>
+    <p>\[T_c=\frac{2\pi\hbar^2}{m\kB}\left(\frac{n}{2{,}612}\right)^{2/3}
+    =1{,}58\times10^{-7}\ \mathrm{K}=158\ \mathrm{nK},\]</p>
+    <p>contra os 170 nK relatados: a diferença é a densidade de pico efetiva da armadilha, não
+    a física. O comprimento de onda térmico nessa temperatura é</p>
+    <p>\[\lambda_T=\frac{h}{\sqrt{2\pi m\kB T_c}}=471\ \mathrm{nm},\]</p>
+    <p>e a separação média é \(n^{-1/3}=342\) nm. De fato \(\lambda_T\gtrsim n^{-1/3}\), com
+    \(n\lambda_T^3=2{,}612\) por construção.</p>
+    <p><b>O hélio.</b> Com \(\rho=145\) kg/m³ e \(m=4{,}0026\,u\), a densidade é
+    \(n=2{,}18\times10^{28}\) m⁻³, dez bilhões de vezes maior. Daí</p>
+    <p>\[T_c=3{,}13\ \mathrm{K},\]</p>
+    <p>contra o ponto lambda medido de 2,17 K. Errar por 44% com um modelo que ignora
+    completamente a interação entre átomos de um líquido é um acerto notável, e foi essa
+    conta que convenceu London, em 1938, de que a superfluidez era condensação de
+    Bose-Einstein.</p>
+    <p><b>O contraste útil.</b> O rubídio é um milhão de vezes menos denso que o ar, e por isso
+    precisa de 158 nanokelvin; o hélio líquido é denso, e por isso lhe bastam 3 kelvin. A
+    temperatura crítica vai como \(n^{2/3}/m\), e os dois fatores conspiram.</p>
     </div>
     </details>
   </div>
 
   <div class="bloco ex">
-    <span class="rotulo">Exercício resolvido 9.4: por que não há ordem em uma dimensão</span>
-    <p><b>Numa cadeia de Ising de \(N\) spins com condições livres, estime a variação de
-    energia livre ao introduzir uma parede de domínio, e conclua.</b></p>
+    <span class="rotulo">Exercício resolvido 9.4: o Sol como corpo negro</span>
+    <p><b>O Sol tem temperatura superficial de 5772 K. Calcule \(\lambda_{\max}\), a
+    emitância, a densidade de energia da radiação e a fração emitida no visível (400 a 700
+    nm). Depois compare com o fundo cósmico, a 2,725 K.</b></p>
     <details class="solucao"><summary>Ver solução</summary>
     <div class="corpo-solucao">
-    <p>No estado totalmente alinhado, cada uma das \(N-1\) ligações contribui com \(-J\).
-    Inverter todos os spins à direita de uma posição quebra <b>uma única</b> ligação, cujo
-    custo passa de \(-J\) para \(+J\):</p>
-    <p>\[\Delta U=2J.\]</p>
-    <p>Mas a parede pode ser colocada em qualquer uma das \(N-1\) posições, e todas dão a
-    mesma energia. O ganho de entropia é portanto</p>
-    <p>\[\Delta S=\kB\ln\left(N-1\right)\approx\kB\ln N,\]</p>
-    <p>de modo que</p>
-    <p>\[\Delta F=2J-\kB T\ln N.\]</p>
-    <p><b>A conclusão.</b> Para qualquer \(T>0\) fixo, \(\Delta F<0\) assim que
-    \(N>e^{2J/\kB T}\). Criar a parede <em>diminui</em> a energia livre, de modo que ela se
-    cria espontaneamente, e o mesmo argumento vale para a segunda, a terceira e assim por
-    diante. A ordem de longo alcance é destruída em qualquer temperatura positiva, e
-    \(T_C=0\).</p>
-    <p>O comprimento de correlação exato confirma: \(\xi=-1/\ln\tanh\left(J/\kB T\right)\),
-    finito para todo \(T>0\) e divergindo só quando \(T\to0\). A \(\kB T=J\) ele vale 3,7
-    sítios; a \(\kB T=J/2\), 27 sítios.</p>
-    <p><b>Por que 2D é diferente.</b> Em duas dimensões a parede é uma curva fechada, e o seu
-    custo cresce com o <em>perímetro</em>, \(\Delta U\sim2JL\). A entropia da curva também
-    cresce com o perímetro, mais ou menos como \(\kB L\ln3\), mas com coeficiente menor em
-    temperatura baixa. Daí existir uma temperatura abaixo da qual a energia vence: é o
-    argumento de Peierls, e é ele que garante a existência de \(T_C>0\).</p>
+    <p>Pela lei de Wien,</p>
+    <p>\[\lambda_{\max}=\frac{2{,}8978\times10^{-3}}{5772}=502\ \mathrm{nm},\]</p>
+    <p>verde-azulado, bem no meio da faixa visível. A emitância é</p>
+    <p>\[\sigma_{SB}T^4=5{,}670\times10^{-8}\times5772^4
+    =6{,}29\times10^{7}\ \mathrm{W/m^2},\]</p>
+    <p>e a densidade de energia \(u=4\sigma T^4/c=0{,}84\) J/m³. Integrando a lei de Planck
+    entre 400 e 700 nm e dividindo pelo total, o widget da seção 14 devolve cerca de 37% no
+    visível.</p>
+    <p><b>O fundo cósmico.</b> A 2,725 K, \(\lambda_{\max}=1{,}06\) mm (micro-ondas),
+    \(u=4{,}17\times10^{-14}\) J/m³, e a densidade de fótons é</p>
+    <p>\[n_\gamma=\frac{2\zeta(3)}{\pi^2}\left(\frac{\kB T}{\hbar c}\right)^3
+    =4{,}1\times10^{8}\ \mathrm{m^{-3}}=411\ \mathrm{cm^{-3}}.\]</p>
+    <p><b>Duas observações.</b> A primeira é que o olho humano evoluiu com a janela de
+    emissão do Sol, e não por acaso. A segunda é que há 411 fótons do Big Bang em cada
+    centímetro cúbico deste ambiente, contra cerca de 0,2 prótons por metro cúbico no
+    universo: há cerca de dois bilhões de fótons para cada bárion, e essa razão é um dos
+    números que a cosmologia precisa explicar.</p>
     </div>
     </details>
   </div>
 
   <!-- ================================================== -->
-  <h2 id="s20">20. Exercícios propostos</h2>
+  <h2 id="s18">18. Exercícios propostos</h2>
 
   <div class="bloco ex">
     <span class="rotulo">Para resolver</span>
     <ol class="lista-ex">
-      <li><b>9.1</b> Demonstre o teorema de Bohr-van Leeuwen em detalhe: escreva \(Z\) para
-      \(N\) cargas clássicas em campo magnético, faça a translação
-      \(\vec p\,'=\vec p-q\vec A(\vec r)\) e mostre que \(Z\) independe de \(\vec A\).
-      Explique em uma frase por que o argumento falha no caso quântico.</li>
+      <li><b>9.1</b> Mostre que, para um gás ideal de bósons ou de férmions,
+      \(PV=\frac23U\) no caso não relativístico e \(PV=\frac13U\) no ultrarrelativístico,
+      <em>independentemente</em> da estatística. Parta de \(\Phi=-PV=-\kB T\ln Y\).</li>
 
-      <li><b>9.2</b> Mostre que, para dois spins \(1/2\), \(\hat s_1\cdot\hat s_2\) vale
-      \(\hbar^2/4\) no tripleto e \(-3\hbar^2/4\) no singleto. Use
-      \(\hat S^2=\left(\hat s_1+\hat s_2\right)^2\) e os autovalores \(S(S+1)\hbar^2\).</li>
+      <li><b>9.2</b> Obtenha \(\mu(T)\approx\epsilon_F\left[1-\frac{\pi^2}{12}(T/T_F)^2\right]\)
+      aplicando a expansão de Sommerfeld à condição \(N=\) const. Confira contra o widget da
+      seção 9 em \(T/T_F=0{,}1\), onde ele dá \(\mu/\epsilon_F=0{,}9916\).</li>
 
-      <li><b>9.3</b> Generalize a seção 10 para spin \(S\) qualquer e mostre que a equação de
-      autoconsistência vira \(m=B_S\left(S\mathfrak{H}_{\rm efe}\right)\) com \(B_S\) a
-      função de Brillouin do Módulo 3. Obtenha \(T_C\) em função de \(S\) e verifique que
-      \(S=1/2\) devolve o resultado da seção 10.</li>
+      <li><b>9.3</b> Um nêutron tem massa 1839 vezes a do elétron. Para uma estrela de
+      nêutrons de uma massa solar e raio 12 km, calcule \(n\), \(\epsilon_F\) e verifique se
+      os nêutrons são relativísticos.</li>
 
-      <li><b>9.4</b> Mostre que o expoente \(\delta\) do campo médio vale 3, partindo de
-      \(\mathfrak{H}=\left(1-T_C/T\right)m+m^3/3\) em \(T=T_C\).</li>
+      <li><b>9.4</b> Mostre que a entropia de um gás de fótons é \(S=\frac43 u V/T\) e que
+      \(VT^3\) é constante numa expansão adiabática. Use isso para explicar por que a
+      temperatura do fundo cósmico cai como \(1/a\), com \(a\) o fator de escala do
+      universo.</li>
 
-      <li><b>9.5</b> <b>O calor específico no campo médio.</b> Use
-      \(U=-\frac12 N\nu J m^2\) e \(m_s^2\approx3\left(1-T/T_C\right)\) para mostrar que
-      \(c\) tem um <em>salto</em> finito em \(T_C\), e não uma divergência, e calcule o
-      tamanho do salto em unidades de \(\kB\). Compare com o \(\alpha=0{,}110\) medido.</li>
+      <li><b>9.5</b> <b>Adsorção de Langmuir, outra vez.</b> No Módulo 5, e com mais calma no
+      Módulo 6, a fração de sítios
+      ocupados saiu como \(\theta=1/\left(1+e^{-\beta(\epsilon+\mu)}\right)\). Mostre que
+      isso é literalmente a distribuição de Fermi-Dirac, e identifique por quê: o que, no
+      problema da adsorção, faz o papel do princípio de exclusão?</li>
 
-      <li><b>9.6</b> Da energia livre de Landau \(\mathcal F=\frac a2m^2+\frac b4m^4-hm\),
-      calcule \(\chi=\partial m/\partial h\) em \(h=0\) dos dois lados de \(T_C\) e mostre
-      que a razão \(\chi(T_C^-)/\chi(T_C^+)\) vale \(1/2\) a temperaturas simétricas. Esse
-      fator 2 é uma previsão testável do campo médio.</li>
+      <li><b>9.6</b> No sólido de Einstein do Módulo 3, a ocupação média de um oscilador saiu
+      como \(\bar n=1/\left(e^{\beta\hbar\omega}-1\right)\). Mostre que isso é Bose-Einstein
+      com \(\mu=0\) e explique por que o potencial químico tem de se anular aqui, pelo mesmo
+      motivo que se anula para fótons.</li>
 
-      <li><b>9.7</b> No widget do Ising, fixe \(\kB T/J=2{,}269\) e observe a rede por
-      alguns minutos. Descreva o que distingue essa configuração das de \(T=1{,}5\) e
-      \(T=3{,}5\), e explique por que a magnetização flutua tão lentamente ali.</li>
+      <li><b>9.7</b> Calcule a razão entre a densidade intrínseca de portadores do silício a
+      400 K e a 300 K, usando \(n_i\propto T^{3/2}e^{-E_g/2\kB T}\) com \(E_g=1{,}12\) eV.
+      Compare com o widget da seção 13 e comente a consequência prática para um
+      microprocessador.</li>
 
-      <li><b>9.8</b> Ainda no widget do Ising, meça \(|m|\) em seis temperaturas entre 1,6
-      e 2,2, ajuste \(\ln|m|\) contra \(\ln\left(1-T/T_C\right)\) e estime \(\beta\).
-      Compare com 1/8 e com 1/2, e explique por que uma rede de 64×64 tende a dar um valor
-      intermediário.</li>
+      <li><b>9.8</b> <b>A susceptibilidade de Pauli.</b> Num campo magnético, as bandas de
+      spin para cima e para baixo se deslocam de \(\mp\mu_B\mathcal{H}\). Mostre que a
+      magnetização resultante é \(M=\mu_B^2 g(\epsilon_F)\mathcal{H}\) e que a
+      susceptibilidade é independente da temperatura, ao contrário da lei de Curie do Módulo
+      3. Explique o contraste em termos de quantos spins conseguem virar.</li>
 
-      <li><b>9.9</b> Mostre que a aproximação de campo médio aplicada ao modelo de Ising
-      numa rede de coordenação \(\nu\) dá \(\kB T_C=\nu J\). Compare com o valor exato
-      \(2{,}269J\) da rede quadrada (\(\nu=4\)) e com \(T_C=0\) da cadeia (\(\nu=2\)), e
-      comente a tendência do erro com \(\nu\).</li>
+      <li><b>9.9</b> Deduza a lei de Rayleigh-Jeans como o limite \(\hbar\omega\ll\kB T\) da
+      lei de Planck, mostre que a energia total diverge, e identifique em que comprimento de
+      onda a previsão clássica erra por um fator 2 a 5772 K.</li>
 
-      <li><b>9.10</b> No widget de Ginzburg-Landau, verifique a lei \(\ell\sim\sqrt{\gamma
-      t}\) medindo o tamanho típico em dois instantes separados por um fator 4 no tempo.
-      Depois explique, pelo balanço entre a tensão da parede e a velocidade de relaxação,
-      por que o expoente é \(1/2\).</li>
+      <li><b>9.10</b> Para o gás de Bose abaixo de \(T_c\), mostre que
+      \(U\propto T^{5/2}\) e portanto \(C_V\propto T^{3/2}\), e que \(C_V\) tem um pico em
+      \(T_c\). Compare o expoente com o \(T^3\) de Debye e explique a diferença pela relação
+      de dispersão.</li>
     </ol>
   </div>
 
   <nav class="nav-aulas">
-    <a href="aula08.html"><small>Módulo anterior</small>← 8. Gases quânticos</a>
-    <a class="prox" href="aula10.html"><small>Próximo módulo</small>10. Supercondutividade →</a>
+    <a href="aula08.html"><small>Módulo anterior</small>← 8. Gases clássicos</a>
+    <a class="prox" href="aula10.html"><small>Próximo módulo</small>10. Magnetismo →</a>
   </nav>
 
 </main>
@@ -1035,6 +1027,6 @@
   <!--PORTAL--><p><small><a href="https://apianomorais.github.io/">Todas as disciplinas e a pesquisa em apianomorais.github.io</a></small></p><!--/PORTAL-->
 </footer>
 
-<script src="assets/js/widgets.js?v=202611201318"></script>
+<script src="assets/js/widgets.js?v=202611202222"></script>
 </body>
 </html>
